@@ -8,7 +8,7 @@
 		<version>1.0.2</version>
 	</parent>
 	<artifactId>core</artifactId>
-	<version>1.0.6</version>
+	<version>1.0.8</version>
 	<packaging>jar</packaging>
 	<dependencies>
 		<!--工具类 -->
