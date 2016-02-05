@@ -1,0 +1,33 @@
+package ${modulePackage}.service.impl;
+
+import java.io.Serializable;
+
+import com.github.jyoghurt.core.exception.ServiceException;
+import com.github.jyoghurt.core.service.impl.ServiceSupport;
+import ${modulePackage}.dao.${className}Mapper;
+import ${modulePackage}.domain.${className};
+import ${modulePackage}.service.${className}Service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+@Service("${lowerName}Service")
+public class ${className}ServiceImpl extends ServiceSupport<${className}, ${className}Mapper> implements ${className}Service {
+	@Autowired
+    private ${className}Mapper ${lowerName}Mapper;
+
+    @Override
+	public ${className}Mapper getMapper() {
+		return ${lowerName}Mapper;
+	}
+
+    @Override
+    public void delete(Serializable id) throws ServiceException {
+        getMapper().delete(${className}.class, id);
+    }
+
+    @Override
+    public ${className} find(Serializable id) throws ServiceException {
+        return getMapper().selectById(${className}.class,id);
+    }
+}

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="${modulePackage}.dao.${className}Mapper">
+    <!-- Result Map-->
+    <resultMap id="cascadeResultMap" type="${modulePackage}.domain.$!{className}">
+    #foreach($item in $!{columnDatas})
+    <result column="$item.columnName" property="$item.columnName"/>
+    #end
+</resultMap>
+
+</mapper>   

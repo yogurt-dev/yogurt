@@ -1,0 +1,43 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.github.jyoghurt</groupId>
+		<artifactId>root</artifactId>
+		<version>1.0.2</version>
+	</parent>
+	<artifactId>generator</artifactId> 
+	<version>1.0.5</version>
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.11</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi</artifactId>
+			<version>3.11</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.poi</groupId>
+			<artifactId>poi-ooxml</artifactId>
+			<version>3.11</version>
+		</dependency>
+		<!--<dependency>-->
+			<!--<groupId>com.github.jyoghurt</groupId>-->
+			<!--<artifactId>core</artifactId>-->
+			<!--<version>1.0.2</version>-->
+		<!--</dependency>-->
+		<!--generator java code start -->
+		<dependency>
+			<groupId>org.apache.velocity</groupId>
+			<artifactId>velocity</artifactId>
+			<version>1.7</version>
+			<scope>compile</scope>
+		</dependency>
+		<!--generator java code end -->
+	</dependencies>
+
+</project>
+
