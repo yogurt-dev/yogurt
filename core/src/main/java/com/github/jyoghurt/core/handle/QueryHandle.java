@@ -153,8 +153,9 @@ public class QueryHandle {
     private StringBuilder appendLessEqualThanSql(StringBuilder sb, String sqlOperate, String fieldName,
                                                  String expandFieldName, String value) throws Exception {
         addExpandData(expandFieldName, value);
-        return sb.append(sqlOperate).append(" t.").append(fieldName).append("<= ").append("#{" +
-                StringUtils.join(BaseMapper.DATA + "." + expandFieldName) + "}");
+        return sb.append(sqlOperate).append(" t.").append(fieldName).append("<= date_format(addDate(").append("#{" +
+                StringUtils.join(BaseMapper.DATA + "." + expandFieldName) + "},1),'%Y-%m-%d')");
+
     }
 
     public QueryHandle addGroupBy(String groupBy) {
