@@ -1,6 +1,5 @@
 package com.github.jyoghurt.core.utils;
 
-import com.github.jyoghurt.core.enums.FieldType;
 import com.github.jyoghurt.core.exception.UtilException;
 import com.github.jyoghurt.core.utils.beanUtils.AnnotationBinder;
 import com.github.jyoghurt.core.utils.beanUtils.AnnotationReader;
@@ -21,24 +20,6 @@ public class JPAUtils {
     protected static Logger logger = LoggerFactory.getLogger(JPAUtils.class);
 
     /**
-     * 字段类型枚举对应标识，用于field判断字段类型
-     * add by limiao 20150216
-     */
-    public static HashMap<FieldType, String> FIELD_TYPE_SIGN_MAP = new HashMap<FieldType, String>();
-
-    static {
-        FIELD_TYPE_SIGN_MAP.put(FieldType.Byte, "byte");
-        FIELD_TYPE_SIGN_MAP.put(FieldType.Short, "short");
-        FIELD_TYPE_SIGN_MAP.put(FieldType.Int, "int");
-        FIELD_TYPE_SIGN_MAP.put(FieldType.Long, "long");
-        FIELD_TYPE_SIGN_MAP.put(FieldType.Float, "float");
-        FIELD_TYPE_SIGN_MAP.put(FieldType.Double, "double");
-        FIELD_TYPE_SIGN_MAP.put(FieldType.String, "string");
-        FIELD_TYPE_SIGN_MAP.put(FieldType.Boolean, "boolean");
-        FIELD_TYPE_SIGN_MAP.put(FieldType.Date, "date");
-    }
-
-    /**
      * 获取所有属性，包括父类属性
      *
      * @param entityClass 业务实体类
@@ -48,7 +29,6 @@ public class JPAUtils {
         Field[] fields = entityClass.getDeclaredFields();//获得属性
         return getAllFields(entityClass.getSuperclass(), new ArrayList<Field>(Arrays.asList(fields)));
     }
-
 
     private static List<Field> getAllFields(Class<?> entityClass, List<Field> fields) {
         if (Object.class.equals(entityClass)) {
@@ -204,7 +184,7 @@ public class JPAUtils {
      * @return boolean
      */
     public static boolean fieldIsStringType(Field field) {
-        return fieldIsWhatType(field, FieldType.String);
+        return field.getType().equals(String.class);
     }
 
     /**
@@ -215,19 +195,6 @@ public class JPAUtils {
      * @return boolean
      */
     public static boolean fieldIsDateType(Field field) {
-        return fieldIsWhatType(field, FieldType.Date);
+        return field.getType().equals(Date.class);
     }
-
-    /**
-     * 判断一个field是否是什么类型
-     * add by limiao 20160216
-     *
-     * @param field     field对象
-     * @param fieldType fieldType枚举
-     * @return boolean
-     */
-    public static boolean fieldIsWhatType(Field field, FieldType fieldType) {
-        return field.getType().toString().toLowerCase().indexOf(FIELD_TYPE_SIGN_MAP.get(fieldType)) > -1;
-    }
-
 }

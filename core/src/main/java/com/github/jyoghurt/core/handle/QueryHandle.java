@@ -2,11 +2,9 @@ package com.github.jyoghurt.core.handle;
 
 import com.github.jyoghurt.core.configuration.PageConvert;
 import com.github.jyoghurt.core.dao.BaseMapper;
-import com.github.jyoghurt.core.domain.BaseEntity;
+import com.github.jyoghurt.core.utils.DateTimeFormatter;
 import com.github.jyoghurt.core.utils.JPAUtils;
 import com.github.jyoghurt.core.utils.SpringContextUtils;
-import com.github.jyoghurt.core.utils.beanUtils.BeanUtils;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,8 +27,8 @@ public class QueryHandle {
     private static final String AND = " AND ";
     private static final String OR = " OR ";
 
-    private static final String SENIOR_SEARCH = "1";
-    private static final String COMMON_SEARCH = "0";
+    private static final Boolean SENIOR_SEARCH = true;
+    private static final Boolean COMMON_SEARCH = false;
 
     // 当前页
     private int page = 1;
@@ -54,7 +52,7 @@ public class QueryHandle {
     private String groupBy;
 
     //如果是null则是or like，如果是1则是 and like
-    private String seniorSearch;
+    private Boolean seniorSearch;
 
     /**
      * 设置高级查询方法 add by limiao 20160214
@@ -62,8 +60,8 @@ public class QueryHandle {
      * @param object 高级查询涉及的对象
      * @return QueryHandle
      */
-    public QueryHandle useSeniorSearch(Object object) throws Exception {
-        Assert.notNull(object, "useSeniorSearch -> object can not be null!");
+    public QueryHandle seniorSearch(Object object) throws Exception {
+        Assert.notNull(object, "seniorSearch -> object can not be null!");
         if (seniorSearch != null) {
             customWhereSql(this.getSeniorSearchWhereSql(this.getSeniorSearchSqlOperate(), object));
         }
@@ -77,7 +75,7 @@ public class QueryHandle {
      * @return String AND或OR
      */
     private String getSeniorSearchSqlOperate() {
-        if (SENIOR_SEARCH.equals(seniorSearch)) {
+        if (SENIOR_SEARCH && seniorSearch) {
             return AND;
         } else {
             return OR;
@@ -91,6 +89,8 @@ public class QueryHandle {
      * @param object     高级查询涉及的对象
      * @return String sql
      */
+    //todo 异常修改成 UI异常
+    //todo 优化if else
     public String getSeniorSearchWhereSql(String sqlOperate, Object object) throws Exception {
         StringBuilder sb = new StringBuilder();
         /* init request and validate */
@@ -99,16 +99,17 @@ public class QueryHandle {
             throw new IllegalArgumentException("getSeniorSearchWhereSql -> request can not be null!");
         }
         /* 使用反射获取查询字段，拼sql */
-        Class clazz = object.getClass();
-        List<Field> fieldList = JPAUtils.getAllFields(clazz);
+        List<Field> fieldList = JPAUtils.getAllFields(object.getClass());
         for (Field field : fieldList) {
             /*  如果是日期类型，那么去dateQueryParamsMap获取时间段条件 */
             if (JPAUtils.fieldIsDateType(field)) {
+                /* 开始时间传值处理 */
                 String expandFieldName = field.getName() + "_start";
                 String start_time = request.getParameter(expandFieldName);
                 if (StringUtils.isNotEmpty(start_time)) {
                     sb = appendLargerEqualThanSql(sb, sqlOperate, field.getName(), expandFieldName, start_time);
                 }
+                 /* 结束时间传值处理 */
                 expandFieldName = field.getName() + "_end";
                 String end_time = request.getParameter(expandFieldName);
                 if (StringUtils.isNotEmpty(end_time)) {
@@ -117,12 +118,13 @@ public class QueryHandle {
             } else {
                 /* 如果不是日期类型，字段的值不为null，String类型的字段拼like,其他类型的字段拼=号 */
                 Object value = JPAUtils.getValue(object, field);
-                if (value != null && !"".equals(value)) {
-                    if (JPAUtils.fieldIsStringType(field)) {
-                        sb = appendLikeSql(sb, sqlOperate, field.getName());
-                    } else {
-                        sb = appendEqualsSql(sb, sqlOperate, field.getName());
-                    }
+                if (value == null || "".equals(value)) {
+                    continue;
+                }
+                if (JPAUtils.fieldIsStringType(field)) {
+                    sb = appendLikeSql(sb, sqlOperate, field.getName());
+                } else {
+                    sb = appendEqualsSql(sb, sqlOperate, field.getName());
                 }
             }
         }
@@ -153,8 +155,13 @@ public class QueryHandle {
     private StringBuilder appendLessEqualThanSql(StringBuilder sb, String sqlOperate, String fieldName,
                                                  String expandFieldName, String value) throws Exception {
         addExpandData(expandFieldName, value);
-        return sb.append(sqlOperate).append(" t.").append(fieldName).append("<= ").append("#{" +
-                StringUtils.join(BaseMapper.DATA + "." + expandFieldName) + "}");
+        sb.append(sqlOperate).append(" t.").append(fieldName);
+        if (DateTimeFormatter.isYYYYMMddFormatDate(value)) {
+            sb.append("<= date_format(addDate(").append("#{" + StringUtils.join(BaseMapper.DATA + "." + expandFieldName) + "},1),'%Y-%m-%d')");
+        } else {
+            sb.append("<= ").append("#{" + StringUtils.join(BaseMapper.DATA + "." + expandFieldName) + "}");
+        }
+        return sb;
     }
 
     public QueryHandle addGroupBy(String groupBy) {
@@ -286,11 +293,11 @@ public class QueryHandle {
         return expandData;
     }
 
-    public String getSeniorSearch() {
+    public Boolean getSeniorSearch() {
         return seniorSearch;
     }
 
-    public void setSeniorSearch(String seniorSearch) {
+    public void setSeniorSearch(Boolean seniorSearch) {
         this.seniorSearch = seniorSearch;
     }
 }
