@@ -1,5 +1,6 @@
 package com.github.jyoghurt.core.utils;
 
+import com.github.jyoghurt.core.enums.FieldType;
 import com.github.jyoghurt.core.exception.UtilException;
 import com.github.jyoghurt.core.utils.beanUtils.AnnotationBinder;
 import com.github.jyoghurt.core.utils.beanUtils.AnnotationReader;
@@ -18,6 +19,24 @@ import java.util.*;
  */
 public class JPAUtils {
     protected static Logger logger = LoggerFactory.getLogger(JPAUtils.class);
+
+    /**
+     * 字段类型枚举对应标识，用于field判断字段类型
+     * add by limiao 20150216
+     */
+    public static HashMap<FieldType, String> FIELD_TYPE_SIGN_MAP = new HashMap<FieldType, String>();
+
+    static {
+        FIELD_TYPE_SIGN_MAP.put(FieldType.Byte, "byte");
+        FIELD_TYPE_SIGN_MAP.put(FieldType.Short, "short");
+        FIELD_TYPE_SIGN_MAP.put(FieldType.Int, "int");
+        FIELD_TYPE_SIGN_MAP.put(FieldType.Long, "long");
+        FIELD_TYPE_SIGN_MAP.put(FieldType.Float, "float");
+        FIELD_TYPE_SIGN_MAP.put(FieldType.Double, "double");
+        FIELD_TYPE_SIGN_MAP.put(FieldType.String, "string");
+        FIELD_TYPE_SIGN_MAP.put(FieldType.Boolean, "boolean");
+        FIELD_TYPE_SIGN_MAP.put(FieldType.Date, "date");
+    }
 
     /**
      * 获取所有属性，包括父类属性
@@ -158,6 +177,57 @@ public class JPAUtils {
         } catch (Exception e) {
             throw new UtilException(e);
         }
+    }
+
+    /**
+     * 已知对象的field时获取对象的值 add by limiao 20160215
+     *
+     * @param source 具体对象
+     * @param field  字段
+     * @return Object 值
+     */
+    public static Object getValue(Object source, Field field) {
+        try {
+            field.setAccessible(true);
+            return field.get(source);
+        } catch (Exception e) {
+            logger.error("JPAUtils getValue 异常！", e);
+            return null;
+        }
+    }
+
+    /**
+     * 判断一个field是否是string类型
+     * add by limiao 20160216
+     *
+     * @param field field对象
+     * @return boolean
+     */
+    public static boolean fieldIsStringType(Field field) {
+        return fieldIsWhatType(field, FieldType.String);
+    }
+
+    /**
+     * 判断一个field是否是date类型
+     * add by limiao 20160216
+     *
+     * @param field field对象
+     * @return boolean
+     */
+    public static boolean fieldIsDateType(Field field) {
+        return fieldIsWhatType(field, FieldType.Date);
+    }
+
+    /**
+     * 判断一个field是否是什么类型
+     * add by limiao 20160216
+     *
+     * @param field     field对象
+     * @param fieldType fieldType枚举
+     * @return boolean
+     */
+    public static boolean fieldIsWhatType(Field field, FieldType fieldType) {
+        return field.getType().toString().toLowerCase().indexOf(FIELD_TYPE_SIGN_MAP.get(fieldType)) > -1;
     }
 
 }
