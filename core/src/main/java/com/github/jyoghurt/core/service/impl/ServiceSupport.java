@@ -145,9 +145,10 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
                 .chainPutAll(queryHandle.getExpandData()));
     }
 
+    //modify by limiao 20160222 .chainPutAll(queryHandle.getExpandData()
     @Override
     public List<T> findAll(T entity, QueryHandle queryHandle) throws ServiceException {
-        return getMapper().findAll((Class<T>) entity.getClass(), getValueMap(queryHandle, entity));
+        return getMapper().findAll((Class<T>) entity.getClass(), getValueMap(queryHandle, entity).chainPutAll(queryHandle.getExpandData()));
     }
 
 
