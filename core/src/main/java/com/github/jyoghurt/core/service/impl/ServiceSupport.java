@@ -23,9 +23,9 @@ import java.util.List;
 import static com.github.jyoghurt.core.utils.beanUtils.BeanUtils.getValueMap;
 
 /**
- * <p>
+ * <p/>
  * 服务支持
- * <p>
+ * <p/>
  * 为服务组件的基类，必须继承
  *
  * @param <T> 该服务组件服务的数据模型，即model;
@@ -148,9 +148,12 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
     //modify by limiao 20160222 .chainPutAll(queryHandle.getExpandData()
     @Override
     public List<T> findAll(T entity, QueryHandle queryHandle) throws ServiceException {
-        return getMapper().findAll((Class<T>) entity.getClass(), getValueMap(queryHandle, entity).chainPutAll(queryHandle.getExpandData()));
+        if (queryHandle == null) {
+            return getMapper().findAll((Class<T>) entity.getClass(), getValueMap(queryHandle, entity));
+        } else {
+            return getMapper().findAll((Class<T>) entity.getClass(), getValueMap(queryHandle, entity).chainPutAll(queryHandle.getExpandData()));
+        }
     }
-
 
     @Override
     public List<T> findAll(T entity) throws ServiceException {
