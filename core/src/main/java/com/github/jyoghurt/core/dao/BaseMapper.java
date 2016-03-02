@@ -127,7 +127,8 @@ public interface BaseMapper<T> {
      * 按条件查询记录集合
      * 此处来写注解，在子类里面生效
      *
-     * @param data 查询条件
+     * @param entityClass 实体类型
+     * @param data        查询条件
      * @return 查询结果列表
      */
     List<T> findAll(@Param(ENTITY_CLASS) Class<T> entityClass, @Param(DATA) Map<String, Object> data);

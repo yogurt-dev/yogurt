@@ -59,6 +59,7 @@ public class QueryHandle {
      *
      * @param object 高级查询涉及的对象
      * @return QueryHandle
+     * @throws Exception
      */
     public QueryHandle seniorSearch(Object object) throws Exception {
         Assert.notNull(object, "seniorSearch -> object can not be null!");
@@ -88,6 +89,7 @@ public class QueryHandle {
      * @param sqlOperate OR 或者 AND
      * @param object     高级查询涉及的对象
      * @return String sql
+     * @throws Exception
      */
     //todo 异常修改成 UI异常
     //todo 优化if else

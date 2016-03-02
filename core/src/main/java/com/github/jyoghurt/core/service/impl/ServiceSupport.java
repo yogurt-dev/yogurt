@@ -23,9 +23,9 @@ import java.util.List;
 import static com.github.jyoghurt.core.utils.beanUtils.BeanUtils.getValueMap;
 
 /**
- * <p/>
+ *
  * 服务支持
- * <p/>
+ *
  * 为服务组件的基类，必须继承
  *
  * @param <T> 该服务组件服务的数据模型，即model;
