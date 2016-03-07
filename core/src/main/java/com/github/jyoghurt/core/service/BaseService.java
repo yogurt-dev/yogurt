@@ -63,6 +63,22 @@ public interface BaseService<T> {
     void delete(Serializable id) throws ServiceException;
 
     /**
+     * 逻辑删除
+     *
+     * @param id 业务实体ID
+     * @throws ServiceException {@inheritDoc}
+     */
+    void logicDelete(Serializable id) throws ServiceException;
+
+    /**
+     * 根据条件逻辑删除
+     * 实体不需要设置deleteFlag=true，否则会将deleteFlag=true拼到条件中
+     *
+     * @param entity 根据非空字段当做删除条件
+     * @throws ServiceException {@inheritDoc}
+     */
+    void logicDeleteByCondition(T entity) throws ServiceException;
+    /**
      * 根据条件删除
      *
      * @param entity 根据非空字段当做删除条件

@@ -18,6 +18,8 @@ public class BaseEntity implements Serializable {
     public static final String OPERATOR_ID = "operatorId";
     @Transient
     public static final String OPERATOR_NAME = "operatorName";
+    @Transient
+    public static final String DELETE_FLAG = "deleteFlag";
 
     private static final long serialVersionUID = 6468926052770326495L;
     // 创建时间
@@ -32,6 +34,8 @@ public class BaseEntity implements Serializable {
     private String modifierId;
     // 修改人姓名
     private String modifierName;
+    // 删除标示
+    private Boolean deleteFlag;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getModifyDateTime() {
@@ -86,6 +90,15 @@ public class BaseEntity implements Serializable {
 
     public BaseEntity setModifierName(String modifierName) {
         this.modifierName = modifierName;
+        return this;
+    }
+
+    public Boolean getDeleteFlag() {
+        return deleteFlag;
+    }
+
+    public BaseEntity setDeleteFlag(Boolean deleteFlag) {
+        this.deleteFlag = deleteFlag;
         return this;
     }
 }

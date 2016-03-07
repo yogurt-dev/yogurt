@@ -273,7 +273,7 @@ public class BaseMapperProvider {
 
     /**
      * 获取不等于比较值字符串
-     *
+     * <p>
      * add by limiao 20160203
      *
      * @param column 列名
@@ -337,15 +337,15 @@ public class BaseMapperProvider {
      * @throws DaoException {@inheritDoc}
      */
     public String saveBatch(Map<String, Object> param) throws Exception {
-        if(null ==param.get(BaseMapper.ENTITIES)){
+        if (null == param.get(BaseMapper.ENTITIES)) {
             throw new DaoException("批量插入的数据为null");
         }
-        entityClass = ((List)param.get(BaseMapper.ENTITIES)).get(0).getClass();
+        entityClass = ((List) param.get(BaseMapper.ENTITIES)).get(0).getClass();
         BEGIN();
         BATCH_INSERT_INTO(getTableName(entityClass));
 
         Field idField = null;
-        for(int i=0;i<((List)param.get(BaseMapper.ENTITIES)).size();i++) {
+        for (int i = 0; i < ((List) param.get(BaseMapper.ENTITIES)).size(); i++) {
             for (Field field : JPAUtils.getAllFields(entityClass)) {
                 if (!ClassUtils.isPrimitiveOrWrapper(field.getClass()) && !Enum.class.isAssignableFrom(LogSystemType.class)) {
                     continue;
@@ -356,7 +356,7 @@ public class BaseMapperProvider {
                     idField = field;
                     continue;
                 }
-                BATCH_VALUES(field.getName(), StringUtils.join("#{", BaseMapper.ENTITIES, "[",i,"]", ".", field.getName(), "}"));
+                BATCH_VALUES(field.getName(), StringUtils.join("#{", BaseMapper.ENTITIES, "[", i, "]", ".", field.getName(), "}"));
             }
             if (null == idField) {
                 throw new DaoException(StringUtils.join(entityClass.getName(), "实体未配置@Id "));
@@ -393,7 +393,6 @@ public class BaseMapperProvider {
     }
 
 
-
     private void setId(Map<String, Object> param, Field idField) throws IllegalAccessException {
         if (!idField.getType().isAssignableFrom(String.class)) {
             return;
@@ -407,7 +406,7 @@ public class BaseMapperProvider {
         idField.set(param.get(BaseMapper.ENTITY), id);
     }
 
-    private void setIdBatch(BaseEntity baseEntity,int i, Field idField) throws IllegalAccessException {
+    private void setIdBatch(BaseEntity baseEntity, int i, Field idField) throws IllegalAccessException {
         if (!idField.getType().isAssignableFrom(String.class)) {
             return;
         }
@@ -502,6 +501,30 @@ public class BaseMapperProvider {
         return SQL();
     }
 
+    public String logicDelete(Map<String, Object> param) throws DaoException {
+        entityClass = (Class<?>) param.get(BaseMapper.ENTITY_CLASS);
+        BEGIN();
+        UPDATE(getTableName(entityClass));
+        param.put(BaseEntity.DELETE_FLAG, true);
+        SET(getEqualsValue(BaseEntity.DELETE_FLAG, BaseEntity.DELETE_FLAG));
+        try {
+            Field idField = JPAUtils.getIdField(entityClass);
+            WHERE(getEqualsValue(idField.getName(), BaseMapper.ID));
+        } catch (UtilException e) {
+            throw new DaoException(e);
+        }
+        return SQL();
+    }
+
+    public String logicDeleteByCondition(Map<String, Object> param) throws DaoException {
+        beginWithClass(param);
+        createAllWhere((Map<String, Object>) param.get(BaseMapper.DATA), false);
+        UPDATE(StringUtils.join(getTableName(entityClass), " t"));
+        param.put(BaseEntity.DELETE_FLAG, true);
+        SET(getEqualsValue(BaseEntity.DELETE_FLAG, BaseEntity.DELETE_FLAG));
+        return SQL();
+    }
+
     public String updateForSelective(Map<String, Object> param) throws DaoException {
         entityClass = param.get(BaseMapper.ENTITY).getClass();
         BEGIN();
@@ -550,4 +573,6 @@ public class BaseMapperProvider {
         createAllWhere((Map<String, Object>) param.get(BaseMapper.DATA), false);
         return StringUtils.join(SQL(), limit);
     }
+
+
 }

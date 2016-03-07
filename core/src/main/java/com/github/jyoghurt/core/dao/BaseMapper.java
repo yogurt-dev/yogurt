@@ -67,14 +67,23 @@ public interface BaseMapper<T> {
     @DeleteProvider(type = BaseMapperProvider.class, method = "delete")
     void delete(@Param(ENTITY_CLASS) Class<?> entityClass, @Param(ID) Serializable id);
 
+    /**
+     * 逻辑删除
+     *
+     * @param entityClass
+     * @param id
+     */
+    @UpdateProvider(type = BaseMapperProvider.class, method = "logicDelete")
+    void logicDelete(@Param(ENTITY_CLASS) Class<?> entityClass, @Param(ID) Serializable id);
 
     /**
-     * 删除实体
+     * 根据条件逻辑删除
      *
-     * @param entity 业务实体
+     * @param entityClass 业务实体类
+     * @param data        删除条件
      */
-//    @DeleteProvider(type = BaseMapperProvider.class,method="delete")
-//    void delete(T entity);
+    @UpdateProvider(type = BaseMapperProvider.class, method = "logicDeleteByCondition")
+    void logicDeleteByCondition(@Param(ENTITY_CLASS) Class<T> entityClass, @Param(DATA) Map<String, Object> data);
 
     /**
      * 根据条件删除
@@ -132,4 +141,6 @@ public interface BaseMapper<T> {
      * @return 查询结果列表
      */
     List<T> findAll(@Param(ENTITY_CLASS) Class<T> entityClass, @Param(DATA) Map<String, Object> data);
+
+
 }

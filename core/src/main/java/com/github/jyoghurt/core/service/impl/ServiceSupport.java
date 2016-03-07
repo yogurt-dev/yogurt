@@ -17,6 +17,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.annotation.Resource;
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -66,8 +67,6 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
             }
         }
         getMapper().saveBatch(entities);
-
-
     }
 
     @Override
@@ -94,6 +93,16 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
             }
         }
         getMapper().update(entity);
+    }
+
+    @Override
+    public void logicDelete(Serializable id) throws ServiceException {
+        throw new ServiceException("You must override this method!");
+    }
+
+    @Override
+    public void logicDeleteByCondition(T entity) throws ServiceException {
+        getMapper().logicDeleteByCondition((Class<T>) entity.getClass(),getValueMap(entity));
     }
 
     @Override
