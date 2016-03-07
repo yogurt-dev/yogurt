@@ -23,8 +23,11 @@ public class CreateBean {
 	static String password;
 	static String rt = "\r\n\t";
 	static String dbInstance;
-	private static final List ingoreColumns = Arrays.asList("createDateTime", "modifyDateTime", "operatorId",
-			"operatorName");
+	//modify by limiao 20160307 如下字段不生成到domain
+//	private static final List ingoreColumns = Arrays.asList("createDateTime", "modifyDateTime", "operatorId",
+//			"operatorName");
+	private static final List ingoreColumns = Arrays.asList("founderId", "founderName", "modifierId",
+			"modifierName","deleteFlag","createDateTime","modifyDateTime");
 	String SQLTables = "show tables";
 	static {
 		try {
@@ -197,7 +200,6 @@ public class CreateBean {
 		System.out.println(sb.toString());
 		this.createFile(createPath, "", sb.toString());
 	}
-
 
 	public String getTablesNameToClassName(String tableName) {
 		String[] split = tableName.split("_");

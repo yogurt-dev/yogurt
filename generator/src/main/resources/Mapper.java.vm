@@ -11,10 +11,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * ${className} Mapper
+ * ${replaceSuffixClassName} Mapper
  *
  */
-public interface ${className}Mapper extends BaseMapper<${className}> {
+public interface ${replaceSuffixClassName}Mapper extends BaseMapper<${className}> {
 
     @Override
     @SelectProvider(type = BaseMapperProvider.class, method = "selectById")

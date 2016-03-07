@@ -4,26 +4,26 @@ import java.io.Serializable;
 
 import com.github.jyoghurt.core.exception.ServiceException;
 import com.github.jyoghurt.core.service.impl.ServiceSupport;
-import ${modulePackage}.dao.${className}Mapper;
+import ${modulePackage}.dao.${replaceSuffixClassName}Mapper;
 import ${modulePackage}.domain.${className};
-import ${modulePackage}.service.${className}Service;
+import ${modulePackage}.service.${replaceSuffixClassName}Service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-@Service("${lowerName}Service")
-public class ${className}ServiceImpl extends ServiceSupport<${className}, ${className}Mapper> implements ${className}Service {
+@Service("${replaceSuffixLowerName}Service")
+public class ${replaceSuffixClassName}ServiceImpl extends ServiceSupport<${className}, ${replaceSuffixClassName}Mapper> implements ${replaceSuffixClassName}Service {
 	@Autowired
-    private ${className}Mapper ${lowerName}Mapper;
+    private ${replaceSuffixClassName}Mapper ${replaceSuffixLowerName}Mapper;
 
     @Override
-	public ${className}Mapper getMapper() {
-		return ${lowerName}Mapper;
+	public ${replaceSuffixClassName}Mapper getMapper() {
+		return ${replaceSuffixLowerName}Mapper;
 	}
 
     @Override
-    public void delete(Serializable id) throws ServiceException {
-        getMapper().delete(${className}.class, id);
+    public void logicDelete(Serializable id) throws ServiceException {
+        getMapper().logicDelete(${className}.class, id);
     }
 
     @Override

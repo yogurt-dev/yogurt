@@ -27,6 +27,31 @@ public class Java_Code_Generator {
     private static String url = res.getString("jdbc_url").replace("${jdbc_database}", dbInstance).replace
             ("${jdbc_ip}", res.getString("jdbc_ip"));
 
+    //add by limiao 20160307
+    private static List CLASS_NAME_SUFFIX_LIST = new ArrayList();
+
+    static {
+        CLASS_NAME_SUFFIX_LIST.add("T");
+        CLASS_NAME_SUFFIX_LIST.add("R");
+    }
+
+    /**
+     * add by limiao 20160307 如果最后一位字母在CLASS_NAME_SUFFIX_LIST中，则replace掉
+     *
+     * @param className className如"MemberT"
+     * @return String 如"Member"
+     */
+    public static String getReplaceSuffixClassName(String className) {
+        if (className == null || className.length() < 1) {
+            return className;
+        }
+        String suffix = className.substring(className.length() - 1, className.length());
+        if (CLASS_NAME_SUFFIX_LIST.contains(suffix)) {
+            className = className.substring(0, className.length() - 1);
+        }
+        return className;
+    }
+
     /**
      * @param tableName     表名
      * @param codeName      表名对应的中文注释
@@ -45,7 +70,6 @@ public class Java_Code_Generator {
             return;
         }
 
-
         if (null == modulePackage || "".equals(modulePackage)) {
             return;
         }
@@ -53,8 +77,14 @@ public class Java_Code_Generator {
         CreateBean createBean = new CreateBean();
         createBean.setMysqlInfo(url, username, passWord, dbInstance);
         /** 此处修改成你的 表名 和 中文注释 ***/
+
         String className = createBean.getTablesNameToClassName(tableName);
+        //add by limiao 去掉结尾的ClassName
+        String replaceSuffixClassName = getReplaceSuffixClassName(className);
+
         String lowerName = className.substring(0, 1).toLowerCase() + className.substring(1, className.length());
+        //add by limiao 去掉结尾的LowerName
+        String replaceSuffixLowerName = replaceSuffixClassName.substring(0, 1).toLowerCase() + replaceSuffixClassName.substring(1, replaceSuffixClassName.length());
 
         // 项目跟路径路径，此处修改为你的项目路径
         String rootPath = CommonPageParser.getRootPath();// "F:\\openwork\\open\\";
@@ -82,17 +112,35 @@ public class Java_Code_Generator {
         String modelPath = File.separator + "domain" + File.separator + className + ".java";
         String searchFormPath = File.separator + "controller" + File.separator + "form" + File.separator + className
                 + "SearchForm.java";
-        String mapperPath = File.separator + "dao" + File.separator + className + "Mapper.java";
-        String mapperXmlPath = File.separator + "dao" + File.separator + className + "Mapper.xml";
-        String servicePath = File.separator + "service" + File.separator + className + "Service.java";
-        String serviceImplPath = File.separator + "service" + File.separator + "impl" + File.separator + className
-                + "ServiceImpl.java";
-        String controllerPath = File.separator + "controller" + File.separator + className + "Controller.java";
-        String sqlMapperPath = File.separator + "dao" + File.separator + className + "Mapper.xml";
-        String htmlPath = File.separator + className + ".html";
 
-        String listJSPPath = lowerName + File.separator + className + "List.jsp";
-        String editJSPPath = lowerName + File.separator + "edit" + className + ".jsp";
+        //modify by limiao 20160307 以下className都修改成replaceSuffixClassName
+        //String mapperPath = File.separator + "dao" + File.separator + className + "Mapper.java";
+        String mapperPath = File.separator + "dao" + File.separator + replaceSuffixClassName + "Mapper.java";
+
+        //String mapperXmlPath = File.separator + "dao" + File.separator + className + "Mapper.xml";
+        String mapperXmlPath = File.separator + "dao" + File.separator + replaceSuffixClassName + "Mapper.xml";
+
+        //String servicePath = File.separator + "service" + File.separator + className + "Service.java";
+        String servicePath = File.separator + "service" + File.separator + replaceSuffixClassName + "Service.java";
+
+        //String serviceImplPath = File.separator + "service" + File.separator + "impl" + File.separator + className
+        // + "ServiceImpl.java";
+        String serviceImplPath = File.separator + "service" + File.separator + "impl" + File.separator + replaceSuffixClassName
+                + "ServiceImpl.java";
+        //String controllerPath = File.separator + "controller" + File.separator + className + "Controller.java";
+        String controllerPath = File.separator + "controller" + File.separator + replaceSuffixClassName + "Controller.java";
+
+        //String sqlMapperPath = File.separator + "dao" + File.separator + className + "Mapper.xml";
+        String sqlMapperPath = File.separator + "dao" + File.separator + replaceSuffixClassName + "Mapper.xml";
+
+        //String htmlPath = File.separator + className + ".html";
+        String htmlPath = File.separator + replaceSuffixClassName + ".html";
+
+        //String listJSPPath = lowerName + File.separator + className + "List.jsp";
+        String listJSPPath = lowerName + File.separator + replaceSuffixClassName + "List.jsp";
+
+        // String editJSPPath = lowerName + File.separator + "edit" + className + ".jsp";
+        String editJSPPath = lowerName + File.separator + "edit" + replaceSuffixClassName + ".jsp";
 
         // String springPath="conf" + File.separator + "spring" + File.separator ;
         // String sqlMapPath="conf" + File.separator + "mybatis" + File.separator ;
@@ -106,6 +154,10 @@ public class Java_Code_Generator {
         context.put("modulePackage", modulePackage);
         context.put("importPackage", modulePackage);
         context.put("moduleSimplePackage", moduleSimplePackage);
+
+        //add by limiao 20160307 增加两个变量到context
+        context.put("replaceSuffixClassName", replaceSuffixClassName);
+        context.put("replaceSuffixLowerName", replaceSuffixLowerName);
         /****************************** 生成bean字段 *********************************/
         try {
             context.put("feilds", createBean.getBeanFeilds(tableName)); // 生成bean
@@ -143,6 +195,7 @@ public class Java_Code_Generator {
         if (ArrayUtils.isNotEmpty(templates) && ArrayUtils.contains(templates, BEAN)) {
             CommonPageParser.WriterPage(context, "Bean.java.vm", realPath + javaPath + modulePakPath, modelPath); //
         }
+
         if (ArrayUtils.isNotEmpty(templates) && ArrayUtils.contains(templates, MAPPER)) {
             CommonPageParser.WriterPage(context, "Mapper.java.vm", realPath + javaPath + modulePakPath, mapperPath); // 生成MybatisMapper接口
         }
