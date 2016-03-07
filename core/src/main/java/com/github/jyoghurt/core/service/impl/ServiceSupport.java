@@ -96,6 +96,11 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
     }
 
     @Override
+    public void delete(Serializable id) throws ServiceException {
+        throw new ServiceException("You must override this method!");
+    }
+
+    @Override
     public void logicDelete(Serializable id) throws ServiceException {
         throw new ServiceException("You must override this method!");
     }
