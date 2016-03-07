@@ -125,24 +125,9 @@
         {"data": "$item.columnName","orderable":false},
               #end
        ],
-                    columnDefs:[{
-                        render: function(data, type, row) {
-                            return data;
-                        },
-                        "targets": 2
-                    }],
-                    createdRow: function ( row, data, index) {
-                        $('td', row).click(function(){
-                        })
-                    },
                     //表单详情
                     viewForm:$('#${replaceSuffixLowerName}Form'),
-                    //新建行函数
-                    createItem:editRow,
-                    //编辑函数
-                    editItem :editRow,
-                    //删除函数
-                    deleteItem :deleteRow,
+
                     //重新加载
                     reloadGrid :reloadGrid,
                     //初始化结束后回调

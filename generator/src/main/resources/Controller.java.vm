@@ -69,7 +69,7 @@ public class ${replaceSuffixClassName}Controller extends BaseController {
 //	@LogContent("删除${codeName}")
 //	@RequestMapping(value = "/{${prikey}}",method=RequestMethod.DELETE)
 //	public HttpResultEntity<?> delete(@PathVariable String ${prikey})  throws Exception{
-//		${replaceSuffixLowerName}Service.delete(${prikey});
+//		${replaceSuffixLowerName}Service.logicDelete(${prikey});
 //		return getSuccessResult();
 //	}
 //

@@ -22,6 +22,11 @@ public class ${replaceSuffixClassName}ServiceImpl extends ServiceSupport<${class
 	}
 
     @Override
+    public void delete(Serializable id) throws ServiceException {
+        getMapper().delete(${className}.class, id);
+    }
+
+    @Override
     public void logicDelete(Serializable id) throws ServiceException {
         getMapper().logicDelete(${className}.class, id);
     }
