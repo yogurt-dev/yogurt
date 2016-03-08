@@ -46,7 +46,7 @@
                     }
                     //modal窗口的配置项目
                     var config = {
-                        dom:$('#${lowerName}Form'),
+                        dom:$('#${replaceSuffixLowerName}Form'),
                         title:flag?'编辑页面':'新建页面',
                         btns:[{text:'保存',
                             icon:'btn-info',
@@ -63,7 +63,7 @@
                 //删除 走后台
                 function deleteRow(rowdata){
                     if(confirm('确认删除吗？')){
-                        var url = '${lowerName}/'+rowdata.${prikey};
+                        var url = '${replaceSuffixLowerName}/'+rowdata.${prikey};
                         var sfn = function(data,status){
                             reloadGrid();
                             DF.toast.success(data.message);
@@ -85,7 +85,7 @@
                     if(rowdata){
                         DF.setFormValues(rowdata,form);
                     }
-//                    var url = '${lowerName}/'+rowdata.${prikey};
+//                    var url = '${replaceSuffixLowerName}/'+rowdata.${prikey};
 //                    var sfn = function(data,status){
 //                        DF.setFormValues(data,form);
 //                    };
@@ -104,14 +104,14 @@
                     DF.ajax({
                         data:JSON.stringify(data),
                         type:flag?'put':'post',
-                        url:'${lowerName}',
+                        url:'${replaceSuffixLowerName}',
                         dataType:'json',
                         success:sfn
                     });
                 };
                 var grid = DF.dataTable({
                     id:"table",
-                    ajax: "${lowerName}/list",
+                    ajax: "${replaceSuffixLowerName}/list",
                     rowbtns : [
                         {text:'编辑',name:'edit',class:'btn-success',fn:editRow},
                         {text:'删除',name:'delete',class:'btn-danger',fn:deleteRow}
@@ -125,24 +125,9 @@
         {"data": "$item.columnName","orderable":false},
               #end
        ],
-                    columnDefs:[{
-                        render: function(data, type, row) {
-                            return data;
-                        },
-                        "targets": 2
-                    }],
-                    createdRow: function ( row, data, index) {
-                        $('td', row).click(function(){
-                        })
-                    },
                     //表单详情
-                    viewForm:$('#${lowerName}Form'),
-                    //新建行函数
-                    createItem:editRow,
-                    //编辑函数
-                    editItem :editRow,
-                    //删除函数
-                    deleteItem :deleteRow,
+                    viewForm:$('#${replaceSuffixLowerName}Form'),
+
                     //重新加载
                     reloadGrid :reloadGrid,
                     //初始化结束后回调
@@ -155,7 +140,7 @@
     </div>
 </div>
 <!-- Basic Setup  End-->
-<script type="text/template" id="${lowerName}Form">
+<script type="text/template" id="${replaceSuffixLowerName}Form">
     <form class="validate"  >
         <div class="row">
             <div class="col-md-12">

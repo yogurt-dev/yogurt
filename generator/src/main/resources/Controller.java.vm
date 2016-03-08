@@ -2,16 +2,18 @@ package ${modulePackage}.controller;
 
 import javax.annotation.Resource;
 
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
+
+import org.springframework.web.bind.annotation.*;
 import com.github.jyoghurt.core.controller.BaseController;
 import com.github.jyoghurt.core.handle.QueryHandle;
 import com.github.jyoghurt.core.result.HttpResultEntity;
 import com.github.jyoghurt.core.result.QueryResult;
 import ${importPackage}.domain.${className};
-import ${importPackage}.service.${className}Service;
+import ${importPackage}.service.${replaceSuffixClassName}Service;
 import org.springframework.web.bind.annotation.RequestMethod;
 import com.github.jyoghurt.core.annotations.LogContent;
+
+
 
 /**
  * ${codeName}控制器
@@ -19,15 +21,15 @@ import com.github.jyoghurt.core.annotations.LogContent;
  */
 @RestController
 @LogContent(module = "${moduleName}")
-@RequestMapping("/${lowerName}")
-public class ${className}Controller extends BaseController {
+@RequestMapping("/${replaceSuffixLowerName}")
+public class ${replaceSuffixClassName}Controller extends BaseController {
 
 
 	/**
 	 * ${codeName}服务类
 	 */
 	@Resource
-	private ${className}Service ${lowerName}Service;
+	private ${replaceSuffixClassName}Service ${replaceSuffixLowerName}Service;
 
 //	/**
 //	 * 列出${codeName}
@@ -35,7 +37,7 @@ public class ${className}Controller extends BaseController {
 //	@LogContent("查询${codeName}")
 //	@RequestMapping(value = "/list",method=RequestMethod.GET)
 //	public HttpResultEntity<?> list(${className} ${lowerName} ,QueryHandle queryHandle) throws Exception {
-//        return getSuccessResult(${lowerName}Service.getData(${lowerName},queryHandle.configPage().addOrderBy("createDateTime",
+//        return getSuccessResult(${replaceSuffixLowerName}Service.getData(${lowerName},queryHandle.configPage().addOrderBy("createDateTime",
 //				"desc")));
 //
 //	}
@@ -47,7 +49,7 @@ public class ${className}Controller extends BaseController {
 //	@LogContent("添加${codeName}")
 //	@RequestMapping(method=RequestMethod.POST)
 //	public HttpResultEntity<?> add(@RequestBody ${className} ${lowerName}) throws Exception {
-//		${lowerName}Service.save(${lowerName});
+//		${replaceSuffixLowerName}Service.save(${lowerName});
 //        return getSuccessResult();
 //	}
 //
@@ -57,7 +59,7 @@ public class ${className}Controller extends BaseController {
 //	@LogContent("编辑${codeName}")
 //	@RequestMapping(method=RequestMethod.PUT)
 //	public HttpResultEntity<?> edit(@RequestBody ${className} ${lowerName}) throws Exception {
-//		${lowerName}Service.updateForSelective(${lowerName});
+//		${replaceSuffixLowerName}Service.updateForSelective(${lowerName});
 //        return getSuccessResult();
 //	}
 //
@@ -66,8 +68,8 @@ public class ${className}Controller extends BaseController {
 //	 */
 //	@LogContent("删除${codeName}")
 //	@RequestMapping(value = "/{${prikey}}",method=RequestMethod.DELETE)
-//	public HttpResultEntity<?> delete(@PathVariable String ${prikey})  throws Exception{
-//		${lowerName}Service.delete(${prikey});
+//	public HttpResultEntity<?> logicDelete(@PathVariable String ${prikey})  throws Exception{
+//		${replaceSuffixLowerName}Service.logicDelete(${prikey});
 //		return getSuccessResult();
 //	}
 //
@@ -77,6 +79,6 @@ public class ${className}Controller extends BaseController {
 //	 @LogContent("查询单个${codeName}")
 //	 @RequestMapping(value = "/{${prikey}}",method=RequestMethod.GET)
 //	 public HttpResultEntity<?> get(@PathVariable String $prikey)  throws Exception{
-//		 return getSuccessResult(${lowerName}Service.find($prikey));
+//		 return getSuccessResult(${replaceSuffixLowerName}Service.find($prikey));
 //	 }
 }

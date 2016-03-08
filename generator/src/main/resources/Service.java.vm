@@ -7,6 +7,6 @@ import ${modulePackage}.domain.${className};
  * ${codeName}服务层
  *
  */
-public interface ${className}Service extends BaseService<${className}> {
+public interface ${replaceSuffixClassName}Service extends BaseService<${className}> {
 
 }
