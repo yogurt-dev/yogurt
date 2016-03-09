@@ -10,7 +10,7 @@ import java.util.Date;
 /**
  * Created by jtwu on 2015/4/21.
  */
-public class BaseEntity implements Serializable {
+public class BaseEntity<T extends BaseEntity<T>> implements Serializable {
 
     @Transient
     public static final String DEFAULT_OPERATOR = "system";
@@ -51,9 +51,9 @@ public class BaseEntity implements Serializable {
         return createDateTime;
     }
 
-    public BaseEntity setCreateDateTime(Date createDateTime) {
+    public T setCreateDateTime(Date createDateTime) {
         this.createDateTime = createDateTime;
-        return this;
+        return (T) this;
     }
 
 
@@ -61,44 +61,44 @@ public class BaseEntity implements Serializable {
         return founderId;
     }
 
-    public BaseEntity setFounderId(String founderId) {
+    public T setFounderId(String founderId) {
         this.founderId = founderId;
-        return this;
+        return (T) this;
     }
 
     public String getFounderName() {
         return founderName;
     }
 
-    public BaseEntity setFounderName(String founderName) {
+    public T setFounderName(String founderName) {
         this.founderName = founderName;
-        return this;
+        return (T) this;
     }
 
     public String getModifierId() {
         return modifierId;
     }
 
-    public BaseEntity setModifierId(String modifierId) {
+    public T setModifierId(String modifierId) {
         this.modifierId = modifierId;
-        return this;
+        return (T) this;
     }
 
     public String getModifierName() {
         return modifierName;
     }
 
-    public BaseEntity setModifierName(String modifierName) {
+    public T setModifierName(String modifierName) {
         this.modifierName = modifierName;
-        return this;
+        return (T) this;
     }
 
     public Boolean getDeleteFlag() {
         return deleteFlag;
     }
 
-    public BaseEntity setDeleteFlag(Boolean deleteFlag) {
+    public T setDeleteFlag(Boolean deleteFlag) {
         this.deleteFlag = deleteFlag;
-        return this;
+        return (T) this;
     }
 }
