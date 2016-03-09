@@ -7,6 +7,6 @@ import com.github.jyoghurt.core.domain.BaseEntity;
 
 ##@JsonSerialize(include= JsonSerialize.Inclusion.NON_NULL)
 @javax.persistence.Table(name = "${tableName}")
-public class ${className} extends BaseEntity{
+public class ${className} extends BaseEntity<${className}>{
 	${feilds}
 }
