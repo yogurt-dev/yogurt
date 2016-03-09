@@ -309,6 +309,17 @@ public class BaseMapperProvider {
 
         Field idField = null;
         for (Field field : JPAUtils.getAllFields(entityClass)) {
+
+            //add by limiao 20160309 insert 为null的不拼sql
+            try {
+                Object value = JPAUtils.getValue(param.get(BaseMapper.ENTITY), field.getName());
+                if (null == value) {
+                    continue;
+                }
+            } catch (UtilException e) {
+                throw new DaoException(e);
+            }
+
             if (!ClassUtils.isPrimitiveOrWrapper(field.getClass()) && !Enum.class.isAssignableFrom(LogSystemType.class)) {
                 continue;
             }
@@ -347,6 +358,17 @@ public class BaseMapperProvider {
         Field idField = null;
         for (int i = 0; i < ((List) param.get(BaseMapper.ENTITIES)).size(); i++) {
             for (Field field : JPAUtils.getAllFields(entityClass)) {
+
+                //add by limiao 20160309 insert 为null的不拼sql
+                try {
+                    Object value = JPAUtils.getValue(param.get(BaseMapper.ENTITY), field.getName());
+                    if (null == value) {
+                        continue;
+                    }
+                } catch (UtilException e) {
+                    throw new DaoException(e);
+                }
+
                 if (!ClassUtils.isPrimitiveOrWrapper(field.getClass()) && !Enum.class.isAssignableFrom(LogSystemType.class)) {
                     continue;
                 }
