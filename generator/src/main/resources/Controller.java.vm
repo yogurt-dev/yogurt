@@ -37,7 +37,7 @@ public class ${replaceSuffixClassName}Controller extends BaseController {
 //	@LogContent("查询${codeName}")
 //	@RequestMapping(value = "/list",method=RequestMethod.GET)
 //	public HttpResultEntity<?> list(${className} ${lowerName} ,QueryHandle queryHandle) throws Exception {
-//        return getSuccessResult(${replaceSuffixLowerName}Service.getData(${lowerName},queryHandle.configPage().addOrderBy("createDateTime",
+//        return getSuccessResult(${replaceSuffixLowerName}Service.getData(${lowerName}.setDeleteFlag(false),queryHandle.configPage().addOrderBy("createDateTime",
 //				"desc")));
 //
 //	}
