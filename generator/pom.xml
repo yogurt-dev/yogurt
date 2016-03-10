@@ -7,7 +7,7 @@
 		<version>1.0.2</version>
 	</parent>
 	<artifactId>generator</artifactId> 
-	<version>1.0.6</version>
+	<version>2.0.1</version>
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
@@ -24,11 +24,6 @@
 			<artifactId>poi-ooxml</artifactId>
 			<version>3.11</version>
 		</dependency>
-		<!--<dependency>-->
-			<!--<groupId>com.github.jyoghurt</groupId>-->
-			<!--<artifactId>core</artifactId>-->
-			<!--<version>1.0.2</version>-->
-		<!--</dependency>-->
 		<!--generator java code start -->
 		<dependency>
 			<groupId>org.apache.velocity</groupId>
