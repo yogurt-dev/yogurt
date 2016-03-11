@@ -42,8 +42,9 @@ public class BaseEntity<T extends BaseEntity<T>> implements Serializable {
         return modifyDateTime;
     }
 
-    public void setModifyDateTime(Date modifyDateTime) {
+    public T setModifyDateTime(Date modifyDateTime) {
         this.modifyDateTime = modifyDateTime;
+        return (T) this;
     }
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")

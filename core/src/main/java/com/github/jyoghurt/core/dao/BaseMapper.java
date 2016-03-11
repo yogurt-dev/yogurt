@@ -17,6 +17,7 @@ public interface BaseMapper<T> {
     String ENTITIES = "entities";
     String ID = "id";
     String DATA = "data";
+    String CUSTOM_SQL = "customSql";
 
     /**
      * 插入一条记录
@@ -142,5 +143,22 @@ public interface BaseMapper<T> {
      */
     List<T> findAll(@Param(ENTITY_CLASS) Class<T> entityClass, @Param(DATA) Map<String, Object> data);
 
+    /**
+     * 根据自定义sql查询list
+     *
+     * @param customSql 自定义sql
+     * @return 查询结果列表
+     */
+    @SelectProvider(type = BaseMapperProvider.class, method = "findListBySql")
+    List<T> findListBySql(@Param(CUSTOM_SQL) String customSql, @Param(DATA) Map<String, Object> data);
+
+    /**
+     *
+     * @param customSql
+     * @param data
+     * @return
+     */
+    @SelectProvider(type = BaseMapperProvider.class, method = "findListTotalRecordBySql")
+    Long findListTotalRecordBySql(@Param(CUSTOM_SQL) String customSql, @Param(DATA) Map<String, Object> data);
 
 }

@@ -42,7 +42,7 @@ public class QueryHandle {
     //sql 操作符辅助类
     private Map<String, OperatorHandle> operatorHandles = new HashMap();
     //是否使用distinct
-    private Boolean distinct = false;
+    private Boolean distinct ;
     //扩展的whereSql
     private List<String> whereSqls = new ArrayList<>();
     //扩展数据

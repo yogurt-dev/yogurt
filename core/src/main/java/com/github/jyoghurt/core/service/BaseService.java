@@ -141,4 +141,14 @@ public interface BaseService<T> {
      */
     List<T> findAll(T entity) throws ServiceException;
 
+    /**
+     * 自定义sql查询列表
+     *
+     * @param customSql   自定义sql
+     * @param queryHandle 查询辅助类
+     * @return 业务实体集合
+     * @throws ServiceException {@inheritDoc}
+     */
+    QueryResult<T> findListBySql(String customSql, QueryHandle queryHandle) throws ServiceException;
+
 }

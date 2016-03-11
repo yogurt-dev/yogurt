@@ -24,9 +24,8 @@ import java.util.List;
 import static com.github.jyoghurt.core.utils.beanUtils.BeanUtils.getValueMap;
 
 /**
- *
  * 服务支持
- *
+ * <p>
  * 为服务组件的基类，必须继承
  *
  * @param <T> 该服务组件服务的数据模型，即model;
@@ -107,7 +106,7 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
 
     @Override
     public void logicDeleteByCondition(T entity) throws ServiceException {
-        getMapper().logicDeleteByCondition((Class<T>) entity.getClass(),getValueMap(entity));
+        getMapper().logicDeleteByCondition((Class<T>) entity.getClass(), getValueMap(entity));
     }
 
     @Override
@@ -124,9 +123,19 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
     public QueryResult<T> getData(T entity, QueryHandle queryHandle) throws ServiceException {
         QueryResult<T> qr = newQueryResult();
         qr.setData(getMapper().pageData((Class<T>) entity.getClass(), getValueMap(queryHandle, entity).chainPutAll
-                (queryHandle.getExpandData())));
+                (queryHandle == null ? null : queryHandle.getExpandData())));
         qr.setRecordsTotal(getMapper().pageTotalRecord((Class<T>) entity.getClass(), getValueMap(queryHandle, entity)
-                .chainPutAll(queryHandle.getExpandData())));
+                .chainPutAll(queryHandle == null ? null : queryHandle.getExpandData())));
+        return qr;
+    }
+
+    @Override
+    public QueryResult<T> findListBySql(String customSql, QueryHandle queryHandle) throws ServiceException {
+        QueryResult<T> qr = newQueryResult();
+        qr.setData(getMapper().findListBySql(customSql, getValueMap(queryHandle).chainPutAll
+                (queryHandle == null ? null : queryHandle.getExpandData())));
+        qr.setRecordsTotal(getMapper().findListTotalRecordBySql(customSql, getValueMap(queryHandle).chainPutAll
+                (queryHandle == null ? null : queryHandle.getExpandData())));
         return qr;
     }
 
@@ -156,16 +165,16 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
     @Override
     public Long count(T entity, QueryHandle queryHandle) throws ServiceException {
         return getMapper().pageTotalRecord((Class<T>) entity.getClass(), getValueMap(queryHandle, entity)
-                .chainPutAll(queryHandle.getExpandData()));
+                .chainPutAll(queryHandle == null ? null : queryHandle.getExpandData()));
     }
 
-    //modify by limiao 20160222 .chainPutAll(queryHandle.getExpandData()
+    //modify by limiao 20160222 .chainPutAll(queryHandle==null?null:queryHandle.getExpandData()
     @Override
     public List<T> findAll(T entity, QueryHandle queryHandle) throws ServiceException {
         if (queryHandle == null) {
             return getMapper().findAll((Class<T>) entity.getClass(), getValueMap(queryHandle, entity));
         } else {
-            return getMapper().findAll((Class<T>) entity.getClass(), getValueMap(queryHandle, entity).chainPutAll(queryHandle.getExpandData()));
+            return getMapper().findAll((Class<T>) entity.getClass(), getValueMap(queryHandle, entity).chainPutAll(queryHandle == null ? null : queryHandle.getExpandData()));
         }
     }
 

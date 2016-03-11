@@ -197,10 +197,7 @@ public class BaseMapperProvider {
                 WHERE(whereSql);
             }
         }
-        if (param.containsKey("page") && usePage) {
-            limit = StringUtils.join(" limit ", ((Integer) param.get("page") - 1) * (Integer) param.get("rows"), " , ",
-                    param.get("rows").toString());
-        }
+        createLimit(param, usePage);
         if (param.containsKey("sqlJoinHandle")) {
             LinkedList<SQLJoinHandle> sqlJoinHandle = (LinkedList<SQLJoinHandle>) param.get("sqlJoinHandle");
             for (SQLJoinHandle sqlJoinAssistor : sqlJoinHandle) {
@@ -238,6 +235,19 @@ public class BaseMapperProvider {
         }
         if (param.containsKey("groupBy")) {
             GROUP_BY((String) param.get("groupBy"));
+        }
+    }
+
+    /**
+     * 创建limit
+     *
+     * @param param   参数
+     * @param usePage 是否使用分页
+     */
+    private void createLimit(Map<String, Object> param, Boolean usePage) {
+        if (param.containsKey("page") && usePage) {
+            limit = StringUtils.join(" limit ", ((Integer) param.get("page") - 1) * (Integer) param.get("rows"), " , ",
+                    param.get("rows").toString());
         }
     }
 
@@ -507,7 +517,16 @@ public class BaseMapperProvider {
         }
         FROM(getTableNameWithAlias(entityClass));
         createAllWhere((Map<String, Object>) param.get(BaseMapper.DATA), false, true);
-        return StringUtils.join(SQL(), limit);
+        return SQL();
+    }
+
+    public String findListBySql(Map<String, Object> param) throws DaoException {
+        createLimit((Map<String, Object>) param.get(BaseMapper.DATA), true);
+        return StringUtils.join(param.get(BaseMapper.CUSTOM_SQL), limit);
+    }
+
+    public String findListTotalRecordBySql(Map<String, Object> param) throws DaoException {
+        return StringUtils.join("select count(*) from (", param.get(BaseMapper.CUSTOM_SQL), ") as countTable");
     }
 
     public String delete(Map<String, Object> param) throws DaoException {
