@@ -25,7 +25,9 @@ public class ChainMap<K, V> extends LinkedHashMap<K, V> {
     }
 
     public ChainMap<K,V> chainPutAll(Map map){
-        super.putAll(map);
+        if(map!=null) {
+            super.putAll(map);
+        }
         return this;
     }
 
