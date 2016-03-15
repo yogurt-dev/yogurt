@@ -379,7 +379,7 @@ public class BaseMapperProvider {
                 }
                 //add by limiao 20160309 insert 为null的不拼sql
                 try {
-                    Object value = JPAUtils.getValue(param.get(BaseMapper.ENTITY), field.getName());
+                    Object value = JPAUtils.getValue(((List) param.get(BaseMapper.ENTITIES)).get(i), field.getName());
                     if (null == value) {
                         continue;
                     }
