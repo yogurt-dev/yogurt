@@ -367,4 +367,21 @@ public class BeanUtils {
         }
 
     }
+
+    /**
+     * 判断class是否是基础类型及包装类
+     *
+     * @param clz 待判定class
+     * @return boolean
+     */
+    public static boolean isPrimitiveClass(Class clz) {
+        if (clz.isAssignableFrom(String.class) || clz.isPrimitive()) {
+            return true;
+        }
+        try {
+            return ((Class) clz.getField("TYPE").get(null)).isPrimitive();
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }
