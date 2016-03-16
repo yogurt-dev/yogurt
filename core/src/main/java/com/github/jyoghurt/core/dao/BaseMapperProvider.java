@@ -529,6 +529,10 @@ public class BaseMapperProvider {
         return StringUtils.join("select count(*) from (", param.get(BaseMapper.CUSTOM_SQL), ") as countTable");
     }
 
+    public String findUniqueObjectBySql(Map<String, Object> param) throws DaoException {
+        return StringUtils.join(param.get(BaseMapper.CUSTOM_SQL), " limit 1");
+    }
+
     public String delete(Map<String, Object> param) throws DaoException {
         beginWithClass(param);
         DELETE_FROM(getTableName(entityClass));

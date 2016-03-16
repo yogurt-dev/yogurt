@@ -161,4 +161,13 @@ public interface BaseMapper<T> {
     @SelectProvider(type = BaseMapperProvider.class, method = "findListTotalRecordBySql")
     Long findListTotalRecordBySql(@Param(CUSTOM_SQL) String customSql, @Param(DATA) Map<String, Object> data);
 
+    /**
+     *
+     * @param customSql
+     * @param data
+     * @return
+     */
+    @SelectProvider(type = BaseMapperProvider.class, method = "findUniqueObjectBySql")
+    Object findUniqueObjectBySql(@Param("customSql") String customSql, @Param("data") Map<String, Object> data);
+
 }
