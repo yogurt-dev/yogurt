@@ -179,6 +179,12 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
     }
 
     @Override
+    public void updateBySql(String customSql, T entity, QueryHandle queryHandle) throws ServiceException {
+        getMapper().updateBySql((Class<T>) entity.getClass(), customSql, getValueMap(queryHandle, entity).chainPutAll
+                (queryHandle == null ? null : queryHandle.getExpandData()));
+    }
+
+    @Override
     public List<T> findAll(T entity) throws ServiceException {
         return findAll(entity, null);
     }
