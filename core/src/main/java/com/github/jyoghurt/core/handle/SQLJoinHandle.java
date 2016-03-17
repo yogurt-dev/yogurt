@@ -40,8 +40,9 @@ public class SQLJoinHandle {
         return selectColumns;
     }
 
-    public void setSelectColumns(String selectColumns) {
+    public SQLJoinHandle setSelectColumns(String selectColumns) {
         this.selectColumns = selectColumns;
+        return this;
     }
 
     public JoinType getJoinType() {
