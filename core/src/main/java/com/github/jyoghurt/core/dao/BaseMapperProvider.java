@@ -160,14 +160,14 @@ public class BaseMapperProvider {
          */
 
         for (String key : operatorMap.keySet()) {
-            if(key.contains(".")){
-                operatorMap.put(key.replace(".","_"),operatorMap.get(key));
+            if (key.contains(".")) {
+                operatorMap.put(key.replace(".", "_"), operatorMap.get(key));
             }
         }
         //用户自定义值优先
         Object value = ArrayUtils.isEmpty((operatorMap.get(fieldNameKey)).getValues())
                 ? "#{" + StringUtils.join(BaseMapper.DATA + "." + fieldNameKey) + "}"
-                : "#{" + BaseMapper.DATA + ".operatorHandles." + fieldNameKey.replace(".","_") + ".values[0]}";
+                : "#{" + BaseMapper.DATA + ".operatorHandles." + fieldNameKey.replace(".", "_") + ".values[0]}";
         switch ((operatorMap.get(fieldNameKey)).getOperator()) {
             case EQUAL: {
                 WHERE(StringUtils.join(prefix, field.getName(), " = ", value));
@@ -232,19 +232,24 @@ public class BaseMapperProvider {
         if (null == field.getType().getAnnotation(Table.class) || (null == field.getAnnotation(OneToMany.class)
                 && null == field.getAnnotation(OneToOne.class) && null == field.getAnnotation(ManyToMany.class)
                 && null == field.getAnnotation(ManyToOne.class))) {
+            return;
         }
-        if (null != field.getAnnotation(ManyToOne.class)) {
-            String joinTableName = field.getType().getSimpleName();
-            String foreignKey = null == field.getAnnotation(JoinColumn.class)
-                    ? JPAUtils.getIdField(field.getType()).getName() : (field.getAnnotation(JoinColumn.class))
-                    .referencedColumnName();
-            //添加级联
-            SQLJoinHandle sqlJoinHandle = new SQLJoinHandle().setSelectColumns(field.getName() + ".*")
-                    .setJoinType(SQLJoinHandle.JoinType.RIGHT_OUTER_JOIN).setJoinSql(StringUtils.join(joinTableName, " ", field.getName(), " on t.",
-                            JPAUtils.getIdField(field.getType()).getName(), "=", field.getName(), ".", foreignKey));
-            sqlJoinHandles.add(sqlJoinHandle);
-            createFieldsWhereSql(operatorMap, param, field.getName(), field.getType());
-        }
+//        if (null != field.getAnnotation(ManyToOne.class)) {
+        String joinTableName = field.getType().getSimpleName();
+        String foreignKey = null == field.getAnnotation(JoinColumn.class)
+                ? JPAUtils.getIdField(field.getType()).getName() : (field.getAnnotation(JoinColumn.class))
+                .referencedColumnName();
+        //添加级联
+        SQLJoinHandle sqlJoinHandle = new SQLJoinHandle().setSelectColumns(field.getName() + ".*")
+                .setJoinType(SQLJoinHandle.JoinType.LEFT_OUTER_JOIN).setJoinSql(StringUtils.join(joinTableName, " ",
+                        field.getName(), " on t.", JPAUtils.getIdField(field.getType()).getName(), "=", field.getName(), ".", foreignKey));
+        sqlJoinHandles.add(sqlJoinHandle);
+        createFieldsWhereSql(operatorMap, param, field.getName(), field.getType());
+        return;
+//        }
+//        if (null != field.getAnnotation(OneToMany.class)) {
+//
+//        }
     }
 
 
