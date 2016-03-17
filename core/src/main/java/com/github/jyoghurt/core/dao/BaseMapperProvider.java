@@ -701,6 +701,13 @@ public class BaseMapperProvider {
         return sql().replaceFirst("DELETE FROM", "DELETE t FROM");
     }
 
+    public String updateBySql(Map<String, Object> param) throws DaoException {
+        beginWithClass(param);
+        UPDATE(getTableNameWithAlias(entityClass));
+        SET(param.get(BaseMapper.CUSTOM_SQL).toString());
+        createAllWhere((Map<String, Object>) param.get(BaseMapper.DATA), false);
+        return SQL();
+    }
 
     public String updateByCondition(Map<String, Object> param) throws DaoException {
         beginWithClass(param);

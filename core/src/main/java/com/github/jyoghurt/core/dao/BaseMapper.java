@@ -153,7 +153,6 @@ public interface BaseMapper<T> {
     List<T> findListBySql(@Param(CUSTOM_SQL) String customSql, @Param(DATA) Map<String, Object> data);
 
     /**
-     *
      * @param customSql
      * @param data
      * @return
@@ -162,12 +161,21 @@ public interface BaseMapper<T> {
     Long findListTotalRecordBySql(@Param(CUSTOM_SQL) String customSql, @Param(DATA) Map<String, Object> data);
 
     /**
-     *
      * @param customSql
      * @param data
      * @return
      */
     @SelectProvider(type = BaseMapperProvider.class, method = "findUniqueObjectBySql")
     Object findUniqueObjectBySql(@Param("customSql") String customSql, @Param("data") Map<String, Object> data);
+
+    /**
+     * 自定义更新sql
+     *
+     * @param customSql
+     * @param data
+     * @return
+     */
+    @UpdateProvider(type = BaseMapperProvider.class, method = "updateBySql")
+    void updateBySql(@Param(ENTITY_CLASS) Class<T> entityClass,@Param(CUSTOM_SQL) String customSql, @Param(DATA) Map<String, Object> data);
 
 }

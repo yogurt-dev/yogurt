@@ -78,6 +78,7 @@ public interface BaseService<T> {
      * @throws ServiceException {@inheritDoc}
      */
     void logicDeleteByCondition(T entity) throws ServiceException;
+
     /**
      * 根据条件删除
      *
@@ -150,5 +151,14 @@ public interface BaseService<T> {
      * @throws ServiceException {@inheritDoc}
      */
     QueryResult<T> findListBySql(String customSql, QueryHandle queryHandle) throws ServiceException;
+
+    /**
+     * 自定义sql更新 add by limiao 20160316
+     *
+     * @param customSql   自定义sql
+     * @param queryHandle 查询辅助类
+     * @throws ServiceException {@inheritDoc}
+     */
+    void updateBySql(String customSql, T entity, QueryHandle queryHandle) throws ServiceException;
 
 }
