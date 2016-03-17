@@ -234,7 +234,6 @@ public class BaseMapperProvider {
                 && null == field.getAnnotation(ManyToOne.class))) {
             return;
         }
-//        if (null != field.getAnnotation(ManyToOne.class)) {
         String joinTableName = field.getType().getSimpleName();
         String foreignKey = null == field.getAnnotation(JoinColumn.class)
                 ? JPAUtils.getIdField(field.getType()).getName() : (field.getAnnotation(JoinColumn.class))
@@ -246,10 +245,7 @@ public class BaseMapperProvider {
         sqlJoinHandles.add(sqlJoinHandle);
         createFieldsWhereSql(operatorMap, param, field.getName(), field.getType());
         return;
-//        }
-//        if (null != field.getAnnotation(OneToMany.class)) {
-//
-//        }
+
     }
 
 

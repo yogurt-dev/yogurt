@@ -4,6 +4,7 @@ import com.github.jyoghurt.core.exception.UtilException;
 import com.github.jyoghurt.core.utils.beanUtils.AnnotationBinder;
 import com.github.jyoghurt.core.utils.beanUtils.AnnotationReader;
 import com.github.jyoghurt.core.utils.beanUtils.EntityBinder;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +28,7 @@ public class JPAUtils {
      */
     public static List<Field> getAllFields(Class<?> entityClass) {
         Field[] fields = entityClass.getDeclaredFields();//获得属性
-        return getAllFields(entityClass.getSuperclass(), new ArrayList<Field>(Arrays.asList(fields)));
+        return getAllFields(entityClass.getSuperclass(), new ArrayList<>(Arrays.asList(fields)));
     }
 
     private static List<Field> getAllFields(Class<?> entityClass, List<Field> fields) {
@@ -36,10 +37,6 @@ public class JPAUtils {
             Iterator<Field> it = fields.iterator();
             while (it.hasNext()) {
                 Field next = it.next();
-                if ("serialVersionUID".equals(next.getName())) {
-                    it.remove();
-                    continue;
-                }
                 if (null != next.getAnnotation(Transient.class)) {
                     it.remove();
                 }
@@ -79,17 +76,38 @@ public class JPAUtils {
      * @throws UtilException {@inheritDoc}
      */
     public static Object getValue(Object source, String fieldName) throws UtilException {
+        if (null == source || StringUtils.isEmpty(fieldName)) {
+            throw new UtilException("parameter is null");
+        }
         try {
-            for (Field field : source.getClass().getDeclaredFields()) {
-                if (field.getName().equals(fieldName)) {
-                    field.setAccessible(true);
-                    return field.get(source);
-                }
-            }
-            return null;
+            Field field = getField(source.getClass(), fieldName);
+            field.setAccessible(true);  //设置私有属性范围
+            return field.get(source);
         } catch (Exception e) {
             throw new UtilException(e);
         }
+    }
+
+
+    /**
+     * 获取类及父类的属性
+     *
+     * @param clazz     类
+     * @param fieldName 字段
+     * @return 字段
+     * @throws NoSuchFieldException
+     */
+    public static Field getField(Class clazz, String fieldName) throws NoSuchFieldException {
+        if (clazz == Object.class) {
+            throw new NoSuchFieldException();
+        }
+        for (Field field : clazz.getDeclaredFields()) {
+            if (field.getName().equals(fieldName)) {
+                return field;
+            }
+        }
+        return getField(clazz.getSuperclass(),fieldName);
+
     }
 
     /**
@@ -101,8 +119,11 @@ public class JPAUtils {
      * @throws UtilException {@inheritDoc}
      */
     public static void setValue(Object source, String fieldName, Object value) throws UtilException {
+        if (null == source || StringUtils.isEmpty(fieldName)) {
+            throw new UtilException("parameter is null");
+        }
         try {
-            Field field = source.getClass().getDeclaredField(fieldName);
+            Field field = getField(source.getClass(), fieldName);
             field.setAccessible(true);  //设置私有属性范围
             field.set(source, value);
         } catch (Exception e) {
@@ -128,8 +149,7 @@ public class JPAUtils {
      * @throws UtilException
      */
 
-    private static void interpretField(Object entity,
-                                       List<Object> list) throws UtilException {
+    private static void interpretField(Object entity, List<Object> list) throws UtilException {
         try {
             if (entity == null) {
                 return;
