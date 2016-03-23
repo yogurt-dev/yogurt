@@ -144,7 +144,7 @@ public class BaseMapperProvider {
         }
 
         //封装类型递归处理，拼装成级联查询
-        if (!BeanUtils.isPrimitiveClass(field.getType())) {
+        if (null!=field.getType().getAnnotation(Table.class)) {
             parseCascade(operatorMap, field, param);
             return false;
         }
@@ -407,7 +407,6 @@ public class BaseMapperProvider {
 
         Field idField = null;
         for (Field field : JPAUtils.getAllFields(entityClass)) {
-
             if (!ClassUtils.isPrimitiveOrWrapper(field.getClass()) && !Enum.class.isAssignableFrom(LogSystemType.class)) {
                 continue;
             }
@@ -545,6 +544,10 @@ public class BaseMapperProvider {
         Field idField = null;
         for (Field field : JPAUtils.getAllFields(entityClass)) {
             field.setAccessible(true);
+            //非基础类型不处理
+            if(field.getType().isAssignableFrom(Collection.class)||null==field.getType().getAnnotation(Table.class)){
+                continue;
+            }
             //处理主键
             if (null == field.getAnnotation(Id.class)) {
                 SET(StringUtils.join(getEqualsValue(field.getName(), StringUtils.join(BaseMapper.ENTITY, ".", field.getName()))));
@@ -664,6 +667,10 @@ public class BaseMapperProvider {
         Field idField = null;
         for (Field field : JPAUtils.getAllFields(entityClass)) {
             field.setAccessible(true);
+            //非基础类型不处理
+            if(field.getType().isAssignableFrom(Collection.class)||null==field.getType().getAnnotation(Table.class)){
+                continue;
+            }
             //处理主键
             if (null != field.getAnnotation(Id.class)) {
                 idField = field;

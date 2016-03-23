@@ -37,6 +37,10 @@ public class JPAUtils {
             Iterator<Field> it = fields.iterator();
             while (it.hasNext()) {
                 Field next = it.next();
+                if ("serialVersionUID".equals(next.getName())) {
+                    it.remove();
+                    continue;
+                }
                 if (null != next.getAnnotation(Transient.class)) {
                     it.remove();
                 }
