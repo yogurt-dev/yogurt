@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.ResourceBundle;
 
 
-public class Java_Code_Generator {
+public class JavaCodeGenerator {
 
     private static final String BEAN = "bean";
     private static final String MAPPER = "mapper";
