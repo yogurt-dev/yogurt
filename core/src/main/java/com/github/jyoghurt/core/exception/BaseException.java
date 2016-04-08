@@ -36,5 +36,9 @@ public abstract class BaseException extends Exception {
         super(message, cause);
     }
 
+    public String getErrorCode() {
+        return errorCode;
+    }
+
     protected abstract ExceptionBody[] getErrors();
 }
