@@ -1,7 +1,7 @@
 package com.github.jyoghurt.core.interceptor;
 
-
 import com.github.jyoghurt.core.controller.BaseController;
+import com.github.jyoghurt.core.exception.ServiceException;
 import com.github.jyoghurt.core.result.HttpResultEntity;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -10,7 +10,6 @@ import org.aspectj.lang.annotation.Aspect;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 
@@ -23,7 +22,7 @@ import javax.validation.ConstraintViolationException;
 public class ValidateParamInterceptor {
     @Around(value = "@within(org.springframework.web.bind.annotation.RestController)||" +
             "@within(org.springframework.stereotype.Controller)")
-    public HttpResultEntity around(ProceedingJoinPoint pjp) throws Throwable {
+    public HttpResultEntity controllerInterceptor(ProceedingJoinPoint pjp) throws Throwable {
         try {
             return (HttpResultEntity) pjp.proceed();
         } catch (ConstraintViolationException e) {
@@ -32,6 +31,19 @@ public class ValidateParamInterceptor {
                 message = StringUtils.join(message, violation.getMessage(), ",");
             }
             return BaseController.getErrorResult(message);
+        }
+    }
+
+    @Around(value = "@within(org.springframework.stereotype.Service)")
+    public Object serviceInterceptor(ProceedingJoinPoint pjp) throws Throwable {
+        try {
+            return  pjp.proceed();
+        } catch (ConstraintViolationException e) {
+            String message = StringUtils.EMPTY;
+            for (ConstraintViolation violation : e.getConstraintViolations()) {
+                message = StringUtils.join(message, violation.getMessage(), ",");
+            }
+            throw new ServiceException(message);
         }
     }
 }

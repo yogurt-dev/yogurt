@@ -5,6 +5,7 @@ import com.github.jyoghurt.core.dao.BaseMapper;
 import com.github.jyoghurt.core.utils.DateTimeFormatter;
 import com.github.jyoghurt.core.utils.JPAUtils;
 import com.github.jyoghurt.core.utils.SpringContextUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,6 +16,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Field;
+import java.sql.Connection;
 import java.util.*;
 
 /**
@@ -42,7 +44,7 @@ public class QueryHandle {
     //sql 操作符辅助类
     private Map<String, OperatorHandle> operatorHandles = new HashMap();
     //是否使用distinct
-    private Boolean distinct ;
+    private Boolean distinct;
     //扩展的whereSql
     private List<String> whereSqls = new ArrayList<>();
     //扩展数据

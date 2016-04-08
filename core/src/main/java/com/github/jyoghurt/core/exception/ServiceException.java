@@ -23,4 +23,9 @@ public class ServiceException extends BaseException {
     public ServiceException(String message, Throwable cause) {
         super(message, cause);
     }
+
+    @Override
+    ExceptionBody[] getErrors() {
+        return new ExceptionBody[0];
+    }
 }

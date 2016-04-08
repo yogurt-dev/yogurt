@@ -106,6 +106,7 @@ public class BaseMapperProvider {
                         case SQL: {
                             WHERE(customWhereHandle.getSql());
                             operatorTag = true;
+                            break;
                         }
                     }
                 }
@@ -519,7 +520,7 @@ public class BaseMapperProvider {
             VALUES(idField.getName(), StringUtils.join("#{", BaseMapper.ENTITY, ".", idField.getName(), "}"));
             return;
         }
-        String id = UUID.randomUUID().toString();
+        String id = UUID.randomUUID().toString().replace("-","");
         VALUES(idField.getName(), StringUtils.join("'", id, "'"));
         idField.set(param.get(BaseMapper.ENTITY), id);
     }
@@ -532,7 +533,7 @@ public class BaseMapperProvider {
             BATCH_VALUES(idField.getName(), StringUtils.join("#{", BaseMapper.ENTITIES, "[", i, "]", ".", idField.getName(), "}"));
             return;
         }
-        String id = UUID.randomUUID().toString();
+        String id = UUID.randomUUID().toString().replace("-","");
         BATCH_VALUES(idField.getName(), StringUtils.join("'", id, "'"));
         idField.set(baseEntity, id);
     }
@@ -545,7 +546,7 @@ public class BaseMapperProvider {
         for (Field field : JPAUtils.getAllFields(entityClass)) {
             field.setAccessible(true);
             //非基础类型不处理
-            if(field.getType().isAssignableFrom(Collection.class)||null==field.getType().getAnnotation(Table.class)){
+            if(field.getType().isAssignableFrom(Collection.class)||null!=field.getType().getAnnotation(Table.class)){
                 continue;
             }
             //处理主键
@@ -668,7 +669,7 @@ public class BaseMapperProvider {
         for (Field field : JPAUtils.getAllFields(entityClass)) {
             field.setAccessible(true);
             //非基础类型不处理
-            if(field.getType().isAssignableFrom(Collection.class)||null==field.getType().getAnnotation(Table.class)){
+            if(field.getType().isAssignableFrom(Collection.class)||null!=field.getType().getAnnotation(Table.class)){
                 continue;
             }
             //处理主键
