@@ -41,5 +41,5 @@ public abstract class BaseException extends Exception {
         super(message, cause);
     }
 
-    abstract ExceptionBody[] getErrors();
+    protected abstract ExceptionBody[] getErrors();
 }

@@ -15,7 +15,7 @@ public class DaoException extends BaseException {
     private static final long serialVersionUID = 7799029148591208607L;
 
     @Override
-    ExceptionBody[] getErrors() {
+    protected ExceptionBody[] getErrors() {
         return new ExceptionBody[0];
     }
 
