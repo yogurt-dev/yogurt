@@ -3,6 +3,7 @@ package com.github.jyoghurt.core.interceptor;
 import com.github.jyoghurt.core.controller.BaseController;
 import com.github.jyoghurt.core.exception.ServiceException;
 import com.github.jyoghurt.core.result.HttpResultEntity;
+import com.github.jyoghurt.core.result.HttpResultHandle;
 import org.apache.commons.lang3.StringUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -30,7 +31,8 @@ public class ValidateParamInterceptor {
             for (ConstraintViolation violation : e.getConstraintViolations()) {
                 message = StringUtils.join(message, violation.getMessage(), ",");
             }
-            return BaseController.getErrorResult(message);
+            return new HttpResultEntity(HttpResultHandle.HttpResultEnum.ERROR.getErrorCode()
+                    ,StringUtils.stripEnd(message, ","));
         }
     }
 
