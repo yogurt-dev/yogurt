@@ -39,6 +39,4 @@ public abstract class BaseException extends Exception {
     public String getErrorCode() {
         return errorCode;
     }
-
-    protected abstract ExceptionBody[] getErrors();
 }

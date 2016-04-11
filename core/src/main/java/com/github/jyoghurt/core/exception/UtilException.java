@@ -24,8 +24,4 @@ public class UtilException extends BaseException {
         super(message, cause);
     }
 
-    @Override
-    protected ExceptionBody[] getErrors() {
-        return new ExceptionBody[0];
-    }
 }
