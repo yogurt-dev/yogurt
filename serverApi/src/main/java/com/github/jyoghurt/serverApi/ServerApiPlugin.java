@@ -34,7 +34,6 @@ public class ServerApiPlugin extends CompilerMojo {
     protected static List<String> classpathElements;
 
     public void init() {
-        getLog().info(classpathElements.toString());
         //获取所有java文件
         findJavaFiles(getSourceDir());
         //创建classDoc
