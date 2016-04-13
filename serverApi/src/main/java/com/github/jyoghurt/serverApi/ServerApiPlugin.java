@@ -3,6 +3,10 @@ package com.github.jyoghurt.serverApi;
 import com.sun.javadoc.ClassDoc;
 
 import com.sun.tools.javadoc.Main;
+import org.apache.commons.beanutils.BeanUtils;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.collections4.map.HashedMap;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -19,7 +23,7 @@ import java.util.jar.JarFile;
 
 @Mojo(name = "createApi", defaultPhase = LifecyclePhase.PACKAGE, threadSafe = true, requiresDependencyResolution = ResolutionScope.COMPILE)
 public class ServerApiPlugin extends CompilerMojo {
-    final static Map<String, ClassDoc> classDocMap = new HashMap<>();
+    static Map<String, ClassDoc> classDocMap = new HashMap<>();
     private Set<String> packages = new HashSet<>();
     private List<String> javaFiles = new ArrayList<>();
 
@@ -30,6 +34,7 @@ public class ServerApiPlugin extends CompilerMojo {
     protected static List<String> classpathElements;
 
     public void init() {
+        getLog().info(classpathElements.toString());
         //获取所有java文件
         findJavaFiles(getSourceDir());
         //创建classDoc
@@ -49,7 +54,9 @@ public class ServerApiPlugin extends CompilerMojo {
     public void execute() throws MojoExecutionException {
         init(sourceDir + "\\src\\main\\java\\");
         try {
-            new ExcelBuild().buildExcel(classDocMap);
+            Map<String, ClassDoc> map = new HashMap<>();
+            map.putAll(classDocMap);
+            new ExcelBuild().buildExcel(map);
         } catch (Exception e) {
             e.printStackTrace();
         }
