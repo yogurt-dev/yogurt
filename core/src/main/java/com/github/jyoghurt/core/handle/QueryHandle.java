@@ -4,9 +4,7 @@ import com.github.jyoghurt.core.configuration.PageConvert;
 import com.github.jyoghurt.core.dao.BaseMapper;
 import com.github.jyoghurt.core.utils.DateTimeFormatter;
 import com.github.jyoghurt.core.utils.JPAUtils;
-import com.github.jyoghurt.core.utils.PropertyReader;
 import com.github.jyoghurt.core.utils.SpringContextUtils;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +15,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.lang.reflect.Field;
-import java.sql.Connection;
 import java.util.*;
 
 /**
@@ -235,17 +232,20 @@ public class QueryHandle {
         return this;
     }
 
+    //分页数据处理，如果超过2000行则设置成默认20行 add by limiao on 2016/4/15.
+    private static int maxRows = 2000;
+    private static int resetRows = 20;
+
+    //以下两个方法需要引用core处系统初始化时设置
+    public static void setMaxRows(int maxRows_) {
+        maxRows = maxRows_;
+    }
+
+    public static void setResetRows(int resetRows_) {
+        resetRows = resetRows_;
+    }
+
     public int getRows() {
-        //分页数据处理，如果超过2000行则设置成默认20行 add by limiao on 2016/4/15.
-        int maxRows;
-        int resetRows;
-        try {
-            maxRows = Integer.parseInt(PropertyReader.readProperty("config", "maxRows"));
-            resetRows = Integer.parseInt(PropertyReader.readProperty("config", "resetRows"));
-        } catch (Exception e) {
-            maxRows = 2000;
-            resetRows = 20;
-        }
         if (rows > maxRows) {
             rows = resetRows;
         }
