@@ -134,13 +134,13 @@ public class JavaCodeGenerator {
         String sqlMapperPath = File.separator + "dao" + File.separator + replaceSuffixClassName + "Mapper.xml";
 
         //String htmlPath = File.separator + className + ".html";
-        String htmlPath = File.separator + replaceSuffixClassName + ".html";
+        String htmlPath = File.separator + replaceSuffixLowerName + ".html";
 
         //String listJSPPath = lowerName + File.separator + className + "List.jsp";
-        String listJSPPath = lowerName + File.separator + replaceSuffixClassName + "List.jsp";
+        String listJSPPath = lowerName + File.separator + replaceSuffixLowerName + "List.jsp";
 
         // String editJSPPath = lowerName + File.separator + "edit" + className + ".jsp";
-        String editJSPPath = lowerName + File.separator + "edit" + replaceSuffixClassName + ".jsp";
+        String editJSPPath = lowerName + File.separator + "edit" + replaceSuffixLowerName + ".jsp";
 
         // String springPath="conf" + File.separator + "spring" + File.separator ;
         // String sqlMapPath="conf" + File.separator + "mybatis" + File.separator ;
