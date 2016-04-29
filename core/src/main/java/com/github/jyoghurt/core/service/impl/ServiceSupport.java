@@ -164,6 +164,13 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
 
     @Override
     public void updateForSelective(T entity) throws ServiceException {
+        try {
+            if (null == JPAUtils.gtIdValue(entity)) {
+                return;
+            }
+        } catch (UtilException e) {
+            throw new ServiceException(e);
+        }
         if (entity instanceof BaseEntity) {
             ((BaseEntity) entity).setModifyDateTime(new Date());
             setFounder((BaseEntity) entity);
