@@ -38,7 +38,7 @@ public class ServerApiPlugin extends CompilerMojo {
         findJavaFiles(getSourceDir());
         //创建classDoc
         String options[] = ArrayUtils.addAll(new String[]{"-cp", StringUtils.join(getClasspathElements(),
-                ";"), "-sourcepath", getSourceDir()},packages.toArray(new String[]{}));
+                ";"), "-sourcepath", getSourceDir()}, packages.toArray(new String[]{}));
         Main.execute("", ClassAnalyzer.class.getName(), options);
 
 //        classDocMap.keySet().forEach(System.out::println);
@@ -51,7 +51,7 @@ public class ServerApiPlugin extends CompilerMojo {
 
     @Override
     public void execute() throws MojoExecutionException {
-        init(sourceDir + "\\src\\main\\java\\");
+        init(sourceDir + File.separator + "src" + File.separator + "main" + File.separator + "java" + File.separator);
         try {
             Map<String, ClassDoc> map = new HashMap<>();
             map.putAll(classDocMap);
@@ -62,7 +62,7 @@ public class ServerApiPlugin extends CompilerMojo {
     }
 
     private void findJavaFiles(String sourceDir) {
-        if(StringUtils.isEmpty(sourceDir)||sourceDir.endsWith("META-INF")){
+        if (StringUtils.isEmpty(sourceDir) || sourceDir.endsWith("META-INF")) {
             return;
         }
         if (!StringUtils.equals(sourceDir, getSourceDir())) {
@@ -82,6 +82,10 @@ public class ServerApiPlugin extends CompilerMojo {
             return;
         }
         File file = new File(sourceDir);
+        if(!file.exists()){
+            getLog().error("file is null ,the path is " + sourceDir);
+            return;
+        }
         File[] tempList = file.listFiles(new JavaFileFilter());
         for (File javaFile : tempList) {
             if (javaFile.isFile()) {
