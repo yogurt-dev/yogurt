@@ -72,21 +72,35 @@ public class JPAUtils {
     }
 
     /**
+     * 获取主键值
+     *
+     * @param po 获取po的主键值
+     * @return 主键值
+     * @throws UtilException
+     */
+    public static Object gtIdValue(Object po) throws UtilException {
+        if (null == po) {
+            return null;
+        }
+        return getValue(po, getIdField(po.getClass()));
+    }
+
+    /**
      * 反射调用get方法
      *
-     * @param source    对象
+     * @param po        对象
      * @param fieldName 属性名
      * @return 返回属性值
      * @throws UtilException {@inheritDoc}
      */
-    public static Object getValue(Object source, String fieldName) throws UtilException {
-        if (null == source || StringUtils.isEmpty(fieldName)) {
+    public static Object getValue(Object po, String fieldName) throws UtilException {
+        if (null == po || StringUtils.isEmpty(fieldName)) {
             throw new UtilException("parameter is null");
         }
         try {
-            Field field = getField(source.getClass(), fieldName);
+            Field field = getField(po.getClass(), fieldName);
             field.setAccessible(true);  //设置私有属性范围
-            return field.get(source);
+            return field.get(po);
         } catch (Exception e) {
             throw new UtilException(e);
         }
@@ -110,7 +124,7 @@ public class JPAUtils {
                 return field;
             }
         }
-        return getField(clazz.getSuperclass(),fieldName);
+        return getField(clazz.getSuperclass(), fieldName);
 
     }
 

@@ -4,10 +4,12 @@ import com.github.jyoghurt.core.configuration.PageConvert;
 import com.github.jyoghurt.core.dao.BaseMapper;
 import com.github.jyoghurt.core.domain.BaseEntity;
 import com.github.jyoghurt.core.exception.ServiceException;
+import com.github.jyoghurt.core.exception.UtilException;
 import com.github.jyoghurt.core.handle.QueryHandle;
 import com.github.jyoghurt.core.result.EasyUIResult;
 import com.github.jyoghurt.core.result.QueryResult;
 import com.github.jyoghurt.core.service.BaseService;
+import com.github.jyoghurt.core.utils.JPAUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -80,6 +82,13 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
 
     @Override
     public void update(T entity) throws ServiceException {
+        try {
+            if (null == JPAUtils.gtIdValue(entity)) {
+                return;
+            }
+        } catch (UtilException e) {
+            throw new ServiceException(e);
+        }
         if (entity instanceof BaseEntity) {
             ((BaseEntity) entity).setModifyDateTime(new Date());
             try {
