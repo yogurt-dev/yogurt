@@ -220,7 +220,7 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
             entity.setFounderId((String) getSessionAttr(BaseEntity.OPERATOR_ID));
             entity.setFounderName((String) getSessionAttr(BaseEntity.OPERATOR_NAME));
         } catch (Exception e) {
-            logger.info("setFounder时session获取失败!", e);
+            logger.debug("setFounder时session获取失败!", e);
             entity.setFounderId(BaseEntity.DEFAULT_OPERATOR);
             entity.setFounderName(BaseEntity.DEFAULT_OPERATOR);
         }
