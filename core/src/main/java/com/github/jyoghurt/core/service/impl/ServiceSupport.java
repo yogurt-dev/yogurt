@@ -95,7 +95,7 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
                 ((BaseEntity) entity).setModifierId((String) getSessionAttr(BaseEntity.OPERATOR_ID));
                 ((BaseEntity) entity).setModifierName((String) getSessionAttr(BaseEntity.OPERATOR_NAME));
             } catch (Exception e) {
-                logger.info("update时session获取失败!", e);
+                logger.info("update时session获取失败!");
                 ((BaseEntity) entity).setModifierId(BaseEntity.DEFAULT_OPERATOR);
                 ((BaseEntity) entity).setModifierName(BaseEntity.DEFAULT_OPERATOR);
             }
@@ -220,7 +220,7 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
             entity.setFounderId((String) getSessionAttr(BaseEntity.OPERATOR_ID));
             entity.setFounderName((String) getSessionAttr(BaseEntity.OPERATOR_NAME));
         } catch (Exception e) {
-            logger.debug("setFounder时session获取失败!", e);
+            logger.debug("setFounder时session获取失败!");
             entity.setFounderId(BaseEntity.DEFAULT_OPERATOR);
             entity.setFounderName(BaseEntity.DEFAULT_OPERATOR);
         }
