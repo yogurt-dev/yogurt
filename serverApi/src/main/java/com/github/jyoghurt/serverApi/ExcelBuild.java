@@ -256,7 +256,6 @@ public class ExcelBuild {
         analyzeResponseParameter(interfaceEntity, methodDoc);
         //解析错误码
         analyzeErrors(interfaceEntity, methodDoc);
-        log.info(interfaceEntity.getErrors().toString());
     }
 
 
@@ -367,6 +366,7 @@ public class ExcelBuild {
                 typeName = StringUtils.substringBeforeLast(typeName, "<");
             }
             if (typeName.equals("?")) {
+                log.warn("请写明返回值泛型，\"?\"没办法解析"+methodDoc.toString());
                 continue;
             }
             if (!ServerApiPlugin.classDocMap.containsKey(typeName)) {
@@ -376,7 +376,7 @@ public class ExcelBuild {
             classEntity.setClassName(type.getTypeName());
             ClassDoc classDoc = ServerApiPlugin.classDocMap.get(typeName);
             if (null == classDoc) {
-                System.out.println("typeName 没有获得classDoc " + typeName);
+                log.warn("typeName 没有获得classDoc " + typeName);
                 continue;
             }
             for (FieldDoc fieldDoc : classDoc.serializableFields()) {
@@ -517,8 +517,6 @@ public class ExcelBuild {
         if(Object.class.equals(targetClass)){
             return false;
         }
-        log.info(" exceptionClass = " +targetClass.getTypeName());
-        log.info(" BaseException = " +sourceClass.getTypeName());
         if(targetClass.getTypeName().equals(sourceClass.getTypeName())){
             return true;
         }

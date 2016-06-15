@@ -66,9 +66,7 @@ public class ServerApiPlugin extends CompilerMojo {
         if (StringUtils.isEmpty(sourceDir) || sourceDir.endsWith("META-INF")) {
             return;
         }
-        if (!StringUtils.equals(sourceDir, getSourceDir())) {
-            packages.add(sourceDir.replace(getSourceDir(), "").replace("\\", "."));
-        }
+
 
         if (sourceDir.endsWith(".jar")) {
             try {
@@ -91,6 +89,7 @@ public class ServerApiPlugin extends CompilerMojo {
         for (File javaFile : tempList) {
             if (javaFile.isFile()) {
                 javaFiles.add(javaFile.getAbsolutePath());
+                packages.add(sourceDir.replace(getSourceDir(), "").replace("\\", "."));
                 continue;
             }
             if (javaFile.isDirectory()) {
