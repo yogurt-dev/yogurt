@@ -7,6 +7,7 @@ import com.sun.javadoc.Parameter;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.maven.plugin.logging.Log;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
@@ -28,9 +29,11 @@ public class ExcelBuild {
     private SXSSFWorkbook workbook;
     protected int serviceIndex = 0;
     protected int methodIndex = 1;
+    private Log log ;
     private SortedMap<Integer, String> errorMap = new TreeMap<Integer, String>();
 
-    public void buildExcel(Map<String, ClassDoc> classDocMap) throws Exception {
+    public void buildExcel(Map<String, ClassDoc> classDocMap, Log log) throws Exception {
+        this.log = log;
         workbook = new SXSSFWorkbook();
         apiSheet = workbook.createSheet("接口列表");
         {
@@ -54,9 +57,12 @@ public class ExcelBuild {
             if (!filter(classDoc)) {
                 continue;
             }
-
             for (MethodDoc methodDoc : classDoc.methods()) {
-                createApiSheet(methodDoc, classDoc);
+                try {
+                    createApiSheet(methodDoc, classDoc);
+                } catch (Exception e) {
+                    log.error("creat sheet error,class is "+classDocName + " method is " + methodDoc.name(),e);
+                }
             }
         }
         tearDown();
@@ -108,7 +114,20 @@ public class ExcelBuild {
             sheet.setColumnWidth(4, 20 * 256);
             sheet.setColumnWidth(6, 30 * 256);
 
-            int rowIndex = 1;
+
+            int rowIndex = 0;
+            {
+                Row row = sheet.createRow(rowIndex++);
+                Cell nameCell = row.createCell(0);
+                {
+                    nameCell.setCellValue("接口列表");
+                    CreationHelper creationHelper = workbook.getCreationHelper();
+                    Hyperlink link = creationHelper.createHyperlink(Hyperlink.LINK_DOCUMENT);
+                    link.setAddress("#接口列表!A1");
+                    nameCell.setHyperlink(link);
+                }
+            }
+
             {
                 Row row = sheet.createRow(rowIndex++);
                 createHeaderCell(workbook, row, 2, "接口名称");
@@ -237,6 +256,7 @@ public class ExcelBuild {
         analyzeResponseParameter(interfaceEntity, methodDoc);
         //解析错误码
         analyzeErrors(interfaceEntity, methodDoc);
+        log.info(interfaceEntity.getErrors().toString());
     }
 
 
@@ -346,12 +366,19 @@ public class ExcelBuild {
             if (typeName.contains("<")) {
                 typeName = StringUtils.substringBeforeLast(typeName, "<");
             }
+            if (typeName.equals("?")) {
+                continue;
+            }
             if (!ServerApiPlugin.classDocMap.containsKey(typeName)) {
                 serverApiPlugin.init(getSourcePath(Class.forName(typeName)));
             }
             ClassEntity classEntity = new ClassEntity();
             classEntity.setClassName(type.getTypeName());
             ClassDoc classDoc = ServerApiPlugin.classDocMap.get(typeName);
+            if (null == classDoc) {
+                System.out.println("typeName 没有获得classDoc " + typeName);
+                continue;
+            }
             for (FieldDoc fieldDoc : classDoc.serializableFields()) {
                 ParameterEntity parameterEntity = new ParameterEntity();
                 parameterEntity.setParamCode(fieldDoc.name());
@@ -453,19 +480,49 @@ public class ExcelBuild {
         if (ArrayUtils.isEmpty(methodDoc.thrownExceptions())) {
             return;
         }
+
         for (ClassDoc classDoc : methodDoc.thrownExceptions()) {
             Class exceptionClass = Class.forName(classDoc.toString());
-            if (!BaseException.class.isAssignableFrom(exceptionClass)) {
+            if(Exception.class.equals(exceptionClass)){
+                continue;
+            }
+            if (!isAssignableFrom(BaseException.class,exceptionClass)) {
                 continue;
             }
             for (Field field : exceptionClass.getFields()) {
-                if (ExceptionBody.class.isAssignableFrom(field.getType())) {
+                if (isAssignableFrom(ExceptionBody.class,field.getType())) {
                     field.setAccessible(true);
-                    ExceptionBody exceptionBody = (ExceptionBody) field.get(null);
-                    interfaceEntity.getErrors().put(exceptionBody.getCode(), exceptionBody.getMessage());
+//                    ExceptionBody exceptionBody = (ExceptionBody) field.get(null);
+                    Object value = field.get(null);
+                    try {
+                        Field  code = field.get(null).getClass().getDeclaredField("code");
+                        code.setAccessible(true);
+                        Field  message = field.get(null).getClass().getDeclaredField("message");
+                        message.setAccessible(true);
+                        interfaceEntity.getErrors().put(code.get(value).toString(), message.get(value).toString());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
+    }
+
+    /**
+     * java原生的isAssignableFrom在maven环境下无效，未找到原因
+     * @param targetClass
+     * @return
+     */
+    private boolean isAssignableFrom(Class sourceClass, Class targetClass){
+        if(Object.class.equals(targetClass)){
+            return false;
+        }
+        log.info(" exceptionClass = " +targetClass.getTypeName());
+        log.info(" BaseException = " +sourceClass.getTypeName());
+        if(targetClass.getTypeName().equals(sourceClass.getTypeName())){
+            return true;
+        }
+        return isAssignableFrom(sourceClass,targetClass.getSuperclass());
     }
 
     protected String xlsxName = "serverApi.xlsx";

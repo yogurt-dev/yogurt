@@ -34,6 +34,7 @@ public class ServerApiPlugin extends CompilerMojo {
     protected static List<String> classpathElements;
 
     public void init() {
+        getLog().info(classpathElements.toString());
         //获取所有java文件
         findJavaFiles(getSourceDir());
         //创建classDoc
@@ -55,7 +56,7 @@ public class ServerApiPlugin extends CompilerMojo {
         try {
             Map<String, ClassDoc> map = new HashMap<>();
             map.putAll(classDocMap);
-            new ExcelBuild().buildExcel(map);
+            new ExcelBuild().buildExcel(map,getLog());
         } catch (Exception e) {
             e.printStackTrace();
         }
