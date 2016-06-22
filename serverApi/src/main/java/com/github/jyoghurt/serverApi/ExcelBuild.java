@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.poi.hssf.util.HSSFColor;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 
@@ -61,7 +62,7 @@ public class ExcelBuild {
                 try {
                     createApiSheet(methodDoc, classDoc);
                 } catch (Exception e) {
-                    log.error("creat sheet error,class is "+classDocName + " method is " + methodDoc.name(),e);
+                    log.error("Maybe the name is repeated ! "+methodDoc.toString(),e);
                 }
             }
         }
@@ -189,14 +190,18 @@ public class ExcelBuild {
                 Row row = sheet.createRow(rowIndex++);
                 int column = 1;
                 createHeaderCell(workbook, row, column++, "错误码");
+                sheet.addMergedRegion(new CellRangeAddress(rowIndex-1,rowIndex-1,column,column+1));
                 createHeaderCell(workbook, row, column++, "错误描述");
+                createHeaderCell(workbook, row, column++, "");
             }
             {
                 for (String key : interfaceEntity.getErrors().keySet()) {
                     Row row = sheet.createRow(rowIndex++);
                     int column = 1;
                     createValueCell(workbook, row, column++, key);
+                    sheet.addMergedRegion(new CellRangeAddress(rowIndex-1,rowIndex-1,column,column+1));
                     createValueCell(workbook, row, column++, interfaceEntity.getErrors().get(key));
+                    createValueCell(workbook, row, column++, "");
                 }
             }
         }

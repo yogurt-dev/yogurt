@@ -1,9 +1,6 @@
 package com.github.jyoghurt.serverApi;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static com.github.jyoghurt.serverApi.StringUtils.trim;
 
@@ -44,7 +41,7 @@ class InterfaceEntity {
     /**
      * 错误码
      */
-    private Map<String, String> errors = new HashMap();
+    private TreeMap<String, String> errors = new TreeMap();
 
     public String getIfName() {
         return trim(ifName);
@@ -102,11 +99,11 @@ class InterfaceEntity {
         this.responseClass = responseClass;
     }
 
-    public Map<String, String> getErrors() {
+    public TreeMap<String, String> getErrors() {
         return errors;
     }
 
-    public void setErrors(Map<String, String> errors) {
+    public void setErrors(TreeMap<String, String> errors) {
         this.errors = errors;
     }
 }
