@@ -304,6 +304,9 @@ public class ExcelBuild {
                     }
                     break;
                 }
+                case "RequestBody": {
+                    break;
+                }
                 default: {
                     parameterEntity.addParamValidRule(annotationDesc.annotationType().name());
                     break;
