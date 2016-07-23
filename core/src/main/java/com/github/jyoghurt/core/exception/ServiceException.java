@@ -17,7 +17,7 @@ public class ServiceException extends BaseException {
     }
 
     public ServiceException(Throwable cause) {
-        super(StringUtils.EMPTY,cause);
+        super(cause.getMessage(),cause);
     }
 
     public ServiceException(String message, Throwable cause) {

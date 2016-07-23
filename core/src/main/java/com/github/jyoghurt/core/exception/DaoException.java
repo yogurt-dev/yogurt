@@ -28,7 +28,7 @@ public class DaoException extends BaseException {
     }
 
     public DaoException(Throwable cause) {
-        super(StringUtils.EMPTY, cause);
+        super(cause.getMessage(), cause);
     }
 
     public DaoException(String message, Throwable cause) {

@@ -17,7 +17,7 @@ public class UtilException extends BaseException {
     }
 
     public UtilException(Throwable cause) {
-        super(StringUtils.EMPTY,cause);
+        super(cause.getMessage(),cause);
     }
 
     public UtilException(String message, Throwable cause) {

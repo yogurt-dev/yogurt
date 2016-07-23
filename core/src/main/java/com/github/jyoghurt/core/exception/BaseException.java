@@ -39,7 +39,7 @@ public abstract class BaseException extends Exception {
     }
 
     public BaseException(Throwable cause) {
-        super(cause);
+        super(cause.getMessage(),cause);
     }
 
     public BaseException(String message, Throwable cause) {
