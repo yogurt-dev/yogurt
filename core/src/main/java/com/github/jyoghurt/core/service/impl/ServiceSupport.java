@@ -3,6 +3,7 @@ package com.github.jyoghurt.core.service.impl;
 import com.github.jyoghurt.core.configuration.PageConvert;
 import com.github.jyoghurt.core.dao.BaseMapper;
 import com.github.jyoghurt.core.domain.BaseEntity;
+import com.github.jyoghurt.core.exception.BaseException;
 import com.github.jyoghurt.core.exception.ServiceException;
 import com.github.jyoghurt.core.exception.UtilException;
 import com.github.jyoghurt.core.handle.QueryHandle;
@@ -217,8 +218,11 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
 
     private void setFounder(BaseEntity entity) throws ServiceException {
         try {
-            entity.setFounderId((String) getSessionAttr(BaseEntity.OPERATOR_ID));
-            entity.setFounderName((String) getSessionAttr(BaseEntity.OPERATOR_NAME));
+
+            entity.setFounderId(null==getSessionAttr(BaseEntity.OPERATOR_ID)?BaseEntity.DEFAULT_OPERATOR:
+                    (String) getSessionAttr(BaseEntity.OPERATOR_ID));
+            entity.setFounderName(null==getSessionAttr(BaseEntity.OPERATOR_NAME)? BaseEntity.DEFAULT_OPERATOR:
+                    (String) getSessionAttr(BaseEntity.OPERATOR_NAME));
         } catch (Exception e) {
             logger.debug("setFounder时session获取失败!");
             entity.setFounderId(BaseEntity.DEFAULT_OPERATOR);
