@@ -92,14 +92,8 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
         }
         if (entity instanceof BaseEntity) {
             ((BaseEntity) entity).setModifyDateTime(new Date());
-            try {
-                ((BaseEntity) entity).setModifierId((String) getSessionAttr(BaseEntity.OPERATOR_ID));
-                ((BaseEntity) entity).setModifierName((String) getSessionAttr(BaseEntity.OPERATOR_NAME));
-            } catch (Exception e) {
-                logger.info("update时session获取失败!");
-                ((BaseEntity) entity).setModifierId(BaseEntity.DEFAULT_OPERATOR);
-                ((BaseEntity) entity).setModifierName(BaseEntity.DEFAULT_OPERATOR);
-            }
+            //modify by limiao 20160811 处理修改的时候勿将创建人和创建时间更新成修改人和修改时间的问题
+            this.setModifyFounder((BaseEntity) entity);
         }
         getMapper().update(entity);
     }
@@ -174,7 +168,8 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
         }
         if (entity instanceof BaseEntity) {
             ((BaseEntity) entity).setModifyDateTime(new Date());
-            setFounder((BaseEntity) entity);
+            //add by limiao 20160811 处理修改的时候勿将创建人和创建时间更新成修改人和修改时间的问题
+            this.setModifyFounder((BaseEntity) entity);
         }
         getMapper().updateForSelective(entity);
     }
@@ -229,4 +224,17 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
             entity.setFounderName(BaseEntity.DEFAULT_OPERATOR);
         }
     }
+
+    //add by limiao 20160811 处理修改的时候勿将创建人和创建时间更新成修改人和修改时间的问题
+    private void setModifyFounder(BaseEntity entity) throws ServiceException {
+        try {
+            entity.setModifierId((String) getSessionAttr(BaseEntity.OPERATOR_ID));
+            entity.setModifierName((String) getSessionAttr(BaseEntity.OPERATOR_NAME));
+        } catch (Exception e) {
+            logger.info("update时session获取失败!");
+            entity.setModifierId(BaseEntity.DEFAULT_OPERATOR);
+            entity.setModifierName(BaseEntity.DEFAULT_OPERATOR);
+        }
+    }
+
 }
