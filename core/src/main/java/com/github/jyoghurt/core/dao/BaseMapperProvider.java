@@ -22,6 +22,7 @@ import java.lang.reflect.Field;
 import java.util.*;
 
 import static com.github.jyoghurt.core.mybatis.SqlBuilder.*;
+import static com.github.jyoghurt.core.mybatis.SqlBuilder.WHERE;
 
 /**
  * Created by jtwu on 2015/4/21.
@@ -132,20 +133,29 @@ public class BaseMapperProvider {
             return false;
         }
         //排除为空并且未出现的自定义查询条件的字段
-        if (StringUtils.isEmpty(tableAlias) && !param.containsKey(field.getName()) && (!operatorMap.containsKey(field.getName()) || ArrayUtils.isEmpty(
-                operatorMap.get(field.getName()).getValues()))) {
+
+        //modify by limiao 20160811  处理拼in的时候，数组为空，不想查询的问题。当数组为空的时候，仍然继续 start
+//        if (StringUtils.isEmpty(tableAlias) && !param.containsKey(field.getName()) && (!operatorMap.containsKey(field.getName()) || ArrayUtils.isEmpty(
+//                operatorMap.get(field.getName()).getValues()))) {
+//            return false;
+//        }
+        if (StringUtils.isEmpty(tableAlias) && !param.containsKey(field.getName()) && (!operatorMap.containsKey(field.getName()))) {
             return false;
         }
-
         //如果是级联获取的，上一逻辑需要加上表前缀
         String fieldNameKey = StringUtils.isEmpty(tableAlias) ? field.getName() : tableAlias + "." + field.getName();
+//        if (StringUtils.isNotEmpty(tableAlias) && null == JPAUtils.getValue(param.get(tableAlias), field.getName()) &&
+//                (!operatorMap.containsKey(fieldNameKey) || ArrayUtils.isEmpty(operatorMap.get(fieldNameKey).getValues()))) {
+//            return false;
+//        }
         if (StringUtils.isNotEmpty(tableAlias) && null == JPAUtils.getValue(param.get(tableAlias), field.getName()) &&
-                (!operatorMap.containsKey(fieldNameKey) || ArrayUtils.isEmpty(operatorMap.get(fieldNameKey).getValues()))) {
+                (!operatorMap.containsKey(fieldNameKey))) {
             return false;
         }
+        //modify by limiao 20160811  处理拼in的时候，数组为空，不想查询的问题 end
 
         //封装类型递归处理，拼装成级联查询
-        if (null!=field.getType().getAnnotation(Table.class)) {
+        if (null != field.getType().getAnnotation(Table.class)) {
             parseCascade(operatorMap, field, param);
             return false;
         }
@@ -199,8 +209,15 @@ public class BaseMapperProvider {
                 for (int i = 0; i < operatorMap.get(fieldNameKey).getValues().length; i++) {
                     inValue += " #{" + BaseMapper.DATA + ".operatorHandles." + field.getName() + ".values[" + i + "]},";
                 }
-                WHERE(StringUtils.join(prefix, field.getName(), " in (", inValue.substring(0, inValue.length() - 1), ")" +
-                        ""));
+                //add by limiao 20160811 处理拼in的时候，数组为空，不想查询的问题
+                if (StringUtils.isEmpty(inValue)) {
+                    WHERE(StringUtils.join(prefix, field.getName(), " in ( null )"));
+                    //效率高的方案...
+                    //WHERE("1=2");
+                } else {
+                    WHERE(StringUtils.join(prefix, field.getName(), " in (", inValue.substring(0, inValue.length() - 1), ")" +
+                            ""));
+                }
                 break;
             }
             case FIND_IN_SET: {
@@ -520,7 +537,7 @@ public class BaseMapperProvider {
             VALUES(idField.getName(), StringUtils.join("#{", BaseMapper.ENTITY, ".", idField.getName(), "}"));
             return;
         }
-        String id = UUID.randomUUID().toString().replace("-","");
+        String id = UUID.randomUUID().toString().replace("-", "");
         VALUES(idField.getName(), StringUtils.join("'", id, "'"));
         idField.set(param.get(BaseMapper.ENTITY), id);
     }
@@ -533,7 +550,7 @@ public class BaseMapperProvider {
             BATCH_VALUES(idField.getName(), StringUtils.join("#{", BaseMapper.ENTITIES, "[", i, "]", ".", idField.getName(), "}"));
             return;
         }
-        String id = UUID.randomUUID().toString().replace("-","");
+        String id = UUID.randomUUID().toString().replace("-", "");
         BATCH_VALUES(idField.getName(), StringUtils.join("'", id, "'"));
         idField.set(baseEntity, id);
     }
@@ -546,7 +563,7 @@ public class BaseMapperProvider {
         for (Field field : JPAUtils.getAllFields(entityClass)) {
             field.setAccessible(true);
             //非基础类型不处理
-            if(field.getType().isAssignableFrom(Collection.class)||null!=field.getType().getAnnotation(Table.class)){
+            if (field.getType().isAssignableFrom(Collection.class) || null != field.getType().getAnnotation(Table.class)) {
                 continue;
             }
             //处理主键
@@ -669,7 +686,7 @@ public class BaseMapperProvider {
         for (Field field : JPAUtils.getAllFields(entityClass)) {
             field.setAccessible(true);
             //非基础类型不处理
-            if(field.getType().isAssignableFrom(Collection.class)||null!=field.getType().getAnnotation(Table.class)){
+            if (field.getType().isAssignableFrom(Collection.class) || null != field.getType().getAnnotation(Table.class)) {
                 continue;
             }
             //处理主键
