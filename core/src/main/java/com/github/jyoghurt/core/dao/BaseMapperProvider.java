@@ -139,7 +139,8 @@ public class BaseMapperProvider {
 //                operatorMap.get(field.getName()).getValues()))) {
 //            return false;
 //        }
-        if (StringUtils.isEmpty(tableAlias) && !param.containsKey(field.getName()) && (!operatorMap.containsKey(field.getName()))) {
+        if (StringUtils.isEmpty(tableAlias) && !param.containsKey(field.getName()) && (!operatorMap.containsKey(field.getName())) ||
+                operatorMap.get(field.getName()).getValues() == null) {
             return false;
         }
         //如果是级联获取的，上一逻辑需要加上表前缀
@@ -149,7 +150,7 @@ public class BaseMapperProvider {
 //            return false;
 //        }
         if (StringUtils.isNotEmpty(tableAlias) && null == JPAUtils.getValue(param.get(tableAlias), field.getName()) &&
-                (!operatorMap.containsKey(fieldNameKey))) {
+                (!operatorMap.containsKey(fieldNameKey)) || operatorMap.get(fieldNameKey).getValues() == null) {
             return false;
         }
         //modify by limiao 20160811  处理拼in的时候，数组为空，不想查询的问题 end
