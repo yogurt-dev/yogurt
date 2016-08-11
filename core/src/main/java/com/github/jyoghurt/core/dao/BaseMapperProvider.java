@@ -139,8 +139,10 @@ public class BaseMapperProvider {
 //                operatorMap.get(field.getName()).getValues()))) {
 //            return false;
 //        }
-        if (StringUtils.isEmpty(tableAlias) && !param.containsKey(field.getName()) && (!operatorMap.containsKey(field.getName())) ||
-                operatorMap.get(field.getName()).getValues() == null) {
+        if (StringUtils.isEmpty(tableAlias) && !param.containsKey(field.getName()) && (!operatorMap.containsKey(field.getName()))) {
+            return false;
+        }
+        if ((operatorMap.containsKey(field.getName())) && operatorMap.get(field.getName()).getValues() == null) {
             return false;
         }
         //如果是级联获取的，上一逻辑需要加上表前缀
