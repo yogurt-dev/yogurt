@@ -7,8 +7,9 @@ package com.github.jyoghurt.core.handle;
 public class OperatorHandle {
 
     /* modify by limiao 20160203 新增 NOT_EQUAL, NOT_LIKE,IS_NULL ,IS_NOT_NULL */
+    /* modify by limiao 20160825 新增 NOT_IN*/
     public enum operatorType {
-        EQUAL, LIKE, LESS_THEN, MORE_THEN, LESS_EQUAL, MORE_EQUAL, IN, FIND_IN_SET, NOT_EQUAL, NOT_LIKE, IS_NULL, IS_NOT_NULL
+        EQUAL, LIKE, LESS_THEN, MORE_THEN, LESS_EQUAL, MORE_EQUAL, IN, NOT_IN, FIND_IN_SET, NOT_EQUAL, NOT_LIKE, IS_NULL, IS_NOT_NULL
     }
 
     private String column;

@@ -139,9 +139,11 @@ public class BaseMapperProvider {
 //                operatorMap.get(field.getName()).getValues()))) {
 //            return false;
 //        }
-        if (StringUtils.isEmpty(tableAlias) && !param.containsKey(field.getName()) && (!operatorMap.containsKey(field.getName()))) {
+        //!param.containsKey(field.getName()) &&
+        if (StringUtils.isEmpty(tableAlias) && (!operatorMap.containsKey(field.getName()))) {
             return false;
         }
+
         if ((operatorMap.containsKey(field.getName())) && operatorMap.get(field.getName()).getValues() == null) {
             return false;
         }
@@ -182,6 +184,7 @@ public class BaseMapperProvider {
         Object value = ArrayUtils.isEmpty((operatorMap.get(fieldNameKey)).getValues())
                 ? "#{" + StringUtils.join(BaseMapper.DATA + "." + fieldNameKey) + "}"
                 : "#{" + BaseMapper.DATA + ".operatorHandles." + fieldNameKey.replace(".", "_") + ".values[0]}";
+
         switch ((operatorMap.get(fieldNameKey)).getOperator()) {
             case EQUAL: {
                 WHERE(StringUtils.join(prefix, field.getName(), " = ", value));
@@ -207,18 +210,21 @@ public class BaseMapperProvider {
                 WHERE(StringUtils.join(prefix, field.getName(), " >= ", value));
                 break;
             }
+            case NOT_IN:
             case IN: {
+                //modify by limiao 20160825 新增 NOT_IN
+                String operate = this.getInOrNotInOperate((operatorMap.get(fieldNameKey)).getOperator());
                 String inValue = "";
                 for (int i = 0; i < operatorMap.get(fieldNameKey).getValues().length; i++) {
                     inValue += " #{" + BaseMapper.DATA + ".operatorHandles." + field.getName() + ".values[" + i + "]},";
                 }
                 //add by limiao 20160811 处理拼in的时候，数组为空，不想查询的问题
                 if (StringUtils.isEmpty(inValue)) {
-                    WHERE(StringUtils.join(prefix, field.getName(), " in ( null )"));
+                    WHERE(StringUtils.join(prefix, field.getName(), operate + "  ( null )"));
                     //效率高的方案...
                     //WHERE("1=2");
                 } else {
-                    WHERE(StringUtils.join(prefix, field.getName(), " in (", inValue.substring(0, inValue.length() - 1), ")" +
+                    WHERE(StringUtils.join(prefix, field.getName(), operate + "  (", inValue.substring(0, inValue.length() - 1), ")" +
                             ""));
                 }
                 break;
@@ -247,6 +253,23 @@ public class BaseMapperProvider {
         }
         return true;
     }
+
+    //modify by limiao 20160825 新增 NOT_IN
+    private String getInOrNotInOperate(OperatorHandle.operatorType operatorType) {
+        String operate = null;
+        switch (operatorType) {
+            case IN: {
+                operate = " in ";
+                break;
+            }
+            case NOT_IN: {
+                operate = " not in ";
+                break;
+            }
+        }
+        return operate;
+    }
+
 
     private void parseCascade(Map<String, OperatorHandle> operatorMap, Field field, Map<String, Object> param) throws UtilException {
         //不是PO不做任何处理,没有配置级联关系不处理

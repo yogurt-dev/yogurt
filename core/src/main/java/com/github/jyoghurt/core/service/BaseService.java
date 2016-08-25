@@ -79,6 +79,18 @@ public interface BaseService<T> {
      */
     void logicDeleteByCondition(T entity) throws ServiceException;
 
+
+    /**
+     * add by limiao 20160825
+     * 根据条件逻辑删除
+     * 实体不需要设置deleteFlag=true，否则会将deleteFlag=true拼到条件中
+     *
+     * @param entity      根据非空字段当做删除条件
+     * @param queryHandle queryHandle
+     * @throws ServiceException {@inheritDoc}
+     */
+    void logicDeleteByCondition(T entity, QueryHandle queryHandle) throws ServiceException;
+
     /**
      * 根据条件删除
      *

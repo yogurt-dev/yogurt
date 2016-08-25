@@ -114,6 +114,11 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
     }
 
     @Override
+    public void logicDeleteByCondition(T entity, QueryHandle queryHandle) throws ServiceException {
+        getMapper().logicDeleteByCondition((Class<T>) entity.getClass(), getValueMap(entity, queryHandle));
+    }
+
+    @Override
     public void deleteByCondition(T entity) throws ServiceException {
         getMapper().deleteByCondition((Class<T>) entity.getClass(), getValueMap(entity));
     }
@@ -214,9 +219,9 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
     private void setFounder(BaseEntity entity) throws ServiceException {
         try {
 
-            entity.setFounderId(null==getSessionAttr(BaseEntity.OPERATOR_ID)?BaseEntity.DEFAULT_OPERATOR:
+            entity.setFounderId(null == getSessionAttr(BaseEntity.OPERATOR_ID) ? BaseEntity.DEFAULT_OPERATOR :
                     (String) getSessionAttr(BaseEntity.OPERATOR_ID));
-            entity.setFounderName(null==getSessionAttr(BaseEntity.OPERATOR_NAME)? BaseEntity.DEFAULT_OPERATOR:
+            entity.setFounderName(null == getSessionAttr(BaseEntity.OPERATOR_NAME) ? BaseEntity.DEFAULT_OPERATOR :
                     (String) getSessionAttr(BaseEntity.OPERATOR_NAME));
         } catch (Exception e) {
             logger.debug("setFounder时session获取失败!");
