@@ -11,6 +11,7 @@ import com.github.jyoghurt.core.handle.SQLJoinHandle;
 import com.github.jyoghurt.core.utils.JPAUtils;
 import com.github.jyoghurt.core.utils.beanUtils.BeanUtils;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -128,42 +129,17 @@ public class BaseMapperProvider {
 
     private boolean createFieldWhereSql(Map<String, OperatorHandle> operatorMap, Field field, Map<String, Object>
             param, String tableAlias) throws UtilException {
-        //排除非持久化字段和Class字段
-        if (null != field.getAnnotation(Transient.class) || field.getType().isAssignableFrom(Class.class)) {
+        //验证是否需要拼装该属性
+        if (!validateField2WhereSql(operatorMap, field, param, tableAlias)) {
             return false;
         }
-        //排除为空并且未出现的自定义查询条件的字段
-
-        //modify by limiao 20160811  处理拼in的时候，数组为空，不想查询的问题。当数组为空的时候，仍然继续 start
-//        if (StringUtils.isEmpty(tableAlias) && !param.containsKey(field.getName()) && (!operatorMap.containsKey(field.getName()) || ArrayUtils.isEmpty(
-//                operatorMap.get(field.getName()).getValues()))) {
-//            return false;
-//        }
-        //!param.containsKey(field.getName()) &&
-        if (StringUtils.isEmpty(tableAlias) && (!operatorMap.containsKey(field.getName()))) {
-            return false;
-        }
-
-        if ((operatorMap.containsKey(field.getName())) && operatorMap.get(field.getName()).getValues() == null) {
-            return false;
-        }
-        //如果是级联获取的，上一逻辑需要加上表前缀
-        String fieldNameKey = StringUtils.isEmpty(tableAlias) ? field.getName() : tableAlias + "." + field.getName();
-//        if (StringUtils.isNotEmpty(tableAlias) && null == JPAUtils.getValue(param.get(tableAlias), field.getName()) &&
-//                (!operatorMap.containsKey(fieldNameKey) || ArrayUtils.isEmpty(operatorMap.get(fieldNameKey).getValues()))) {
-//            return false;
-//        }
-        if (StringUtils.isNotEmpty(tableAlias) && null == JPAUtils.getValue(param.get(tableAlias), field.getName()) &&
-                (!operatorMap.containsKey(fieldNameKey)) || operatorMap.get(fieldNameKey).getValues() == null) {
-            return false;
-        }
-        //modify by limiao 20160811  处理拼in的时候，数组为空，不想查询的问题 end
 
         //封装类型递归处理，拼装成级联查询
         if (null != field.getType().getAnnotation(Table.class)) {
             parseCascade(operatorMap, field, param);
             return false;
         }
+        String fieldNameKey = StringUtils.isEmpty(tableAlias) ? field.getName() : tableAlias + "." + field.getName();
         String prefix = StringUtils.isEmpty(tableAlias) ? "t." : StringUtils.join(tableAlias, ".");
         if (!operatorMap.containsKey(fieldNameKey)) {
             WHERE(StringUtils.join(prefix, getEqualsValue(field
@@ -210,23 +186,12 @@ public class BaseMapperProvider {
                 WHERE(StringUtils.join(prefix, field.getName(), " >= ", value));
                 break;
             }
-            case NOT_IN:
+            case NOT_IN: {
+                createInOrNotIn(operatorMap, field, fieldNameKey, prefix, " not in ");
+                break;
+            }
             case IN: {
-                //modify by limiao 20160825 新增 NOT_IN
-                String operate = this.getInOrNotInOperate((operatorMap.get(fieldNameKey)).getOperator());
-                String inValue = "";
-                for (int i = 0; i < operatorMap.get(fieldNameKey).getValues().length; i++) {
-                    inValue += " #{" + BaseMapper.DATA + ".operatorHandles." + field.getName() + ".values[" + i + "]},";
-                }
-                //add by limiao 20160811 处理拼in的时候，数组为空，不想查询的问题
-                if (StringUtils.isEmpty(inValue)) {
-                    WHERE(StringUtils.join(prefix, field.getName(), operate + "  ( null )"));
-                    //效率高的方案...
-                    //WHERE("1=2");
-                } else {
-                    WHERE(StringUtils.join(prefix, field.getName(), operate + "  (", inValue.substring(0, inValue.length() - 1), ")" +
-                            ""));
-                }
+                createInOrNotIn(operatorMap, field, fieldNameKey, prefix, " in ");
                 break;
             }
             case FIND_IN_SET: {
@@ -254,22 +219,50 @@ public class BaseMapperProvider {
         return true;
     }
 
-    //modify by limiao 20160825 新增 NOT_IN
-    private String getInOrNotInOperate(OperatorHandle.operatorType operatorType) {
-        String operate = null;
-        switch (operatorType) {
-            case IN: {
-                operate = " in ";
-                break;
-            }
-            case NOT_IN: {
-                operate = " not in ";
-                break;
+    private void createInOrNotIn(Map<String, OperatorHandle> operatorMap, Field field, String fieldNameKey, String prefix, String operate) {
+        List inValues = new ArrayList<>();
+        if (ArrayUtils.isNotEmpty(operatorMap.get(fieldNameKey).getValues())) {
+            for (int i = 0; i < operatorMap.get(fieldNameKey).getValues().length; i++) {
+                inValues.add(" #{" + BaseMapper.DATA + ".operatorHandles." + field
+                        .getName() + ".values[" + i + "]}");
             }
         }
-        return operate;
+
+        //add by limiao 20160811 处理拼in的时候，数组为空，不想查询的问题
+        String inValueSql = inValues.isEmpty() ? " ( null ) "
+                : StringUtils.join(" (", StringUtils.join(inValues, ","), ")");
+        WHERE(StringUtils.join(prefix, field.getName(), operate + inValueSql));
     }
 
+    /**
+     * 验证该字段是否有需要拼装到sql中
+     *
+     * @param operatorMap 扩展运算集合
+     * @param field       字段
+     * @param param       数据集合
+     * @param tableAlias  字段所属表别名
+     * @return boolean值, 是否需要验证
+     * @throws UtilException
+     */
+    private boolean validateField2WhereSql(Map<String, OperatorHandle> operatorMap, Field field, Map<String, Object>
+            param, String tableAlias) throws UtilException {
+        if (null != field.getAnnotation(Transient.class) || field.getType().isAssignableFrom(Class.class)) {
+            return false;
+        }
+        return validateFieldInParam(field, param, tableAlias) || validateFieldInOperatorMap(field, operatorMap,
+                tableAlias);
+    }
+
+    private boolean validateFieldInParam(Field field, Map<String, Object> param, String tableAlias) throws UtilException {
+        return (StringUtils.isEmpty(tableAlias) && param.containsKey(field.getName())) ||
+                (StringUtils.isNotEmpty(tableAlias) && null == JPAUtils.getValue(param.get(tableAlias), field.getName()));
+    }
+
+    private boolean validateFieldInOperatorMap(Field field, Map<String, OperatorHandle> operatorMap, String tableAlias) {
+        String fieldNameKey = StringUtils.isEmpty(tableAlias) ? field.getName() : tableAlias + "." + field.getName();
+//        return (operatorMap.containsKey(fieldNameKey) && ArrayUtils.isNotEmpty(operatorMap.get(fieldNameKey).getValues()));
+        return operatorMap.containsKey(fieldNameKey);
+    }
 
     private void parseCascade(Map<String, OperatorHandle> operatorMap, Field field, Map<String, Object> param) throws UtilException {
         //不是PO不做任何处理,没有配置级联关系不处理
@@ -288,8 +281,6 @@ public class BaseMapperProvider {
                         field.getName(), " on t.", JPAUtils.getIdField(field.getType()).getName(), "=", field.getName(), ".", foreignKey));
         sqlJoinHandles.add(sqlJoinHandle);
         createFieldsWhereSql(operatorMap, param, field.getName(), field.getType());
-        return;
-
     }
 
 
@@ -616,7 +607,7 @@ public class BaseMapperProvider {
      * @return sql
      * @throws DaoException {@inheritDoc}
      */
-    protected String getTableName(Class entityClass) throws DaoException {
+    private String getTableName(Class entityClass) throws DaoException {
         Annotation table = entityClass.getAnnotation(Table.class);
         if (null == table) {
             throw new DaoException(StringUtils.join("实体未配置Table注解 entityClass =", entityClass.getName()));
@@ -628,7 +619,7 @@ public class BaseMapperProvider {
         return tableName;
     }
 
-    protected String getTableNameWithAlias(Class entityClass) throws DaoException {
+    private String getTableNameWithAlias(Class entityClass) throws DaoException {
         return StringUtils.join(getTableName(entityClass), " t");
     }
 
