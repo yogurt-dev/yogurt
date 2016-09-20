@@ -1,5 +1,6 @@
 package com.github.jyoghurt.core.utils;
 
+import com.github.jyoghurt.core.spring.context.support.PropertyConfigurer;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -76,5 +77,9 @@ public class SpringContextUtils implements ApplicationContextAware {
 
     public static Boolean containsBean(String beanName) {
         return applicationContext.containsBean(beanName);
+    }
+
+    public static String getProperty(String key) {
+        return PropertyConfigurer.getProperty(key);
     }
 }

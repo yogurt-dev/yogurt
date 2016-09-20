@@ -1,6 +1,7 @@
 package com.github.jyoghurt.core.service.impl;
 
 import com.github.jyoghurt.core.configuration.PageConvert;
+import com.github.jyoghurt.core.configuration.impl.PageConfiguration;
 import com.github.jyoghurt.core.dao.BaseMapper;
 import com.github.jyoghurt.core.domain.BaseEntity;
 import com.github.jyoghurt.core.exception.BaseException;
@@ -42,9 +43,6 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
 
     @Value("${tableJsLib}")
     private String tableJsLib;
-
-    @Resource(name = "pageConvert")
-    private PageConvert pageConvert;
 
     @Override
     public void save(T entity) throws ServiceException {
@@ -152,14 +150,14 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
         if (StringUtils.isEmpty(tableJsLib)) {
             return new EasyUIResult();
         }
-        return pageConvert.createQueryResult();
+        return PageConfiguration.create().createQueryResult();
     }
 
     protected QueryResult<T> newQueryResult(List<T> list) {
         if (StringUtils.isEmpty(tableJsLib)) {
             return new EasyUIResult(list);
         }
-        return pageConvert.createQueryResult(list);
+        return PageConfiguration.create().createQueryResult(list);
     }
 
     @Override

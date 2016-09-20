@@ -1,6 +1,7 @@
 package com.github.jyoghurt.core.handle;
 
 import com.github.jyoghurt.core.configuration.PageConvert;
+import com.github.jyoghurt.core.configuration.impl.PageConfiguration;
 import com.github.jyoghurt.core.dao.BaseMapper;
 import com.github.jyoghurt.core.utils.DateTimeFormatter;
 import com.github.jyoghurt.core.utils.JPAUtils;
@@ -280,10 +281,7 @@ public class QueryHandle {
     }
 
     public QueryHandle configPage() {
-        try {
-            (SpringContextUtils.getBean(PageConvert.class)).convert(this, getHttpServletRequest());
-        } catch (NoSuchBeanDefinitionException e) {
-        }
+        PageConfiguration.create().convert(this, getHttpServletRequest());
         return this;
     }
 
