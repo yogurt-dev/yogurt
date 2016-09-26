@@ -1,6 +1,7 @@
 package com.github.jyoghurt.core.controller;
 
 
+import com.github.jyoghurt.core.exception.BaseException;
 import com.github.jyoghurt.core.result.HttpResultEntity;
 import com.github.jyoghurt.core.result.HttpResultHandle;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -56,6 +57,13 @@ public class BaseController {
 
     public static HttpResultEntity<?> getErrorResult(Object result) {
         return HttpResultHandle.getErrorResult(result);
+    }
+
+    public static HttpResultEntity<?> getErrorResult(BaseException e){
+        if(null==e||null==e.getExceptionBody()){
+            return getErrorResult();
+        }
+        return HttpResultHandle.getErrorResult(e.getErrorCode(),e.getExceptionBody().getMessage());
     }
 
 }

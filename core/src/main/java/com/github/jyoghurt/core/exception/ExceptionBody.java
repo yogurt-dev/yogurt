@@ -2,6 +2,7 @@ package com.github.jyoghurt.core.exception;
 
 /**
  * Created by jtwu on 2016/4/8.
+ * 自定义异常体
  */
 public class ExceptionBody {
     private String code;

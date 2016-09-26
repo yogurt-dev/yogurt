@@ -15,19 +15,25 @@ public abstract class BaseException extends Exception {
      */
     private String errorCode;
 
+    /**
+     * 自定义异常体
+     */
+    private ExceptionBody exceptionBody;
+
     public BaseException(String refBizId, String logContent, Exception e) {
         super();
     }
 
     public BaseException(ExceptionBody exceptionBody) {
         super(exceptionBody.getMessage());
+        this.exceptionBody=exceptionBody;
         this.errorCode = exceptionBody.getCode();
     }
 
     public BaseException(ExceptionBody exceptionBody, Throwable cause) {
-        super(exceptionBody.getMessage());
+        super(exceptionBody.getMessage(),cause);
+        this.exceptionBody=exceptionBody;
         this.errorCode = exceptionBody.getCode();
-        logger.error(exceptionBody.toString(), cause);
     }
 
     public BaseException() {
@@ -48,5 +54,9 @@ public abstract class BaseException extends Exception {
 
     public String getErrorCode() {
         return errorCode;
+    }
+
+    public ExceptionBody getExceptionBody() {
+        return exceptionBody;
     }
 }
