@@ -4,6 +4,8 @@ package com.github.jyoghurt.core.controller;
 import com.github.jyoghurt.core.exception.BaseException;
 import com.github.jyoghurt.core.result.HttpResultEntity;
 import com.github.jyoghurt.core.result.HttpResultHandle;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
 import javax.servlet.http.HttpServletRequest;
@@ -20,6 +22,7 @@ public class BaseController {
     protected HttpServletRequest request;
     protected HttpServletResponse response;
     protected HttpSession session;
+    protected static Logger logger = LoggerFactory.getLogger(BaseController.class);
 
     @ModelAttribute
     public void setReqAndRes(HttpServletRequest request, HttpServletResponse response) {
@@ -37,7 +40,6 @@ public class BaseController {
         extMap.put("file", "doc,docx,xls,xlsx,ppt,htm,html,txt,zip,rar,gz,bz2");
 
     }
-
 
 
     public HttpResultEntity<?> getSuccessResult() {
@@ -59,11 +61,15 @@ public class BaseController {
         return HttpResultHandle.getErrorResult(result);
     }
 
-    public static HttpResultEntity<?> getErrorResult(BaseException e){
-        if(null==e||null==e.getExceptionBody()){
+    public static HttpResultEntity<?> getErrorResult(BaseException e) {
+        if (null == e) {
             return getErrorResult();
         }
-        return HttpResultHandle.getErrorResult(e.getErrorCode(),e.getExceptionBody().getMessage());
+        logger.warn(e.getMessage(), e.getCause());
+        if (null == e.getExceptionBody()) {
+            return getErrorResult();
+        }
+        return HttpResultHandle.getErrorResult(e.getErrorCode(), e.getExceptionBody().getMessage());
     }
 
 }
