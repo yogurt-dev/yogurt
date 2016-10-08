@@ -4,6 +4,7 @@ import com.github.jyoghurt.core.configuration.PageConvert;
 import com.github.jyoghurt.core.handle.QueryHandle;
 import com.github.jyoghurt.core.result.EasyUIResult;
 import com.github.jyoghurt.core.result.QueryResult;
+import com.github.jyoghurt.core.utils.SpringContextUtils;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
 import org.springframework.core.type.AnnotatedTypeMetadata;
@@ -19,7 +20,7 @@ public class EasyUIPageService implements Condition,PageConvert {
 
     @Override
     public boolean matches(ConditionContext conditionContext, AnnotatedTypeMetadata annotatedTypeMetadata) {
-        return PageConvert.EasyUI.equalsIgnoreCase(ResourceBundle.getBundle("environment-config").getString("tableJsLib"));
+        return PageConvert.EasyUI.equalsIgnoreCase(SpringContextUtils.getProperty("tableJsLib"));
     }
 
     @Override

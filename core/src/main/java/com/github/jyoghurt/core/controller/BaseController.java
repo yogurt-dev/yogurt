@@ -57,10 +57,6 @@ public class BaseController {
     }
 
 
-    public static HttpResultEntity<?> getErrorResult(Object result) {
-        return HttpResultHandle.getErrorResult(result);
-    }
-
     public static HttpResultEntity<?> getErrorResult(BaseException e) {
         if (null == e) {
             return getErrorResult();
@@ -70,6 +66,10 @@ public class BaseController {
             return getErrorResult();
         }
         return HttpResultHandle.getErrorResult(e.getErrorCode(), e.getExceptionBody().getMessage());
+    }
+
+    public static HttpResultEntity<?> getErrorResult(Object result) {
+        return HttpResultHandle.getErrorResult(result);
     }
 
 }

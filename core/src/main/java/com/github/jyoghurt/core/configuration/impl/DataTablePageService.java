@@ -4,6 +4,7 @@ import com.github.jyoghurt.core.configuration.PageConvert;
 import com.github.jyoghurt.core.handle.QueryHandle;
 import com.github.jyoghurt.core.result.DataTableResult;
 import com.github.jyoghurt.core.result.QueryResult;
+import com.github.jyoghurt.core.utils.SpringContextUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Condition;
 import org.springframework.context.annotation.ConditionContext;
@@ -21,7 +22,7 @@ public class DataTablePageService<T> implements Condition,PageConvert<T> {
 
     @Override
     public boolean matches(ConditionContext conditionContext, AnnotatedTypeMetadata annotatedTypeMetadata) {
-        return PageConvert.DataTable.equalsIgnoreCase(ResourceBundle.getBundle("environment-config").getString("tableJsLib"));
+        return PageConvert.DataTable.equalsIgnoreCase(SpringContextUtils.getProperty("tableJsLib"));
     }
 
     @Override

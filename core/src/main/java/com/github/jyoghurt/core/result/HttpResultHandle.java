@@ -46,12 +46,14 @@ public class HttpResultHandle {
     }
 
     public static HttpResultEntity<?> getErrorResult(Object result) {
-            return new HttpResultEntity<>(HttpResultEnum.ERROR.errorCode, HttpResultEnum.ERROR.message, result);
-        }
-    public static HttpResultEntity<?> getErrorResult(String errorCode,String message) {
+        return new HttpResultEntity<>(HttpResultEnum.ERROR.errorCode, HttpResultEnum.ERROR.message, result);
+    }
+
+    public static HttpResultEntity<?> getErrorResult(String errorCode, String message) {
         return new HttpResultEntity<>(errorCode, message);
     }
-    public static HttpResultEntity<?> getErrorResult(String errorCode,String message,Object result) {
+
+    public static HttpResultEntity<?> getErrorResult(String errorCode, String message, Object result) {
         return new HttpResultEntity<>(errorCode, message, result);
     }
 }
