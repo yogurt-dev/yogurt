@@ -127,7 +127,7 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
     }
 
     @Override
-    public QueryResult<T> getData(T entity, QueryHandle queryHandle) throws ServiceException {
+    public QueryResult<T> getData(T entity, QueryHandle queryHandle)  {
         QueryResult<T> qr = newQueryResult();
         qr.setData(getMapper().pageData((Class<T>) entity.getClass(), getValueMap(queryHandle, entity).chainPutAll
                 (queryHandle == null ? null : queryHandle.getExpandData())));

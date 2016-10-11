@@ -583,11 +583,18 @@ public class BaseMapperProvider {
             if (field.getType().isAssignableFrom(Collection.class) || null != field.getType().getAnnotation(Table.class)) {
                 continue;
             }
-            //处理主键
+            //处理nullable
+            Annotation columnAnnotation = field.getAnnotation(Column.class);
+            if (null != columnAnnotation && ((Column) columnAnnotation).nullable() == false
+                    && null == JPAUtils.getValue(param.get(BaseMapper.ENTITY), field.getName()) ) {
+                continue;
+            }
+            //处理非主键
             if (null == field.getAnnotation(Id.class)) {
                 SET(StringUtils.join(getEqualsValue(field.getName(), StringUtils.join(BaseMapper.ENTITY, ".", field.getName()))));
                 continue;
             }
+
             idField = field;
             WHERE(getEqualsValue(field.getName(), StringUtils.join(BaseMapper.ENTITY, ".", field.getName())));
         }

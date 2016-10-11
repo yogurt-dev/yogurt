@@ -1,15 +1,12 @@
 package com.github.jyoghurt.core.exception;
 
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Created with IntelliJ IDEA. User: jtwu Date: 13-2-26 Time: 下午4:10 基础异常类，其他异常需继承此类
  */
-public abstract class BaseException extends Exception {
+public abstract class BaseException extends RuntimeException {
     private static final long serialVersionUID = 8686960428281101225L;
-    private Logger logger = LoggerFactory.getLogger(this.getClass());
+    private boolean logFlag = false;
     /**
      * 异常码
      */
@@ -26,14 +23,17 @@ public abstract class BaseException extends Exception {
 
     public BaseException(ExceptionBody exceptionBody) {
         super(exceptionBody.getMessage());
-        this.exceptionBody=exceptionBody;
+        this.exceptionBody = exceptionBody;
         this.errorCode = exceptionBody.getCode();
     }
 
     public BaseException(ExceptionBody exceptionBody, Throwable cause) {
-        super(exceptionBody.getMessage(),cause);
-        this.exceptionBody=exceptionBody;
+        super(exceptionBody.getMessage(), cause);
+        this.exceptionBody = exceptionBody;
         this.errorCode = exceptionBody.getCode();
+        if (cause instanceof BaseException == false||(((BaseException)cause).logFlag = true)) {
+            logFlag=true;
+        }
     }
 
     public BaseException() {
@@ -45,11 +45,17 @@ public abstract class BaseException extends Exception {
     }
 
     public BaseException(Throwable cause) {
-        super(cause.getMessage(),cause);
+        super(cause.getMessage(), cause);
+        if (cause instanceof BaseException == false) {
+            logFlag=true;
+        }
     }
 
     public BaseException(String message, Throwable cause) {
         super(message, cause);
+        if (cause instanceof BaseException == false) {
+            logFlag=true;
+        }
     }
 
     public String getErrorCode() {
@@ -59,4 +65,9 @@ public abstract class BaseException extends Exception {
     public ExceptionBody getExceptionBody() {
         return exceptionBody;
     }
+
+    public boolean getLogFlag() {
+        return logFlag;
+    }
+
 }
