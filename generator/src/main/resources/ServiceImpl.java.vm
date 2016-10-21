@@ -2,7 +2,6 @@ package ${modulePackage}.service.impl;
 
 import java.io.Serializable;
 
-import com.github.jyoghurt.core.exception.ServiceException;
 import com.github.jyoghurt.core.service.impl.ServiceSupport;
 import ${modulePackage}.dao.${replaceSuffixClassName}Mapper;
 import ${modulePackage}.domain.${className};
@@ -22,12 +21,12 @@ public class ${replaceSuffixClassName}ServiceImpl extends ServiceSupport<${class
 	}
 
     @Override
-    public void logicDelete(Serializable id) throws ServiceException {
+    public void logicDelete(Serializable id)  {
         getMapper().logicDelete(${className}.class, id);
     }
 
     @Override
-    public ${className} find(Serializable id) throws ServiceException {
+    public ${className} find(Serializable id)  {
         return getMapper().selectById(${className}.class,id);
     }
 }

@@ -4,7 +4,7 @@ package com.github.jyoghurt.core.exception;
 /**
  * Created with IntelliJ IDEA. User: jtwu Date: 13-2-26 Time: 下午4:10 基础异常类，其他异常需继承此类
  */
-public abstract class BaseException extends RuntimeException {
+public abstract class BaseException extends RuntimeException{
     private static final long serialVersionUID = 8686960428281101225L;
     private boolean logFlag = false;
     /**

@@ -1,7 +1,6 @@
 package com.github.jyoghurt.core.service;
 
 
-import com.github.jyoghurt.core.exception.ServiceException;
 import com.github.jyoghurt.core.handle.QueryHandle;
 import com.github.jyoghurt.core.result.QueryResult;
 
@@ -18,66 +17,66 @@ public interface BaseService<T> {
      * 保存实体
      *
      * @param entity 待保存的实体
-     * @throws ServiceException {@inheritDoc}
+     * 
      */
-    void save(T entity) throws ServiceException;
+    void save(T entity) ;
 
     /**
      * 批量保存
      *
      * @param entities 待保存实体列表
-     * @throws ServiceException {@inheritDoc}
+     * 
      */
-    void saveBatch(List<T> entities) throws ServiceException;
+    void saveBatch(List<T> entities) ;
 
     /**
      * 根据选择的保存实体
      *
      * @param entity 待保存的实体
-     * @throws ServiceException {@inheritDoc}
+     * 
      */
-    void saveForSelective(T entity) throws ServiceException;
+    void saveForSelective(T entity) ;
 
     /**
      * 更新实体
      *
      * @param entity 业务实体
-     * @throws ServiceException {@inheritDoc}
+     * 
      */
-    void update(T entity) throws ServiceException;
+    void update(T entity) ;
 
     /**
      * 根据选择的更新实体
      *
      * @param entity 业务实体
-     * @throws ServiceException {@inheritDoc}
+     * 
      */
-    void updateForSelective(T entity) throws ServiceException;
+    void updateForSelective(T entity) ;
 
     /**
      * 删除实体
      *
      * @param id 业务实体ID
-     * @throws ServiceException {@inheritDoc}
+     * 
      */
-    void delete(Serializable id) throws ServiceException;
+    void delete(Serializable id) ;
 
     /**
      * 逻辑删除
      *
      * @param id 业务实体ID
-     * @throws ServiceException {@inheritDoc}
+     * 
      */
-    void logicDelete(Serializable id) throws ServiceException;
+    void logicDelete(Serializable id) ;
 
     /**
      * 根据条件逻辑删除
      * 实体不需要设置deleteFlag=true，否则会将deleteFlag=true拼到条件中
      *
      * @param entity 根据非空字段当做删除条件
-     * @throws ServiceException {@inheritDoc}
+     * 
      */
-    void logicDeleteByCondition(T entity) throws ServiceException;
+    void logicDeleteByCondition(T entity) ;
 
 
     /**
@@ -87,34 +86,34 @@ public interface BaseService<T> {
      *
      * @param entity      根据非空字段当做删除条件
      * @param queryHandle queryHandle
-     * @throws ServiceException {@inheritDoc}
+     * 
      */
-    void logicDeleteByCondition(T entity, QueryHandle queryHandle) throws ServiceException;
+    void logicDeleteByCondition(T entity, QueryHandle queryHandle) ;
 
     /**
      * 根据条件删除
      *
      * @param entity 根据非空字段当做删除条件
-     * @throws ServiceException {@inheritDoc}
+     * 
      */
-    void deleteByCondition(T entity) throws ServiceException;
+    void deleteByCondition(T entity) ;
 
     /**
      * 根据条件删除
      *
      * @param entity 根据非空字段当做删除条件
-     * @throws ServiceException {@inheritDoc}
+     * 
      */
-    public void deleteByCondition(T entity, QueryHandle queryHandle) throws ServiceException;
+    public void deleteByCondition(T entity, QueryHandle queryHandle) ;
 
     /**
      * 根据ID获取实体
      *
      * @param id 业务实体ID
      * @return 业务实体
-     * @throws ServiceException {@inheritDoc}
+     * 
      */
-    T find(Serializable id) throws ServiceException;
+    T find(Serializable id) ;
 
     /**
      * 获取数据
@@ -122,18 +121,18 @@ public interface BaseService<T> {
      * @param entity      查询业务实体
      * @param queryHandle 查询辅助类
      * @return 根据查询条件查询的查询结果集
-     * @throws ServiceException {@inheritDoc}
+     * 
      */
-    QueryResult<T> getData(T entity, QueryHandle queryHandle) throws ServiceException;
+    QueryResult<T> getData(T entity, QueryHandle queryHandle) ;
 
     /**
      * 按条件查询记录总数
      *
      * @param entity      查询业务实体
      * @param queryHandle 查询辅助类
-     * @throws ServiceException {@inheritDoc}
+     * 
      */
-    Long count(T entity, QueryHandle queryHandle) throws ServiceException;
+    Long count(T entity, QueryHandle queryHandle) ;
 
     /**
      * 按条件查询记录集合
@@ -141,18 +140,18 @@ public interface BaseService<T> {
      * @param entity      业务实体类或业务查询实体类
      * @param queryHandle 查询辅助类
      * @return 业务实体集合
-     * @throws ServiceException {@inheritDoc}
+     * 
      */
-    List<T> findAll(T entity, QueryHandle queryHandle) throws ServiceException;
+    List<T> findAll(T entity, QueryHandle queryHandle) ;
 
     /**
      * 按条件查询记录集合
      *
      * @param entity 业务实体类或业务查询实体类
      * @return 业务实体集合
-     * @throws ServiceException {@inheritDoc}
+     * 
      */
-    List<T> findAll(T entity) throws ServiceException;
+    List<T> findAll(T entity) ;
 
     /**
      * 自定义sql查询列表
@@ -160,17 +159,17 @@ public interface BaseService<T> {
      * @param customSql   自定义sql
      * @param queryHandle 查询辅助类
      * @return 业务实体集合
-     * @throws ServiceException {@inheritDoc}
+     * 
      */
-    QueryResult<T> findListBySql(String customSql, QueryHandle queryHandle) throws ServiceException;
+    QueryResult<T> findListBySql(String customSql, QueryHandle queryHandle) ;
 
     /**
      * 自定义sql更新 add by limiao 20160316
      *
      * @param customSql   自定义sql
      * @param queryHandle 查询辅助类
-     * @throws ServiceException {@inheritDoc}
+     * 
      */
-    void updateBySql(String customSql, T entity, QueryHandle queryHandle) throws ServiceException;
+    void updateBySql(String customSql, T entity, QueryHandle queryHandle) ;
 
 }

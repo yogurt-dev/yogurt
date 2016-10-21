@@ -2,7 +2,6 @@
 package com.github.jyoghurt.core.utils.beanUtils;
 
 
-import com.github.jyoghurt.core.exception.ServiceException;
 import com.github.jyoghurt.core.exception.UtilException;
 import com.github.jyoghurt.core.utils.ChainMap;
 import org.apache.commons.lang3.StringUtils;
@@ -13,7 +12,6 @@ import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.io.*;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.sql.Timestamp;
 import java.text.DateFormat;
@@ -41,9 +39,9 @@ public class BeanUtils {
      *
      * @param target 目标对象
      * @param source 源对象
-     * @throws UtilException {@inheritDoc}
+     * @ {@inheritDoc}
      */
-    public static void copyProperties(Object source, Object target) throws UtilException {
+    public static void copyProperties(Object source, Object target)  {
         copyProperties(source, target, true);
     }
 
@@ -54,9 +52,9 @@ public class BeanUtils {
      * @param target       目标对象
      * @param source       源对象
      * @param nullBeCopied 字段为null的是否复制
-     * @throws UtilException {@inheritDoc}
+     * @ {@inheritDoc}
      */
-    public static void copyProperties(Object source, Object target, Boolean nullBeCopied) throws UtilException {
+    public static void copyProperties(Object source, Object target, Boolean nullBeCopied)  {
         copyProperties(source, target, null, null, nullBeCopied);
     }
 
@@ -66,9 +64,9 @@ public class BeanUtils {
      * @param target              目标对象
      * @param source              源对象
      * @param effectiveProperties 需要复制的属性列表
-     * @throws UtilException {@inheritDoc}
+     * @ {@inheritDoc}
      */
-    public static void copyProperties(Object source, Object target, String[] effectiveProperties) throws UtilException {
+    public static void copyProperties(Object source, Object target, String[] effectiveProperties)  {
         copyProperties(source, target, effectiveProperties, null);
     }
 
@@ -79,10 +77,10 @@ public class BeanUtils {
      * @param source              源对象
      * @param effectiveProperties 需要复制的属性列表
      * @param ignoreProperties    不需要复制的属性列表
-     * @throws UtilException {@inheritDoc}
+     * @ {@inheritDoc}
      */
     public static void copyProperties(Object source, Object target, String[] effectiveProperties,
-                                      String[] ignoreProperties) throws UtilException {
+                                      String[] ignoreProperties)  {
         copyProperties(source, target, effectiveProperties, ignoreProperties, true);
     }
 
@@ -95,10 +93,10 @@ public class BeanUtils {
      * @param effectiveProperties 需要复制的属性列表
      * @param ignoreProperties    不需要复制的属性列表
      * @param nullBeCopied        字段为null是否复制
-     * @throws UtilException {@inheritDoc}
+     * @ {@inheritDoc}
      */
     public static void copyProperties(Object source, Object target, String[] effectiveProperties,
-                                      String[] ignoreProperties, Boolean nullBeCopied) throws UtilException {
+                                      String[] ignoreProperties, Boolean nullBeCopied) {
         // Field targetFields[] = destCls.getDeclaredFields();
         // 得到自省对象
 
@@ -155,59 +153,63 @@ public class BeanUtils {
                 }
             }
         } catch (Exception e) {
-            throw new UtilException("复制对象错误", e);
+            throw new UtilException("copy bean error", e);
 
         }
     }
 
     private static void copyCollection(Object target, String[] effectiveProperties, String[] ignoreProperties,
                                        Boolean nullBeCopied, PropertyDescriptor targetPd, Object sourceValue,
-                                       Method writeMethod) throws IllegalAccessException, InvocationTargetException,
-            UtilException, ClassNotFoundException, InstantiationException, NoSuchFieldException {
-        Method targetReadMethod = targetPd.getReadMethod();
-        Collection targetValue = (Collection) targetReadMethod.invoke(target, null);
-        List tempList = new ArrayList();
-        if (sourceValue == null) {
-            writeMethod.invoke(target, sourceValue);
-            return;
-        }
-        if (targetValue == null) {
-            if (Set.class.isAssignableFrom(targetPd.getPropertyType())) {
-                targetValue = new HashSet();
-            } else if (List.class.isAssignableFrom(targetPd.getPropertyType())) {
-                targetValue = new ArrayList();
-            } else {
+                                       Method writeMethod) {
+        try {
+
+
+            Method targetReadMethod = targetPd.getReadMethod();
+            Collection targetValue = (Collection) targetReadMethod.invoke(target, null);
+            List tempList = new ArrayList();
+            if (sourceValue == null) {
+                writeMethod.invoke(target, sourceValue);
                 return;
             }
-        }
-        Object[] sourceArray = ((Collection) sourceValue).toArray();
-        Object[] targetArray = targetValue.toArray();
-        for (int i = 0; i < sourceArray.length; i++) {
-            if (targetValue.contains(sourceArray[i])) {
-                for (int j = 0; j < targetArray.length; j++) {
-                    if (sourceArray[i].equals(targetArray[j])) {
-                        copyProperties(sourceArray[i], targetArray[j], effectiveProperties, ignoreProperties,
-                                nullBeCopied);
-                        tempList.add(targetArray[j]);
-                        break;
-                    }
-                }
-            } else {
-                Object tempTarget = Class.forName(sourceArray[i].getClass().getName()).newInstance();
-                //基本类型直接赋值
-                if (sourceArray[i].getClass().isPrimitive() || sourceArray[i] instanceof String) {
-                    tempTarget = sourceArray[i];
+            if (targetValue == null) {
+                if (Set.class.isAssignableFrom(targetPd.getPropertyType())) {
+                    targetValue = new HashSet();
+                } else if (List.class.isAssignableFrom(targetPd.getPropertyType())) {
+                    targetValue = new ArrayList();
                 } else {
-                    copyProperties(sourceArray[i], tempTarget, effectiveProperties, ignoreProperties, nullBeCopied);
-
+                    return;
                 }
-
-                tempList.add(tempTarget);
             }
+            Object[] sourceArray = ((Collection) sourceValue).toArray();
+            Object[] targetArray = targetValue.toArray();
+            for (int i = 0; i < sourceArray.length; i++) {
+                if (targetValue.contains(sourceArray[i])) {
+                    for (int j = 0; j < targetArray.length; j++) {
+                        if (sourceArray[i].equals(targetArray[j])) {
+                            copyProperties(sourceArray[i], targetArray[j], effectiveProperties, ignoreProperties,
+                                    nullBeCopied);
+                            tempList.add(targetArray[j]);
+                            break;
+                        }
+                    }
+                } else {
+                    Object tempTarget = Class.forName(sourceArray[i].getClass().getName()).newInstance();
+                    //基本类型直接赋值
+                    if (sourceArray[i].getClass().isPrimitive() || sourceArray[i] instanceof String) {
+                        tempTarget = sourceArray[i];
+                    } else {
+                        copyProperties(sourceArray[i], tempTarget, effectiveProperties, ignoreProperties, nullBeCopied);
+
+                    }
+
+                    tempList.add(tempTarget);
+                }
+            }
+            targetValue.clear();
+            targetValue.addAll(tempList);
+        }catch (Exception e){
+            throw new UtilException("copy bean error",e);
         }
-        targetValue.clear();
-        targetValue.addAll(tempList);
-        return;
     }
 
     private static String getMethodRuleName(String sourceTypeName, String targetTypeName) {
@@ -294,9 +296,9 @@ public class BeanUtils {
      *
      * @param originObj 源对象
      * @return 返回复制的实体
-     * @throws UtilException {@inheritDoc}
+     * @ {@inheritDoc}
      */
-    public static Object deepClone(Object originObj) throws UtilException {
+    public static Object deepClone(Object originObj)  {
         ObjectOutputStream oos = null;
         ObjectInputStream ois = null;
         try {
@@ -321,7 +323,7 @@ public class BeanUtils {
     }
 
     public static void setPropertyValueByPName(Object targetObject, String property,
-                                               Object... args) throws UtilException {
+                                               Object... args)  {
         try {
             PropertyDescriptor pd = new PropertyDescriptor(property, targetObject.getClass());
             pd.getWriteMethod().invoke(targetObject, args);
@@ -336,9 +338,8 @@ public class BeanUtils {
      *
      * @param objs 实体列表
      * @return 实体转map
-     * @throws ServiceException {@inheritDoc}
      */
-    public static ChainMap<String, Object> getValueMap(Object... objs) throws ServiceException {
+    public static ChainMap<String, Object> getValueMap(Object... objs) {
         try {
             ChainMap<String, Object> map = new ChainMap<>();
             for (Object obj : objs) {
@@ -352,7 +353,7 @@ public class BeanUtils {
                         if (null == value) {
                             continue;
                         }
-                        if(field.getType().isAssignableFrom(String.class)&& StringUtils.isEmpty((String) value)){
+                        if (field.getType().isAssignableFrom(String.class) && StringUtils.isEmpty((String) value)) {
                             continue;
                         }
                         map.put(field.getName(), value);
@@ -363,7 +364,7 @@ public class BeanUtils {
             }
             return map;
         } catch (Exception e) {
-            throw new ServiceException("Object to Map convert Error", e);
+            throw new UtilException("Object to Map convert Error", e);
         }
 
     }

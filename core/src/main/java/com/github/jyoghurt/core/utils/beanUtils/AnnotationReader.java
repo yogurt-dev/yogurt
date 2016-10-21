@@ -1,6 +1,7 @@
 package com.github.jyoghurt.core.utils.beanUtils;
 
 import com.github.jyoghurt.core.annotationResolver.BaseResolver;
+import com.github.jyoghurt.core.exception.BaseErrorException;
 import com.github.jyoghurt.core.exception.UtilException;
 import com.github.jyoghurt.core.utils.SpringContextUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -29,10 +30,9 @@ public class AnnotationReader {
      *
      * @param entityClass 业务实体
      * @return EntityBinder
-     * @throws UtilException {@inheritDoc}
+     * @ {@inheritDoc}
      */
-    @SuppressWarnings("unchecked")
-    public static EntityBinder readEntity(Class<?> entityClass) throws UtilException {
+    public static EntityBinder readEntity(Class<?> entityClass) {
         if (entityBinders.contains(entityClass)) {
             return entityBinders.get(entityClass);
         }
@@ -77,16 +77,14 @@ public class AnnotationReader {
     }
 
 
-    private static Field getField(Class<?> aClass, String fieldName) throws NoSuchFieldException {
-
+    private static Field getField(Class<?> aClass, String fieldName) {
         try {
             return aClass.getDeclaredField(fieldName);
         } catch (NoSuchFieldException e) {
             try {
                 return getField(aClass.getSuperclass(), fieldName);
             } catch (NullPointerException e1) {
-                System.out.println(aClass.getName() + "**********" + fieldName);
-                throw new NoSuchFieldError();
+                throw new BaseErrorException("class does not have this field :" +fieldName);
             }
         }
     }

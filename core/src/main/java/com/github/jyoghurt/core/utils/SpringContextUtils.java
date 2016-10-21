@@ -29,7 +29,7 @@ public class SpringContextUtils implements ApplicationContextAware {
     public SpringContextUtils() {
     }
 
-    public void setApplicationContext(ApplicationContext _applicationContext) throws BeansException {
+    public void setApplicationContext(ApplicationContext _applicationContext)  {
         applicationContext = _applicationContext;
     }
 

@@ -60,9 +60,9 @@ public class QueryHandle {
      *
      * @param object 高级查询涉及的对象
      * @return QueryHandle
-     * @throws Exception
+     * @
      */
-    public QueryHandle seniorSearch(Object object) throws Exception {
+    public QueryHandle seniorSearch(Object object)  {
         Assert.notNull(object, "seniorSearch -> object can not be null!");
         if (seniorSearch != null) {
             customWhereSql(this.getSeniorSearchWhereSql(this.getSeniorSearchSqlOperate(), object));
@@ -90,11 +90,11 @@ public class QueryHandle {
      * @param sqlOperate OR 或者 AND
      * @param object     高级查询涉及的对象
      * @return String sql
-     * @throws Exception
+     * @
      */
     //todo 异常修改成 UI异常
     //todo 优化if else
-    public String getSeniorSearchWhereSql(String sqlOperate, Object object) throws Exception {
+    public String getSeniorSearchWhereSql(String sqlOperate, Object object)  {
         StringBuilder sb = new StringBuilder();
         /* init request and validate */
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
@@ -138,25 +138,25 @@ public class QueryHandle {
         return null;
     }
 
-    private StringBuilder appendLikeSql(StringBuilder sb, String sqlOperate, String fieldName) throws Exception {
+    private StringBuilder appendLikeSql(StringBuilder sb, String sqlOperate, String fieldName)  {
         return sb.append(sqlOperate).append(" t.").append(fieldName).append(" like CONCAT('%'," +
                 "#{" + StringUtils.join(BaseMapper.DATA + "." + fieldName) + "}" + ", '%')");
     }
 
-    private StringBuilder appendEqualsSql(StringBuilder sb, String sqlOperate, String fieldName) throws Exception {
+    private StringBuilder appendEqualsSql(StringBuilder sb, String sqlOperate, String fieldName)  {
         return sb.append(sqlOperate).append(" t.").append(fieldName).append("= ").append("#{" +
                 StringUtils.join(BaseMapper.DATA + "." + fieldName) + "}");
     }
 
     private StringBuilder appendLargerEqualThanSql(StringBuilder sb, String sqlOperate, String fieldName,
-                                                   String expandFieldName, String value) throws Exception {
+                                                   String expandFieldName, String value)  {
         addExpandData(expandFieldName, value);
         return sb.append(sqlOperate).append(" t.").append(fieldName).append(">= ").append("#{" +
                 StringUtils.join(BaseMapper.DATA + "." + expandFieldName) + "}");
     }
 
     private StringBuilder appendLessEqualThanSql(StringBuilder sb, String sqlOperate, String fieldName,
-                                                 String expandFieldName, String value) throws Exception {
+                                                 String expandFieldName, String value)  {
         addExpandData(expandFieldName, value);
         sb.append(sqlOperate).append(" t.").append(fieldName);
         if (DateTimeFormatter.isYYYYMMddFormatDate(value)) {

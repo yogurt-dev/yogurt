@@ -1,12 +1,9 @@
 package com.github.jyoghurt.core.service.impl;
 
-import com.github.jyoghurt.core.configuration.PageConvert;
 import com.github.jyoghurt.core.configuration.impl.PageConfiguration;
 import com.github.jyoghurt.core.dao.BaseMapper;
 import com.github.jyoghurt.core.domain.BaseEntity;
-import com.github.jyoghurt.core.exception.BaseException;
-import com.github.jyoghurt.core.exception.ServiceException;
-import com.github.jyoghurt.core.exception.UtilException;
+import com.github.jyoghurt.core.exception.BaseErrorException;
 import com.github.jyoghurt.core.handle.QueryHandle;
 import com.github.jyoghurt.core.result.EasyUIResult;
 import com.github.jyoghurt.core.result.QueryResult;
@@ -20,7 +17,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.annotation.Resource;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -35,7 +31,6 @@ import static com.github.jyoghurt.core.utils.beanUtils.BeanUtils.getValueMap;
  * @param <T> 该服务组件服务的数据模型，即model;
  * @author jtwu
  */
-@SuppressWarnings("unchecked")
 public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements BaseService<T> {
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -45,7 +40,8 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
     private String tableJsLib;
 
     @Override
-    public void save(T entity) throws ServiceException {
+    public void save(T entity) {
+
         if (entity instanceof BaseEntity) {
             ((BaseEntity) entity).setCreateDateTime(new Date());
             ((BaseEntity) entity).setModifyDateTime(((BaseEntity) entity).getCreateDateTime());
@@ -55,7 +51,7 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
     }
 
     @Override
-    public void saveBatch(List<T> entities) throws ServiceException {
+    public void saveBatch(List<T> entities) {
         if (CollectionUtils.isEmpty(entities)) {
             return;
         }
@@ -70,7 +66,7 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
     }
 
     @Override
-    public void saveForSelective(T entity) throws ServiceException {
+    public void saveForSelective(T entity) {
         if (entity instanceof BaseEntity) {
             ((BaseEntity) entity).setCreateDateTime(new Date());
             ((BaseEntity) entity).setModifyDateTime(((BaseEntity) entity).getCreateDateTime());
@@ -80,14 +76,11 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
     }
 
     @Override
-    public void update(T entity) throws ServiceException {
-        try {
-            if (null == JPAUtils.gtIdValue(entity)) {
-                return;
-            }
-        } catch (UtilException e) {
-            throw new ServiceException(e);
+    public void update(T entity) {
+        if (null == JPAUtils.gtIdValue(entity)) {
+            return;
         }
+
         if (entity instanceof BaseEntity) {
             ((BaseEntity) entity).setModifyDateTime(new Date());
             //modify by limiao 20160811 处理修改的时候勿将创建人和创建时间更新成修改人和修改时间的问题
@@ -97,37 +90,37 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
     }
 
     @Override
-    public void delete(Serializable id) throws ServiceException {
-        throw new ServiceException("You must override this method!");
+    public void delete(Serializable id) {
+        throw new BaseErrorException("You must override this method!");
     }
 
     @Override
-    public void logicDelete(Serializable id) throws ServiceException {
-        throw new ServiceException("You must override this method!");
+    public void logicDelete(Serializable id) {
+        throw new BaseErrorException("You must override this method!");
     }
 
     @Override
-    public void logicDeleteByCondition(T entity) throws ServiceException {
+    public void logicDeleteByCondition(T entity) {
         getMapper().logicDeleteByCondition((Class<T>) entity.getClass(), getValueMap(entity));
     }
 
     @Override
-    public void logicDeleteByCondition(T entity, QueryHandle queryHandle) throws ServiceException {
+    public void logicDeleteByCondition(T entity, QueryHandle queryHandle) {
         getMapper().logicDeleteByCondition((Class<T>) entity.getClass(), getValueMap(entity, queryHandle));
     }
 
     @Override
-    public void deleteByCondition(T entity) throws ServiceException {
+    public void deleteByCondition(T entity) {
         getMapper().deleteByCondition((Class<T>) entity.getClass(), getValueMap(entity));
     }
 
     @Override
-    public void deleteByCondition(T entity, QueryHandle queryHandle) throws ServiceException {
+    public void deleteByCondition(T entity, QueryHandle queryHandle) {
         getMapper().deleteByCondition((Class<T>) entity.getClass(), getValueMap(entity, queryHandle));
     }
 
     @Override
-    public QueryResult<T> getData(T entity, QueryHandle queryHandle)  {
+    public QueryResult<T> getData(T entity, QueryHandle queryHandle) {
         QueryResult<T> qr = newQueryResult();
         qr.setData(getMapper().pageData((Class<T>) entity.getClass(), getValueMap(queryHandle, entity).chainPutAll
                 (queryHandle == null ? null : queryHandle.getExpandData())));
@@ -137,7 +130,7 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
     }
 
     @Override
-    public QueryResult<T> findListBySql(String customSql, QueryHandle queryHandle) throws ServiceException {
+    public QueryResult<T> findListBySql(String customSql, QueryHandle queryHandle) {
         QueryResult<T> qr = newQueryResult();
         qr.setData(getMapper().findListBySql(customSql, getValueMap(queryHandle).chainPutAll
                 (queryHandle == null ? null : queryHandle.getExpandData())));
@@ -161,14 +154,11 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
     }
 
     @Override
-    public void updateForSelective(T entity) throws ServiceException {
-        try {
-            if (null == JPAUtils.gtIdValue(entity)) {
-                return;
-            }
-        } catch (UtilException e) {
-            throw new ServiceException(e);
+    public void updateForSelective(T entity) {
+        if (null == JPAUtils.gtIdValue(entity)) {
+            return;
         }
+
         if (entity instanceof BaseEntity) {
             ((BaseEntity) entity).setModifyDateTime(new Date());
             //add by limiao 20160811 处理修改的时候勿将创建人和创建时间更新成修改人和修改时间的问题
@@ -178,14 +168,14 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
     }
 
     @Override
-    public Long count(T entity, QueryHandle queryHandle) throws ServiceException {
+    public Long count(T entity, QueryHandle queryHandle) {
         return getMapper().pageTotalRecord((Class<T>) entity.getClass(), getValueMap(queryHandle, entity)
                 .chainPutAll(queryHandle == null ? null : queryHandle.getExpandData()));
     }
 
     //modify by limiao 20160222 .chainPutAll(queryHandle==null?null:queryHandle.getExpandData()
     @Override
-    public List<T> findAll(T entity, QueryHandle queryHandle) throws ServiceException {
+    public List<T> findAll(T entity, QueryHandle queryHandle) {
         if (queryHandle == null) {
             return getMapper().findAll((Class<T>) entity.getClass(), getValueMap(queryHandle, entity));
         } else {
@@ -194,13 +184,13 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
     }
 
     @Override
-    public void updateBySql(String customSql, T entity, QueryHandle queryHandle) throws ServiceException {
+    public void updateBySql(String customSql, T entity, QueryHandle queryHandle) {
         getMapper().updateBySql((Class<T>) entity.getClass(), customSql, getValueMap(queryHandle, entity).chainPutAll
                 (queryHandle == null ? null : queryHandle.getExpandData()));
     }
 
     @Override
-    public List<T> findAll(T entity) throws ServiceException {
+    public List<T> findAll(T entity) {
         return findAll(entity, null);
     }
 
@@ -214,7 +204,7 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
                 .getAttribute(attr);
     }
 
-    private void setFounder(BaseEntity entity) throws ServiceException {
+    private void setFounder(BaseEntity entity) {
         try {
 
             entity.setFounderId(null == getSessionAttr(BaseEntity.OPERATOR_ID) ? BaseEntity.DEFAULT_OPERATOR :
@@ -229,7 +219,7 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
     }
 
     //add by limiao 20160811 处理修改的时候勿将创建人和创建时间更新成修改人和修改时间的问题
-    private void setModifyFounder(BaseEntity entity) throws ServiceException {
+    private void setModifyFounder(BaseEntity entity) {
         try {
             entity.setModifierId((String) getSessionAttr(BaseEntity.OPERATOR_ID));
             entity.setModifierName((String) getSessionAttr(BaseEntity.OPERATOR_NAME));

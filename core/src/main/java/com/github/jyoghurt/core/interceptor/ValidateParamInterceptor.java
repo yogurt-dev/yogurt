@@ -1,7 +1,6 @@
 package com.github.jyoghurt.core.interceptor;
 
-import com.github.jyoghurt.core.controller.BaseController;
-import com.github.jyoghurt.core.exception.ServiceException;
+import com.github.jyoghurt.core.exception.BaseErrorException;
 import com.github.jyoghurt.core.result.HttpResultEntity;
 import com.github.jyoghurt.core.result.HttpResultHandle;
 import org.apache.commons.lang3.StringUtils;
@@ -32,20 +31,20 @@ public class ValidateParamInterceptor {
                 message = StringUtils.join(message, violation.getMessage(), ",");
             }
             return new HttpResultEntity(HttpResultHandle.HttpResultEnum.ERROR.getErrorCode()
-                    ,StringUtils.stripEnd(message, ","));
+                    , StringUtils.stripEnd(message, ","));
         }
     }
 
     @Around(value = "@within(org.springframework.stereotype.Service)")
     public Object serviceInterceptor(ProceedingJoinPoint pjp) throws Throwable {
         try {
-            return  pjp.proceed();
+            return pjp.proceed();
         } catch (ConstraintViolationException e) {
             String message = StringUtils.EMPTY;
             for (ConstraintViolation violation : e.getConstraintViolations()) {
                 message = StringUtils.join(message, violation.getMessage(), ",");
             }
-            throw new ServiceException(message);
+            throw new BaseErrorException(message);
         }
     }
 }

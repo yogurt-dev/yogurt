@@ -1,5 +1,8 @@
 package com.github.jyoghurt.core.utils;
 
+import com.github.jyoghurt.core.exception.UtilException;
+
+import javax.rmi.CORBA.Util;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -68,28 +71,52 @@ public class DateTimeFormatter {
         return FDT.format(date);
     }
 
-    public Date sd(String source) throws ParseException {
-        return SD.parse(source);
+    public Date sd(String source) {
+        try {
+            return SD.parse(source);
+        } catch (ParseException e) {
+            throw new UtilException(e);
+        }
     }
 
-    public Date st(String source) throws ParseException {
-        return ST.parse(source);
+    public Date st(String source) {
+        try {
+            return ST.parse(source);
+        } catch (ParseException e) {
+            throw new UtilException(e);
+        }
     }
 
-    public Date sdt(String source) throws ParseException {
-        return SDT.parse(source);
+    public Date sdt(String source) {
+        try {
+            return SDT.parse(source);
+        } catch (ParseException e) {
+            throw new UtilException(e);
+        }
     }
 
-    public Date fd(String source) throws ParseException {
-        return FD.parse(source);
+    public Date fd(String source) {
+        try {
+            return FD.parse(source);
+        } catch (ParseException e) {
+            throw new UtilException(e);
+        }
     }
 
-    public Date ft(String source) throws ParseException {
-        return FT.parse(source);
+    public Date ft(String source) {
+        try {
+            return FT.parse(source);
+        } catch (ParseException e) {
+            throw new UtilException(e);
+        }
     }
 
-    public Date fdt(String source) throws ParseException {
-        return FDT.parse(source);
+    public Date fdt(String source) {
+        try {
+            return FDT.parse(source);
+        } catch (ParseException e) {
+            throw new UtilException(e);
+        }
     }
 
     /**

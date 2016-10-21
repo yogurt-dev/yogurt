@@ -9,9 +9,7 @@ import com.github.jyoghurt.core.handle.CustomWhereHandle;
 import com.github.jyoghurt.core.handle.OperatorHandle;
 import com.github.jyoghurt.core.handle.SQLJoinHandle;
 import com.github.jyoghurt.core.utils.JPAUtils;
-import com.github.jyoghurt.core.utils.beanUtils.BeanUtils;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.ListUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -23,12 +21,10 @@ import java.lang.reflect.Field;
 import java.util.*;
 
 import static com.github.jyoghurt.core.mybatis.SqlBuilder.*;
-import static com.github.jyoghurt.core.mybatis.SqlBuilder.WHERE;
 
 /**
  * Created by jtwu on 2015/4/21.
  */
-@SuppressWarnings("unchecked")
 public class BaseMapperProvider {
     /**
      * 用于保存解析出来的级联关系
@@ -57,9 +53,9 @@ public class BaseMapperProvider {
      *
      * @param param 参数
      * @return sql
-     * @throws DaoException {@inheritDoc}
+     * @{@inheritDoc}
      */
-    public String findAll(Map<String, Object> param) throws DaoException {
+    public String findAll(Map<String, Object> param) {
         beginWithClass(param);
         if (((Map<String, Object>) param.get(BaseMapper.DATA)).containsKey("distinct")) {
             SELECT_DISTINCT("t.*");
@@ -71,11 +67,11 @@ public class BaseMapperProvider {
         return StringUtils.join(sql(), limit);
     }
 
-    protected void createAllWhere(Map<String, Object> param, boolean usePage) throws DaoException {
+    protected void createAllWhere(Map<String, Object> param, boolean usePage) {
         createAllWhere(param, usePage, false);
     }
 
-    protected void createAllWhere(Map<String, Object> param, boolean usePage, boolean isCount) throws DaoException {
+    protected void createAllWhere(Map<String, Object> param, boolean usePage, boolean isCount) {
         if (MapUtils.isEmpty(param)) {
             return;
         }
@@ -123,12 +119,12 @@ public class BaseMapperProvider {
         }
     }
 
-    private boolean createFieldWhereSql(Map<String, OperatorHandle> operatorMap, Field declaredField, Map<String, Object> param) throws UtilException {
+    private boolean createFieldWhereSql(Map<String, OperatorHandle> operatorMap, Field declaredField, Map<String, Object> param) {
         return createFieldWhereSql(operatorMap, declaredField, param, null);
     }
 
     private boolean createFieldWhereSql(Map<String, OperatorHandle> operatorMap, Field field, Map<String, Object>
-            param, String tableAlias) throws UtilException {
+            param, String tableAlias) {
         //验证是否需要拼装该属性
         if (!validateField2WhereSql(operatorMap, field, param, tableAlias)) {
             return false;
@@ -242,10 +238,10 @@ public class BaseMapperProvider {
      * @param param       数据集合
      * @param tableAlias  字段所属表别名
      * @return boolean值, 是否需要验证
-     * @throws UtilException
+     * @
      */
     private boolean validateField2WhereSql(Map<String, OperatorHandle> operatorMap, Field field, Map<String, Object>
-            param, String tableAlias) throws UtilException {
+            param, String tableAlias) {
         if (null != field.getAnnotation(Transient.class) || field.getType().isAssignableFrom(Class.class)) {
             return false;
         }
@@ -253,7 +249,7 @@ public class BaseMapperProvider {
                 tableAlias);
     }
 
-    private boolean validateFieldInParam(Field field, Map<String, Object> param, String tableAlias) throws UtilException {
+    private boolean validateFieldInParam(Field field, Map<String, Object> param, String tableAlias) {
         return (StringUtils.isEmpty(tableAlias) && param.containsKey(field.getName())) ||
                 (StringUtils.isNotEmpty(tableAlias) && null == JPAUtils.getValue(param.get(tableAlias), field.getName()));
     }
@@ -264,7 +260,7 @@ public class BaseMapperProvider {
         return operatorMap.containsKey(fieldNameKey);
     }
 
-    private void parseCascade(Map<String, OperatorHandle> operatorMap, Field field, Map<String, Object> param) throws UtilException {
+    private void parseCascade(Map<String, OperatorHandle> operatorMap, Field field, Map<String, Object> param) {
         //不是PO不做任何处理,没有配置级联关系不处理
         if (null == field.getType().getAnnotation(Table.class) || (null == field.getAnnotation(OneToMany.class)
                 && null == field.getAnnotation(OneToOne.class) && null == field.getAnnotation(ManyToMany.class)
@@ -288,12 +284,12 @@ public class BaseMapperProvider {
         return StringUtils.join(prefix, StringUtils.isEmpty(tableAlias) ? "" : tableAlias + ".");
     }
 
-    private void createFieldsWhereSql(Map<String, OperatorHandle> operatorMap, Map<String, Object> param) throws UtilException {
+    private void createFieldsWhereSql(Map<String, OperatorHandle> operatorMap, Map<String, Object> param) {
         createFieldsWhereSql(operatorMap, param, null, entityClass);
     }
 
     private void createFieldsWhereSql(Map<String, OperatorHandle> operatorMap, Map<String, Object> param,
-                                      String tableAlias, Class clazz) throws UtilException {
+                                      String tableAlias, Class clazz) {
         for (Field field : JPAUtils.getAllFields(clazz)) {
             createFieldWhereSql(operatorMap, field, param, tableAlias);
         }
@@ -378,17 +374,12 @@ public class BaseMapperProvider {
      *
      * @param param 参数
      * @return sql
-     * @throws DaoException {@inheritDoc}
      */
-    public String selectById(Map<String, Object> param) throws DaoException {
+    public String selectById(Map<String, Object> param) {
         beginWithClass(param);
         SELECT("*");
         FROM(getTableName(entityClass));
-        try {
-            WHERE(getEqualsValue(JPAUtils.getIdField(entityClass).getName(), BaseMapper.ID));
-        } catch (UtilException e) {
-            throw new DaoException(e);
-        }
+        WHERE(getEqualsValue(JPAUtils.getIdField(entityClass).getName(), BaseMapper.ID));
         return sql();
     }
 
@@ -419,7 +410,7 @@ public class BaseMapperProvider {
     /*
      * 生成sql开始
      */
-    protected void beginWithClass(Map<String, Object> param) throws DaoException {
+    protected void beginWithClass(Map<String, Object> param) {
         if (null == param.get(BaseMapper.ENTITY_CLASS)) {
             throw new DaoException(StringUtils.join("获取实体类型失败 entityClass 为空"));
         }
@@ -433,9 +424,9 @@ public class BaseMapperProvider {
      *
      * @param param 参数
      * @return sql
-     * @throws DaoException {@inheritDoc}
+     * @{@inheritDoc}
      */
-    public String save(Map<String, Object> param) throws Exception {
+    public String save(Map<String, Object> param) {
         entityClass = param.get(BaseMapper.ENTITY).getClass();
         begin();
         INSERT_INTO(getTableName(entityClass));
@@ -452,13 +443,9 @@ public class BaseMapperProvider {
                 continue;
             }
             //add by limiao 20160309 insert 为null的不拼sql
-            try {
-                Object value = JPAUtils.getValue(param.get(BaseMapper.ENTITY), field.getName());
-                if (null == value) {
-                    continue;
-                }
-            } catch (UtilException e) {
-                throw new DaoException(e);
+            Object value = JPAUtils.getValue(param.get(BaseMapper.ENTITY), field.getName());
+            if (null == value) {
+                continue;
             }
 
             VALUES(field.getName(), StringUtils.join("#{", BaseMapper.ENTITY, ".", field.getName(), "}"));
@@ -476,9 +463,9 @@ public class BaseMapperProvider {
      *
      * @param param 参数
      * @return sql
-     * @throws DaoException {@inheritDoc}
+     * @{@inheritDoc}
      */
-    public String saveBatch(Map<String, Object> param) throws Exception {
+    public String saveBatch(Map<String, Object> param) {
         if (null == param.get(BaseMapper.ENTITIES)) {
             throw new DaoException("批量插入的数据为null");
         }
@@ -500,14 +487,11 @@ public class BaseMapperProvider {
                     continue;
                 }
                 //add by limiao 20160309 insert 为null的不拼sql
-                try {
-                    Object value = JPAUtils.getValue(((List) param.get(BaseMapper.ENTITIES)).get(i), field.getName());
-                    if (null == value) {
-                        continue;
-                    }
-                } catch (UtilException e) {
-                    throw new DaoException(e);
+                Object value = JPAUtils.getValue(((List) param.get(BaseMapper.ENTITIES)).get(i), field.getName());
+                if (null == value) {
+                    continue;
                 }
+
                 BATCH_VALUES(field.getName(), StringUtils.join("#{", BaseMapper.ENTITIES, "[", i, "]", ".", field.getName(), "}"));
             }
             if (null == idField) {
@@ -520,7 +504,7 @@ public class BaseMapperProvider {
     }
 
 
-    public String saveForSelective(Map<String, Object> param) throws Exception {
+    public String saveForSelective(Map<String, Object> param) {
         final Object entity = param.get(BaseMapper.ENTITY);
         entityClass = entity.getClass();
         begin();
@@ -534,8 +518,12 @@ public class BaseMapperProvider {
                 idField = field;
                 continue;
             }
-            if (field.get(entity) != null) {
-                VALUES(field.getName(), StringUtils.join("#{", BaseMapper.ENTITY, ".", field.getName(), "}"));
+            try {
+                if (field.get(entity) != null) {
+                    VALUES(field.getName(), StringUtils.join("#{", BaseMapper.ENTITY, ".", field.getName(), "}"));
+                }
+            } catch (IllegalAccessException e) {
+                throw new UtilException(e);
             }
         }
         if (null == idField) {
@@ -546,33 +534,43 @@ public class BaseMapperProvider {
     }
 
 
-    private void setId(Map<String, Object> param, Field idField) throws IllegalAccessException {
+    private void setId(Map<String, Object> param, Field idField) {
         if (!idField.getType().isAssignableFrom(String.class)) {
             return;
         }
-        if (StringUtils.isNotEmpty((String) idField.get(param.get(BaseMapper.ENTITY)))) {
-            VALUES(idField.getName(), StringUtils.join("#{", BaseMapper.ENTITY, ".", idField.getName(), "}"));
-            return;
+        try {
+            if (StringUtils.isNotEmpty((String) idField.get(param.get(BaseMapper.ENTITY)))) {
+                VALUES(idField.getName(), StringUtils.join("#{", BaseMapper.ENTITY, ".", idField.getName(), "}"));
+                return;
+            }
+
+            String id = UUID.randomUUID().toString().replace("-", "");
+            VALUES(idField.getName(), StringUtils.join("'", id, "'"));
+            idField.set(param.get(BaseMapper.ENTITY), id);
+        } catch (IllegalAccessException e) {
+            throw new UtilException(e);
         }
-        String id = UUID.randomUUID().toString().replace("-", "");
-        VALUES(idField.getName(), StringUtils.join("'", id, "'"));
-        idField.set(param.get(BaseMapper.ENTITY), id);
     }
 
-    private void setIdBatch(BaseEntity baseEntity, int i, Field idField) throws IllegalAccessException {
+    private void setIdBatch(BaseEntity baseEntity, int i, Field idField) {
         if (!idField.getType().isAssignableFrom(String.class)) {
             return;
         }
-        if (StringUtils.isNotEmpty((String) idField.get(baseEntity))) {
-            BATCH_VALUES(idField.getName(), StringUtils.join("#{", BaseMapper.ENTITIES, "[", i, "]", ".", idField.getName(), "}"));
-            return;
+        try {
+            if (StringUtils.isNotEmpty((String) idField.get(baseEntity))) {
+                BATCH_VALUES(idField.getName(), StringUtils.join("#{", BaseMapper.ENTITIES, "[", i, "]", ".", idField.getName(), "}"));
+                return;
+            }
+
+            String id = UUID.randomUUID().toString().replace("-", "");
+            BATCH_VALUES(idField.getName(), StringUtils.join("'", id, "'"));
+            idField.set(baseEntity, id);
+        } catch (IllegalAccessException e) {
+            throw new UtilException(e);
         }
-        String id = UUID.randomUUID().toString().replace("-", "");
-        BATCH_VALUES(idField.getName(), StringUtils.join("'", id, "'"));
-        idField.set(baseEntity, id);
     }
 
-    public String update(Map<String, Object> param) throws DaoException {
+    public String update(Map<String, Object> param) {
         entityClass = param.get(BaseMapper.ENTITY).getClass();
         begin();
         UPDATE(getTableName(entityClass));
@@ -586,7 +584,7 @@ public class BaseMapperProvider {
             //处理nullable
             Annotation columnAnnotation = field.getAnnotation(Column.class);
             if (null != columnAnnotation && ((Column) columnAnnotation).nullable() == false
-                    && null == JPAUtils.getValue(param.get(BaseMapper.ENTITY), field.getName()) ) {
+                    && null == JPAUtils.getValue(param.get(BaseMapper.ENTITY), field.getName())) {
                 continue;
             }
             //处理非主键
@@ -612,9 +610,9 @@ public class BaseMapperProvider {
      *
      * @param entityClass 实体类
      * @return sql
-     * @throws DaoException {@inheritDoc}
+     * @{@inheritDoc}
      */
-    private String getTableName(Class entityClass) throws DaoException {
+    private String getTableName(Class entityClass) {
         Annotation table = entityClass.getAnnotation(Table.class);
         if (null == table) {
             throw new DaoException(StringUtils.join("实体未配置Table注解 entityClass =", entityClass.getName()));
@@ -626,11 +624,11 @@ public class BaseMapperProvider {
         return tableName;
     }
 
-    private String getTableNameWithAlias(Class entityClass) throws DaoException {
+    private String getTableNameWithAlias(Class entityClass) {
         return StringUtils.join(getTableName(entityClass), " t");
     }
 
-    public String pageData(Map<String, Object> param) throws DaoException {
+    public String pageData(Map<String, Object> param) {
         beginWithClass(param);
         if (((Map<String, Object>) param.get(BaseMapper.DATA)).containsKey("distinct")) {
             SELECT_DISTINCT("t.*");
@@ -642,58 +640,48 @@ public class BaseMapperProvider {
         return StringUtils.join(sql(), limit);
     }
 
-    public String pageTotalRecord(Map<String, Object> param) throws DaoException {
+    public String pageTotalRecord(Map<String, Object> param) {
         beginWithClass(param);
-        try {
-            SELECT("count(distinct t." + JPAUtils.getIdField((Class<?>) param.get(BaseMapper.ENTITY_CLASS)).getName() + ")");
-        } catch (UtilException e) {
-            throw new DaoException("Query paging failure !");
-        }
+        SELECT("count(distinct t." + JPAUtils.getIdField((Class<?>) param.get(BaseMapper.ENTITY_CLASS)).getName() + ")");
         FROM(getTableNameWithAlias(entityClass));
         createAllWhere((Map<String, Object>) param.get(BaseMapper.DATA), false, true);
         return sql();
     }
 
-    public String findListBySql(Map<String, Object> param) throws DaoException {
+    public String findListBySql(Map<String, Object> param) {
         createLimit((Map<String, Object>) param.get(BaseMapper.DATA), true);
         return StringUtils.join(param.get(BaseMapper.CUSTOM_SQL), limit);
     }
 
-    public String findListTotalRecordBySql(Map<String, Object> param) throws DaoException {
+    public String findListTotalRecordBySql(Map<String, Object> param) {
         return StringUtils.join("select count(*) from (", param.get(BaseMapper.CUSTOM_SQL), ") as countTable");
     }
 
-    public String findUniqueObjectBySql(Map<String, Object> param) throws DaoException {
+    public String findUniqueObjectBySql(Map<String, Object> param) {
         return StringUtils.join(param.get(BaseMapper.CUSTOM_SQL), " limit 1");
     }
 
-    public String delete(Map<String, Object> param) throws DaoException {
+    public String delete(Map<String, Object> param) {
         beginWithClass(param);
         DELETE_FROM(getTableName(entityClass));
-        try {
-            WHERE(getEqualsValue(JPAUtils.getIdField(entityClass).getName(), BaseMapper.ID));
-        } catch (UtilException e) {
-            throw new DaoException(e);
-        }
+        WHERE(getEqualsValue(JPAUtils.getIdField(entityClass).getName(), BaseMapper.ID));
+
         return sql();
     }
 
-    public String logicDelete(Map<String, Object> param) throws DaoException {
+    public String logicDelete(Map<String, Object> param) {
         entityClass = (Class<?>) param.get(BaseMapper.ENTITY_CLASS);
         begin();
         UPDATE(getTableName(entityClass));
         param.put(BaseEntity.DELETE_FLAG, true);
         SET(getEqualsValue(BaseEntity.DELETE_FLAG, BaseEntity.DELETE_FLAG));
-        try {
-            Field idField = JPAUtils.getIdField(entityClass);
-            WHERE(getEqualsValue(idField.getName(), BaseMapper.ID));
-        } catch (UtilException e) {
-            throw new DaoException(e);
-        }
+        Field idField = JPAUtils.getIdField(entityClass);
+        WHERE(getEqualsValue(idField.getName(), BaseMapper.ID));
+
         return sql();
     }
 
-    public String logicDeleteByCondition(Map<String, Object> param) throws DaoException {
+    public String logicDeleteByCondition(Map<String, Object> param) {
         beginWithClass(param);
         createAllWhere((Map<String, Object>) param.get(BaseMapper.DATA), false);
         UPDATE(StringUtils.join(getTableName(entityClass), " t"));
@@ -702,7 +690,7 @@ public class BaseMapperProvider {
         return sql();
     }
 
-    public String updateForSelective(Map<String, Object> param) throws DaoException {
+    public String updateForSelective(Map<String, Object> param) {
         entityClass = param.get(BaseMapper.ENTITY).getClass();
         begin();
         UPDATE(getTableName(entityClass));
@@ -718,18 +706,15 @@ public class BaseMapperProvider {
                 idField = field;
                 continue;
             }
-            try {
-                Object value = JPAUtils.getValue(param.get(BaseMapper.ENTITY), field.getName());
-                if (null == value) {
-                    continue;
-                }
-                //空字符串对应修改时，情况输入框
+            Object value = JPAUtils.getValue(param.get(BaseMapper.ENTITY), field.getName());
+            if (null == value) {
+                continue;
+            }
+            //空字符串对应修改时，情况输入框
 //                if(StringUtils.EMPTY.equals(value)){
 //                    continue;
 //                }
-            } catch (UtilException e) {
-                throw new DaoException(e);
-            }
+
             SET(StringUtils.join(getEqualsValue(field.getName(), StringUtils.join(BaseMapper.ENTITY, ".", field.getName()))));
         }
         if (null == idField) {
@@ -739,14 +724,14 @@ public class BaseMapperProvider {
         return sql();
     }
 
-    public String deleteByCondition(Map<String, Object> param) throws DaoException {
+    public String deleteByCondition(Map<String, Object> param) {
         beginWithClass(param);
         createAllWhere((Map<String, Object>) param.get(BaseMapper.DATA), false);
         DELETE_FROM(StringUtils.join(getTableName(entityClass), " t"));
         return sql().replaceFirst("DELETE FROM", "DELETE t FROM");
     }
 
-    public String updateBySql(Map<String, Object> param) throws DaoException {
+    public String updateBySql(Map<String, Object> param) {
         beginWithClass(param);
         UPDATE(getTableNameWithAlias(entityClass));
         SET(param.get(BaseMapper.CUSTOM_SQL).toString());
@@ -754,7 +739,7 @@ public class BaseMapperProvider {
         return SQL();
     }
 
-    public String updateByCondition(Map<String, Object> param) throws DaoException {
+    public String updateByCondition(Map<String, Object> param) {
         beginWithClass(param);
         UPDATE(getTableNameWithAlias(entityClass));
         SET("name = #{name}");

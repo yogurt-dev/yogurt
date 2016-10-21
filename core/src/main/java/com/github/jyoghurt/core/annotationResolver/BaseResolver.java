@@ -1,8 +1,6 @@
 package com.github.jyoghurt.core.annotationResolver;
 
 
-import com.github.jyoghurt.core.exception.UtilException;
-
 import java.lang.reflect.Field;
 
 /**
@@ -17,5 +15,5 @@ public interface BaseResolver {
      * @param object 业务实体
      * @param field  属性
      */
-    void resolve(Object object, Field field) throws UtilException;
+    void resolve(Object object, Field field) ;
 }

@@ -1,5 +1,6 @@
 package com.github.jyoghurt.core.utils;
 
+import com.github.jyoghurt.core.exception.BaseErrorException;
 import com.github.jyoghurt.core.exception.UtilException;
 import com.github.jyoghurt.core.utils.beanUtils.AnnotationBinder;
 import com.github.jyoghurt.core.utils.beanUtils.AnnotationReader;
@@ -18,7 +19,7 @@ import java.util.*;
  * jpa公共处理类
  */
 public class JPAUtils {
-    protected static Logger logger = LoggerFactory.getLogger(JPAUtils.class);
+    private static Logger logger = LoggerFactory.getLogger(JPAUtils.class);
 
     /**
      * 获取所有属性，包括父类属性
@@ -57,9 +58,9 @@ public class JPAUtils {
      *
      * @param entityClass 业务实体类
      * @return 主键属性
-     * @throws UtilException {@inheritDoc}
+     * @ {@inheritDoc}
      */
-    public static Field getIdField(Class<?> entityClass) throws UtilException {
+    public static Field getIdField(Class<?> entityClass) {
         for (Class<?> c = entityClass; c != Object.class; c = c.getSuperclass()) {
             Field[] fields = c.getDeclaredFields();//获得属性
             for (Field field : fields) {
@@ -76,9 +77,9 @@ public class JPAUtils {
      *
      * @param po 获取po的主键值
      * @return 主键值
-     * @throws UtilException
+     * @
      */
-    public static Object gtIdValue(Object po) throws UtilException {
+    public static Object gtIdValue(Object po) {
         if (null == po) {
             return null;
         }
@@ -91,9 +92,9 @@ public class JPAUtils {
      * @param po        对象
      * @param fieldName 属性名
      * @return 返回属性值
-     * @throws UtilException {@inheritDoc}
+     * @ {@inheritDoc}
      */
-    public static Object getValue(Object po, String fieldName) throws UtilException {
+    public static Object getValue(Object po, String fieldName) {
         if (null == po || StringUtils.isEmpty(fieldName)) {
             throw new UtilException("parameter is null");
         }
@@ -113,11 +114,10 @@ public class JPAUtils {
      * @param clazz     类
      * @param fieldName 字段
      * @return 字段
-     * @throws NoSuchFieldException
      */
-    public static Field getField(Class clazz, String fieldName) throws NoSuchFieldException {
+    public static Field getField(Class clazz, String fieldName)  {
         if (clazz == Object.class) {
-            throw new NoSuchFieldException();
+            throw new BaseErrorException("class does not have this field :" +fieldName);
         }
         for (Field field : clazz.getDeclaredFields()) {
             if (field.getName().equals(fieldName)) {
@@ -134,9 +134,9 @@ public class JPAUtils {
      * @param source    对象
      * @param fieldName 属性名
      * @param value     属性值
-     * @throws UtilException {@inheritDoc}
+     * @ {@inheritDoc}
      */
-    public static void setValue(Object source, String fieldName, Object value) throws UtilException {
+    public static void setValue(Object source, String fieldName, Object value) {
         if (null == source || StringUtils.isEmpty(fieldName)) {
             throw new UtilException("parameter is null");
         }
@@ -154,9 +154,9 @@ public class JPAUtils {
      * 基于注解初始化entity一些默认值
      *
      * @param entity 业务实体
-     * @throws UtilException {@inheritDoc}
+     * @ {@inheritDoc}
      */
-    public static void interpretField(Object entity) throws UtilException {
+    public static void interpretField(Object entity) {
         interpretField(entity, new ArrayList<>());
     }
 
@@ -164,37 +164,34 @@ public class JPAUtils {
      * 基于注解初始化entity一些默认值
      *
      * @param entity 业务实体
-     * @throws UtilException
+     * @
      */
 
-    private static void interpretField(Object entity, List<Object> list) throws UtilException {
-        try {
-            if (entity == null) {
-                return;
-            }
-            if (list.contains(entity)) {
-                return;
-            }
-            //集合类型循环处理
-            if (entity instanceof Collection) {
-                for (Iterator<?> it = ((Collection<?>) entity).iterator(); it.hasNext(); ) {
-                    interpretField(it.next(), list);
-                }
-                return;
-            }
-            list.add(entity);
-
-            EntityBinder entityBinder = AnnotationReader.readEntity(entity.getClass());
-
-            //解析注解
-            for (AnnotationBinder annotationBinder : entityBinder.getAnnotationBinders()) {
-                for (Field field : annotationBinder.getFields()) {
-                    annotationBinder.getResolver().resolve(entity, field);
-                }
-            }
-        } catch (Exception e) {
-            throw new UtilException(e);
+    private static void interpretField(Object entity, List<Object> list) {
+        if (entity == null) {
+            return;
         }
+        if (list.contains(entity)) {
+            return;
+        }
+        //集合类型循环处理
+        if (entity instanceof Collection) {
+            for (Iterator<?> it = ((Collection<?>) entity).iterator(); it.hasNext(); ) {
+                interpretField(it.next(), list);
+            }
+            return;
+        }
+        list.add(entity);
+
+        EntityBinder entityBinder = AnnotationReader.readEntity(entity.getClass());
+
+        //解析注解
+        for (AnnotationBinder annotationBinder : entityBinder.getAnnotationBinders()) {
+            for (Field field : annotationBinder.getFields()) {
+                annotationBinder.getResolver().resolve(entity, field);
+            }
+        }
+
     }
 
     /**
