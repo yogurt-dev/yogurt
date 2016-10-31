@@ -1,5 +1,9 @@
 package com.github.jyoghurt.core.exception;
 
+import org.apache.commons.beanutils.PropertyUtils;
+
+import java.lang.reflect.InvocationTargetException;
+
 /**
  * Created by jtwu on 2016/4/8.
  * 自定义异常体
@@ -13,24 +17,35 @@ public class ExceptionBody {
         this.message = message;
     }
 
+    public ExceptionBody(Enum errorEnum) {
+        this.code = errorEnum.name();
+        try {
+            this.message = PropertyUtils.getProperty(errorEnum, "message").toString();
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+            throw new BaseErrorException(e);
+        }
+    }
+
     public String getCode() {
         return code;
     }
 
-    public void setCode(String code) {
+    public ExceptionBody setCode(String code) {
         this.code = code;
+        return this;
     }
 
     public String getMessage() {
         return message;
     }
 
-    public void setMessage(String message) {
+    public ExceptionBody setMessage(String message) {
         this.message = message;
+        return this;
     }
 
     @Override
     public String toString() {
-        return "errorCode:"+code+" errorMessage:"+message;
+        return "errorCode:" + code + " errorMessage:" + message;
     }
 }

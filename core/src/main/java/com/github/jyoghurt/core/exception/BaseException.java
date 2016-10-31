@@ -1,6 +1,8 @@
 package com.github.jyoghurt.core.exception;
 
 
+import java.text.MessageFormat;
+
 /**
  * Created with IntelliJ IDEA. User: jtwu Date: 13-2-26 Time: 下午4:10 基础异常类，其他异常需继承此类
  */
@@ -21,14 +23,14 @@ public abstract class BaseException extends RuntimeException{
         super();
     }
 
-    public BaseException(ExceptionBody exceptionBody) {
-        super(exceptionBody.getMessage());
+    public BaseException(ExceptionBody exceptionBody,Object... objects) {
+        super(MessageFormat.format( exceptionBody.getMessage(),objects));
         this.exceptionBody = exceptionBody;
         this.errorCode = exceptionBody.getCode();
     }
 
-    public BaseException(ExceptionBody exceptionBody, Throwable cause) {
-        super(exceptionBody.getMessage(), cause);
+    public BaseException(ExceptionBody exceptionBody, Throwable cause,Object ... objects) {
+        super(MessageFormat.format( exceptionBody.getMessage(),objects), cause);
         this.exceptionBody = exceptionBody;
         this.errorCode = exceptionBody.getCode();
         if (cause instanceof BaseException == false||(((BaseException)cause).logFlag = true)) {

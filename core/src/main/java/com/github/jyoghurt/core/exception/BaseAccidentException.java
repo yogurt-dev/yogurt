@@ -1,6 +1,8 @@
 package com.github.jyoghurt.core.exception;
 
 
+import java.text.MessageFormat;
+
 /**
  * Created with IntelliJ IDEA. User: jtwu Date: 13-2-26 Time: 下午4:10 基础意外事件异常类，所有意外事件的基类
  * 以下我们对是“意外事件”和“错误”的理解
@@ -32,13 +34,13 @@ public  class BaseAccidentException extends Exception {
         super();
     }
 
-    public BaseAccidentException(ExceptionBody exceptionBody) {
-        super(exceptionBody.getMessage());
+    public BaseAccidentException(ExceptionBody exceptionBody,Object... objects) {
+        super(MessageFormat.format( exceptionBody.getMessage(),objects));
         this.exceptionBody = exceptionBody;
         this.errorCode = exceptionBody.getCode();
     }
 
-    public BaseAccidentException(ExceptionBody exceptionBody, Throwable cause) {
+    public BaseAccidentException(ExceptionBody exceptionBody, Throwable cause,Object... objects) {
         super(exceptionBody.getMessage(), cause);
         this.exceptionBody = exceptionBody;
         this.errorCode = exceptionBody.getCode();
