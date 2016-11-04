@@ -64,7 +64,7 @@ public class BaseController {
         if (ex instanceof BaseErrorException) {
             logger.error(ex.getMessage() + "\n method:★{}★\n parameterValues : ★{}★", request.getContextPath(),
                     WebUtils.getParametersStartingWith(request, null).toString(), ex);
-            return HttpResultHandle.getErrorResult(ex.getMessage());
+            return HttpResultHandle.getErrorResult();
         }
         logger.error("uncaught  exception,\n method:★{}★\n parameterValues : ★{}★", request.getContextPath(),
                 WebUtils.getParametersStartingWith(request, null).toString(), ex);
