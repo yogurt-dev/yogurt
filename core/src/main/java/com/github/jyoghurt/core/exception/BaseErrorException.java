@@ -31,13 +31,13 @@ public class BaseErrorException extends RuntimeException {
     public BaseErrorException(String refBizId, String logContent, Exception e) {
         super();
     }
-
+    @Deprecated
     public BaseErrorException(ExceptionBody exceptionBody) {
         super(exceptionBody.getMessage());
         this.exceptionBody = exceptionBody;
         this.errorCode = exceptionBody.getCode();
     }
-
+    @Deprecated
     public BaseErrorException(ExceptionBody exceptionBody, Throwable cause) {
         super(exceptionBody.getMessage(), cause);
         this.exceptionBody = exceptionBody;
@@ -57,7 +57,7 @@ public class BaseErrorException extends RuntimeException {
         super(MessageFormat.format(message, objects));
     }
 
-
+    @Deprecated
     public BaseErrorException(Throwable cause) {
         super(cause.getMessage(), cause);
     }
@@ -69,11 +69,11 @@ public class BaseErrorException extends RuntimeException {
     public BaseErrorException(String message, Throwable cause, Object... objects) {
         super(MessageFormat.format(message, objects), cause);
     }
-
+    @Deprecated
     public String getErrorCode() {
         return errorCode;
     }
-
+    @Deprecated
     public ExceptionBody getExceptionBody() {
         return exceptionBody;
     }

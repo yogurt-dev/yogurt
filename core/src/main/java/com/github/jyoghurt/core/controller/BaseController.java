@@ -1,12 +1,15 @@
 package com.github.jyoghurt.core.controller;
 
 
-import com.github.jyoghurt.core.exception.BaseException;
+import com.github.jyoghurt.core.exception.BaseAccidentException;
 import com.github.jyoghurt.core.result.HttpResultEntity;
 import com.github.jyoghurt.core.result.HttpResultHandle;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.util.WebUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -19,6 +22,7 @@ import java.util.HashMap;
  * @author JiangYingxu
  */
 public class BaseController {
+    public static String EXCEPTION = "Exception";
     protected HttpServletRequest request;
     protected HttpServletResponse response;
     protected HttpSession session;
@@ -41,6 +45,25 @@ public class BaseController {
 
     }
 
+    @ExceptionHandler
+    public HttpResultEntity<?> exceptionHandler(HttpServletRequest request, Exception ex) {
+        request.setAttribute(EXCEPTION,ex);
+        if (ex instanceof BaseAccidentException) {
+            if (((BaseAccidentException) ex).getLogFlag()) {
+                logger.error(ex.getMessage() + "\n method:★{}★\n parameterValues : ★{}★", request.getContextPath(),
+                        WebUtils.getParametersStartingWith(request, null).toString(), ex);
+            } else {
+                logger.warn(ex.getMessage() + "\n method:★{}★\n parameterValues : ★{}★", request.getContextPath(),
+                        WebUtils.getParametersStartingWith(request, null).toString(), ex);
+            }
+            return HttpResultHandle.getErrorResult(((BaseAccidentException) ex).getErrorCode().replace("ERROR_",
+                    StringUtils.EMPTY), ex.getMessage());
+        }
+        logger.error("uncaught  exception,\n method:★{}★\n parameterValues : ★{}★", request.getContextPath(),
+                WebUtils.getParametersStartingWith(request, null).toString(), ex);
+        return HttpResultHandle.getErrorResult();
+    }
+
 
     public HttpResultEntity<?> getSuccessResult() {
         return HttpResultHandle.getSuccessResult();
@@ -57,7 +80,7 @@ public class BaseController {
     }
 
 
-    public static HttpResultEntity<?> getErrorResult(BaseException e) {
+    public static HttpResultEntity<?> getErrorResult(BaseAccidentException e) {
         if (null == e) {
             return getErrorResult();
         }

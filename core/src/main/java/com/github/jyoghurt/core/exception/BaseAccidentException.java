@@ -41,7 +41,7 @@ public  class BaseAccidentException extends Exception {
     }
 
     public BaseAccidentException(ExceptionBody exceptionBody, Throwable cause,Object... objects) {
-        super(exceptionBody.getMessage(), cause);
+        super(MessageFormat.format( exceptionBody.getMessage(),objects), cause);
         this.exceptionBody = exceptionBody;
         this.errorCode = exceptionBody.getCode();
         if (cause instanceof BaseAccidentException == false||(((BaseAccidentException)cause).logFlag = true)) {

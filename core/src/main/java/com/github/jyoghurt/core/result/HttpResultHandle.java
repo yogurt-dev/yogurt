@@ -49,6 +49,10 @@ public class HttpResultHandle {
         return new HttpResultEntity<>(HttpResultEnum.ERROR.errorCode, HttpResultEnum.ERROR.message, result);
     }
 
+    public static HttpResultEntity<?> getErrorResult(String message) {
+        return new HttpResultEntity<>(HttpResultEnum.ERROR.errorCode, message);
+    }
+
     public static HttpResultEntity<?> getErrorResult(String errorCode, String message) {
         return new HttpResultEntity<>(errorCode, message);
     }
