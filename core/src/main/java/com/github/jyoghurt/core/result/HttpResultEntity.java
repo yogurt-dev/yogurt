@@ -31,7 +31,7 @@ public class HttpResultEntity<R> {
 
     public HttpResultEntity(HttpResultHandle.HttpResultEnum httpResultEnum){
         this.errorCode = httpResultEnum.getErrorCode();
-        this.message = httpResultEnum.getMessage();
+        this.message = httpResultEnum.name();
     }
     @JsonView(BaseResult.class)
     public String getErrorCode() {

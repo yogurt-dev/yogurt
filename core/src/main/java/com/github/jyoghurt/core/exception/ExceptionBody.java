@@ -9,6 +9,7 @@ import java.lang.reflect.InvocationTargetException;
  * 自定义异常体
  */
 public class ExceptionBody {
+    public static String MESSAGE = "message";
     private String code;
     private String message;
 
@@ -20,9 +21,9 @@ public class ExceptionBody {
     public ExceptionBody(Enum errorEnum) {
         this.code = errorEnum.name();
         try {
-            this.message = PropertyUtils.getProperty(errorEnum, "message").toString();
+            this.message = PropertyUtils.getProperty(errorEnum, MESSAGE).toString();
         } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            throw new BaseErrorException(e);
+            throw new BaseErrorException(message, e);
         }
     }
 

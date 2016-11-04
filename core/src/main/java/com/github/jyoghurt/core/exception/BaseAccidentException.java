@@ -30,10 +30,6 @@ public  class BaseAccidentException extends Exception {
      */
     private ExceptionBody exceptionBody;
 
-    public BaseAccidentException(String refBizId, String logContent, Exception e) {
-        super();
-    }
-
     public BaseAccidentException(ExceptionBody exceptionBody,Object... objects) {
         super(MessageFormat.format( exceptionBody.getMessage(),objects));
         this.exceptionBody = exceptionBody;

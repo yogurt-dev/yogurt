@@ -57,11 +57,6 @@ public class BaseErrorException extends RuntimeException {
         super(MessageFormat.format(message, objects));
     }
 
-    @Deprecated
-    public BaseErrorException(Throwable cause) {
-        super(cause.getMessage(), cause);
-    }
-
     public BaseErrorException(String message, Throwable cause) {
         super(message, cause);
     }
@@ -69,13 +64,4 @@ public class BaseErrorException extends RuntimeException {
     public BaseErrorException(String message, Throwable cause, Object... objects) {
         super(MessageFormat.format(message, objects), cause);
     }
-    @Deprecated
-    public String getErrorCode() {
-        return errorCode;
-    }
-    @Deprecated
-    public ExceptionBody getExceptionBody() {
-        return exceptionBody;
-    }
-
 }

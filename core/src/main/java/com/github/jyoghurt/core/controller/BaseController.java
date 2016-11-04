@@ -2,6 +2,7 @@ package com.github.jyoghurt.core.controller;
 
 
 import com.github.jyoghurt.core.exception.BaseAccidentException;
+import com.github.jyoghurt.core.exception.BaseErrorException;
 import com.github.jyoghurt.core.result.HttpResultEntity;
 import com.github.jyoghurt.core.result.HttpResultHandle;
 import org.apache.commons.lang3.StringUtils;
@@ -47,7 +48,7 @@ public class BaseController {
 
     @ExceptionHandler
     public HttpResultEntity<?> exceptionHandler(HttpServletRequest request, Exception ex) {
-        request.setAttribute(EXCEPTION,ex);
+        request.setAttribute(EXCEPTION, ex);
         if (ex instanceof BaseAccidentException) {
             if (((BaseAccidentException) ex).getLogFlag()) {
                 logger.error(ex.getMessage() + "\n method:★{}★\n parameterValues : ★{}★", request.getContextPath(),
@@ -58,6 +59,12 @@ public class BaseController {
             }
             return HttpResultHandle.getErrorResult(((BaseAccidentException) ex).getErrorCode().replace("ERROR_",
                     StringUtils.EMPTY), ex.getMessage());
+        }
+
+        if (ex instanceof BaseErrorException) {
+            logger.error(ex.getMessage() + "\n method:★{}★\n parameterValues : ★{}★", request.getContextPath(),
+                    WebUtils.getParametersStartingWith(request, null).toString(), ex);
+            return HttpResultHandle.getErrorResult(ex.getMessage());
         }
         logger.error("uncaught  exception,\n method:★{}★\n parameterValues : ★{}★", request.getContextPath(),
                 WebUtils.getParametersStartingWith(request, null).toString(), ex);
