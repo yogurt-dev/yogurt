@@ -31,12 +31,14 @@ public class BaseErrorException extends RuntimeException {
     public BaseErrorException(String refBizId, String logContent, Exception e) {
         super();
     }
+
     @Deprecated
     public BaseErrorException(ExceptionBody exceptionBody) {
         super(exceptionBody.getMessage());
         this.exceptionBody = exceptionBody;
         this.errorCode = exceptionBody.getCode();
     }
+
     @Deprecated
     public BaseErrorException(ExceptionBody exceptionBody, Throwable cause) {
         super(exceptionBody.getMessage(), cause);
@@ -47,6 +49,10 @@ public class BaseErrorException extends RuntimeException {
 
     public BaseErrorException() {
         super();
+    }
+
+    public BaseErrorException(Throwable cause) {
+        super(cause.getMessage(), cause);
     }
 
     public BaseErrorException(String message) {
