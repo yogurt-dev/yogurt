@@ -8,8 +8,8 @@ import com.github.jyoghurt.core.result.HttpResultHandle;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.util.WebUtils;
 
 import javax.servlet.http.HttpServletRequest;
@@ -24,17 +24,15 @@ import java.util.HashMap;
  */
 public class BaseController {
     public static String EXCEPTION = "Exception";
-    protected HttpServletRequest request;
-    protected HttpServletResponse response;
-    protected HttpSession session;
+
     protected static Logger logger = LoggerFactory.getLogger(BaseController.class);
 
-    @ModelAttribute
-    public void setReqAndRes(HttpServletRequest request, HttpServletResponse response) {
-        this.request = request;
-        this.response = response;
-        this.session = request.getSession();
-    }
+    @Autowired
+    protected HttpServletRequest request;
+    @Autowired
+    protected HttpServletResponse response;
+    @Autowired
+    protected HttpSession session;
 
     static {
         //定义允许上传的文件扩展名
