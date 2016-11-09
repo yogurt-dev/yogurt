@@ -49,10 +49,10 @@ public class BaseController {
         request.setAttribute(EXCEPTION, ex);
         if (ex instanceof BaseAccidentException) {
             if (((BaseAccidentException) ex).getLogFlag()) {
-                logger.error(ex.getMessage() + "\n method:★{}★\n parameterValues : ★{}★", request.getContextPath(),
+                logger.error(ex.getMessage() + "\n method:★{}★\n parameterValues : ★{}★", request.getServletPath(),
                         WebUtils.getParametersStartingWith(request, null).toString(), ex);
             } else {
-                logger.warn(ex.getMessage() + "\n method:★{}★\n parameterValues : ★{}★", request.getContextPath(),
+                logger.warn(ex.getMessage() + "\n method:★{}★\n parameterValues : ★{}★", request.getServletPath(),
                         WebUtils.getParametersStartingWith(request, null).toString(), ex);
             }
             return HttpResultHandle.getErrorResult(((BaseAccidentException) ex).getErrorCode().replace("ERROR_",
@@ -60,11 +60,11 @@ public class BaseController {
         }
 
         if (ex instanceof BaseErrorException) {
-            logger.error(ex.getMessage() + "\n method:★{}★\n parameterValues : ★{}★", request.getContextPath(),
+            logger.error(ex.getMessage() + "\n method:★{}★\n parameterValues : ★{}★", request.getServletPath(),
                     WebUtils.getParametersStartingWith(request, null).toString(), ex);
             return HttpResultHandle.getErrorResult(ex.getMessage());
         }
-        logger.error("uncaught  exception,\n method:★{}★\n parameterValues : ★{}★", request.getContextPath(),
+        logger.error("uncaught  exception,\n method:★{}★\n parameterValues : ★{}★", request.getServletPath(),
                 WebUtils.getParametersStartingWith(request, null).toString(), ex);
         return HttpResultHandle.getErrorResult();
     }
