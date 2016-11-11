@@ -2,6 +2,7 @@ package com.github.jyoghurt.core.result;
 
 
 import com.github.jyoghurt.core.constant.Constant;
+import com.github.jyoghurt.core.exception.BaseAccidentException;
 import com.github.jyoghurt.core.utils.StringUtils;
 
 /**
@@ -58,5 +59,16 @@ public class HttpResultHandle {
 
     public static HttpResultEntity<?> getErrorResult(String errorCode, String message, Object result) {
         return new HttpResultEntity<>(StringUtils.replaceAllToEmpty(errorCode, Constant.ERROR_CODE_PREFIX), message, result);
+    }
+
+    /**
+     * 通过BaseAccidentException异常和result返回结果集.
+     *
+     * @param e      BaseAccidentException 异常
+     * @param result 结果集
+     * @return HttpResultEntity<?>
+     */
+    public static HttpResultEntity<?> getErrorResult(BaseAccidentException e, Object result) {
+        return getErrorResult(e.getErrorCode(), e.getMessage(), result);
     }
 }
