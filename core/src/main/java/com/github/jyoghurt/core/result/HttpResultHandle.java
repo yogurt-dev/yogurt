@@ -1,5 +1,9 @@
 package com.github.jyoghurt.core.result;
 
+
+import com.github.jyoghurt.core.constant.Constant;
+import com.github.jyoghurt.core.utils.StringUtils;
+
 /**
  * Created by jtwu on 2015/9/22.
  */
@@ -10,7 +14,9 @@ public class HttpResultHandle {
     public static final String SUCCESS_CODE = "1";
 
     public enum HttpResultEnum {
+
         NOT_LOGGED(NOT_LOGGED_CODE), ERROR(ERROR_CODE), SUCCESS(SUCCESS_CODE);
+
         private String errorCode;
 
         HttpResultEnum(String errorCode) {
@@ -24,8 +30,6 @@ public class HttpResultHandle {
         public void setErrorCode(String errorCode) {
             this.errorCode = errorCode;
         }
-
-
     }
 
     public static HttpResultEntity<?> getSuccessResult() {
@@ -49,10 +53,10 @@ public class HttpResultHandle {
     }
 
     public static HttpResultEntity<?> getErrorResult(String errorCode, String message) {
-        return new HttpResultEntity<>(errorCode, message);
+        return new HttpResultEntity<>(StringUtils.replaceAllToEmpty(errorCode, Constant.ERROR_CODE_PREFIX), message);
     }
 
     public static HttpResultEntity<?> getErrorResult(String errorCode, String message, Object result) {
-        return new HttpResultEntity<>(errorCode, message, result);
+        return new HttpResultEntity<>(StringUtils.replaceAllToEmpty(errorCode, Constant.ERROR_CODE_PREFIX), message, result);
     }
 }
