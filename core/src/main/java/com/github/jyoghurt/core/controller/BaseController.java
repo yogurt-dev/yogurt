@@ -48,12 +48,13 @@ public class BaseController {
     @ExceptionHandler
     public HttpResultEntity<?> exceptionHandler(HttpServletRequest request, Exception ex) {
         request.setAttribute(EXCEPTION, ex);
+        String logTemplate = "\n url:★{}★\n parameterValues : ★{}★";
         if (ex instanceof BaseAccidentException) {
             if (((BaseAccidentException) ex).getLogFlag()) {
-                logger.error(ex.getMessage() + "\n method:★{}★\n parameterValues : ★{}★", request.getServletPath(),
+                logger.error(ex.getMessage() + logTemplate, request.getServletPath(),
                         WebUtils.getParametersStartingWith(request, null).toString(), ex);
             } else {
-                logger.warn(ex.getMessage() + "\n method:★{}★\n parameterValues : ★{}★", request.getServletPath(),
+                logger.warn(ex.getMessage() + logTemplate, request.getServletPath(),
                         WebUtils.getParametersStartingWith(request, null).toString(), ex);
             }
             return HttpResultHandle.getErrorResult(((BaseAccidentException) ex).getErrorCode().replace(Constant.ERROR_CODE_PREFIX,
@@ -61,11 +62,11 @@ public class BaseController {
         }
 
         if (ex instanceof BaseErrorException) {
-            logger.error(ex.getMessage() + "\n method:★{}★\n parameterValues : ★{}★", request.getServletPath(),
+            logger.error(ex.getMessage() + logTemplate, request.getServletPath(),
                     WebUtils.getParametersStartingWith(request, null).toString(), ex);
             return HttpResultHandle.getErrorResult(ex.getMessage());
         }
-        logger.error("uncaught  exception,\n method:★{}★\n parameterValues : ★{}★", request.getServletPath(),
+        logger.error("uncaught  exception,"+logTemplate, request.getServletPath(),
                 WebUtils.getParametersStartingWith(request, null).toString(), ex);
         return HttpResultHandle.getErrorResult();
     }
