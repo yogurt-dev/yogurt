@@ -1,15 +1,13 @@
 package com.github.jyoghurt.core.handle;
 
-import com.github.jyoghurt.core.configuration.PageConvert;
 import com.github.jyoghurt.core.configuration.impl.PageConfiguration;
 import com.github.jyoghurt.core.dao.BaseMapper;
 import com.github.jyoghurt.core.utils.DateTimeFormatter;
 import com.github.jyoghurt.core.utils.JPAUtils;
-import com.github.jyoghurt.core.utils.SpringContextUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.util.Assert;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -62,13 +60,62 @@ public class QueryHandle {
      * @return QueryHandle
      * @
      */
-    public QueryHandle seniorSearch(Object object)  {
+    public QueryHandle seniorSearch(Object object) {
         Assert.notNull(object, "seniorSearch -> object can not be null!");
         if (seniorSearch != null) {
             customWhereSql(this.getSeniorSearchWhereSql(this.getSeniorSearchSqlOperate(), object));
         }
         return this;
     }
+
+    /**
+     * 日期范围查询，如：字段createTime ，前台需要按规则传入createTime_start或createTime_end.
+     * 目前支持 年月日格式，会自动把结束时间+1天。
+     *
+     * @param clazz     class
+     * @param fieldName 范围查询的字段，为空则按范围查询所有时间字段
+     */
+    public QueryHandle dateBetweenSearch(Class clazz, String... fieldName) {
+        customWhereSql(this.getDateBetweenSearchWhereSql(clazz, fieldName));
+        return this;
+    }
+
+    public String getDateBetweenSearchWhereSql(Class clazz, String... fieldName) {
+        boolean searchAll = false;
+        if (fieldName == null || fieldName.length == 0) {
+            searchAll = true;
+        }
+        List<String> dateFieldList = new ArrayList<>();
+        CollectionUtils.addAll(dateFieldList, fieldName);
+        StringBuilder sb = new StringBuilder();
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        if (request == null) {
+            throw new IllegalArgumentException("getSearchDateBetweenWhereSql -> request can not be null!");
+        }
+        List<Field> fieldList = JPAUtils.getAllFields(clazz);
+        for (Field field : fieldList) {
+            if (!JPAUtils.fieldIsDateType(field)) {
+                continue;
+            }
+            if (searchAll || dateFieldList.contains(field.getName())) {
+                String expandFieldName = field.getName() + "_start";
+                String startTime = request.getParameter(expandFieldName);
+                if (StringUtils.isNotEmpty(startTime)) {
+                    sb = appendLargerEqualThanSql(sb, AND, field.getName(), expandFieldName, startTime);
+                }
+                String endFieldName = field.getName() + "_end";
+                String end_time = request.getParameter(endFieldName);
+                if (StringUtils.isNotEmpty(end_time)) {
+                    sb = appendLessEqualThanSql(sb, AND, field.getName(), endFieldName, end_time);
+                }
+            }
+        }
+        if (StringUtils.isNotEmpty(sb.toString())) {
+            return "(" + sb.toString().replaceFirst(AND, "") + ")";
+        }
+        return null;
+    }
+
 
     /**
      * 根据高级搜索的条件获取拼接sql的操作符
@@ -94,7 +141,7 @@ public class QueryHandle {
      */
     //todo 异常修改成 UI异常
     //todo 优化if else
-    public String getSeniorSearchWhereSql(String sqlOperate, Object object)  {
+    public String getSeniorSearchWhereSql(String sqlOperate, Object object) {
         StringBuilder sb = new StringBuilder();
         /* init request and validate */
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
@@ -138,25 +185,25 @@ public class QueryHandle {
         return null;
     }
 
-    private StringBuilder appendLikeSql(StringBuilder sb, String sqlOperate, String fieldName)  {
+    private StringBuilder appendLikeSql(StringBuilder sb, String sqlOperate, String fieldName) {
         return sb.append(sqlOperate).append(" t.").append(fieldName).append(" like CONCAT('%'," +
                 "#{" + StringUtils.join(BaseMapper.DATA + "." + fieldName) + "}" + ", '%')");
     }
 
-    private StringBuilder appendEqualsSql(StringBuilder sb, String sqlOperate, String fieldName)  {
+    private StringBuilder appendEqualsSql(StringBuilder sb, String sqlOperate, String fieldName) {
         return sb.append(sqlOperate).append(" t.").append(fieldName).append("= ").append("#{" +
                 StringUtils.join(BaseMapper.DATA + "." + fieldName) + "}");
     }
 
     private StringBuilder appendLargerEqualThanSql(StringBuilder sb, String sqlOperate, String fieldName,
-                                                   String expandFieldName, String value)  {
+                                                   String expandFieldName, String value) {
         addExpandData(expandFieldName, value);
         return sb.append(sqlOperate).append(" t.").append(fieldName).append(">= ").append("#{" +
                 StringUtils.join(BaseMapper.DATA + "." + expandFieldName) + "}");
     }
 
     private StringBuilder appendLessEqualThanSql(StringBuilder sb, String sqlOperate, String fieldName,
-                                                 String expandFieldName, String value)  {
+                                                 String expandFieldName, String value) {
         addExpandData(expandFieldName, value);
         sb.append(sqlOperate).append(" t.").append(fieldName);
         if (DateTimeFormatter.isYYYYMMddFormatDate(value)) {
