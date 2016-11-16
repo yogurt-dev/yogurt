@@ -41,6 +41,8 @@ public class DonkishPageService<T> implements Condition,PageConvert<T> {
             queryHandle.addOrderBy(request.getParameter("mDataProp_"+request.getParameter("iSortCol_0")),
                     request.getParameter("sSortDir_0"));
         }
+        //add by limiao 20161116 处理时间范围查询和联合查询
+        queryHandle.dateBetweenSearch().joinColumnsSearch();
     }
 
     @Override

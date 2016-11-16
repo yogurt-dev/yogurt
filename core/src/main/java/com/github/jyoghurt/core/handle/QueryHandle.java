@@ -2,9 +2,9 @@ package com.github.jyoghurt.core.handle;
 
 import com.github.jyoghurt.core.configuration.impl.PageConfiguration;
 import com.github.jyoghurt.core.dao.BaseMapper;
+import com.github.jyoghurt.core.exception.BaseErrorException;
 import com.github.jyoghurt.core.utils.DateTimeFormatter;
 import com.github.jyoghurt.core.utils.JPAUtils;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,45 +69,81 @@ public class QueryHandle {
     }
 
     /**
-     * 日期范围查询，如：字段createTime ，前台需要按规则传入createTime_start或createTime_end.
-     * 目前支持 年月日格式，会自动把结束时间+1天。
+     * 处理联合字段查询
      *
-     * @param clazz     class
-     * @param fieldName 范围查询的字段，为空则按范围查询所有时间字段
+     * @return QueryHandle
      */
-    public QueryHandle dateBetweenSearch(Class clazz, String... fieldName) {
-        customWhereSql(this.getDateBetweenSearchWhereSql(clazz, fieldName));
+    public QueryHandle joinColumnsSearch() {
+        customWhereSql(this.getJoinColumnsSearchWhereSql());
         return this;
     }
 
-    public String getDateBetweenSearchWhereSql(Class clazz, String... fieldName) {
-        boolean searchAll = false;
-        if (fieldName == null || fieldName.length == 0) {
-            searchAll = true;
-        }
-        List<String> dateFieldList = new ArrayList<>();
-        CollectionUtils.addAll(dateFieldList, fieldName);
-        StringBuilder sb = new StringBuilder();
+    /**
+     * 获取联合字段查询sql
+     *
+     * @return String sql
+     */
+    public String getJoinColumnsSearchWhereSql() {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         if (request == null) {
-            throw new IllegalArgumentException("getSearchDateBetweenWhereSql -> request can not be null!");
+            throw new BaseErrorException("getJoinColumnsSearchWhereSql -> request can not be null!");
         }
-        List<Field> fieldList = JPAUtils.getAllFields(clazz);
-        for (Field field : fieldList) {
-            if (!JPAUtils.fieldIsDateType(field)) {
-                continue;
+        String joinColumnNames = request.getParameter("joinColumnNames");
+        if (StringUtils.isEmpty(joinColumnNames)) {
+            return null;
+        }
+        String joinColumnValue = request.getParameter("joinColumnValue");
+        if (StringUtils.isEmpty(joinColumnValue)) {
+            return null;
+        }
+        String[] fieldNames = joinColumnNames.split(",");
+        StringBuilder sb = new StringBuilder();
+        for (String filedName : fieldNames) {
+            addExpandData(filedName, joinColumnValue);
+            sb = appendLikeSql(sb, OR, filedName);
+        }
+        if (StringUtils.isNotEmpty(sb.toString())) {
+            return "(" + sb.toString().replaceFirst(OR, "") + ")";
+        }
+        return null;
+    }
+
+    /**
+     * 处理日期范围查询，如：字段createTime ，前台需要按规则传入createTime_start或createTime_end.
+     * 目前支持 年月日格式，会自动把结束时间+1天。
+     */
+    public QueryHandle dateBetweenSearch() {
+        customWhereSql(this.getDateBetweenSearchWhereSql());
+        return this;
+    }
+
+
+    /**
+     * 获取日期范围查询sql
+     *
+     * @return String sql
+     */
+    public String getDateBetweenSearchWhereSql() {
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        if (request == null) {
+            throw new BaseErrorException("getSearchDateBetweenWhereSql -> request can not be null!");
+        }
+        String dateRangeColumnNames = request.getParameter("dateRangeColumnNames");
+        if (StringUtils.isEmpty(dateRangeColumnNames)) {
+            return null;
+        }
+        String[] columns = dateRangeColumnNames.split(",");
+        StringBuilder sb = new StringBuilder();
+        for (String filedName : columns) {
+            String expandFieldName = filedName + "_start";
+            String startTime = request.getParameter(expandFieldName);
+            if (StringUtils.isNotEmpty(startTime)) {
+                sb = appendLargerEqualThanSql(sb, AND, filedName, expandFieldName, startTime);
             }
-            if (searchAll || dateFieldList.contains(field.getName())) {
-                String expandFieldName = field.getName() + "_start";
-                String startTime = request.getParameter(expandFieldName);
-                if (StringUtils.isNotEmpty(startTime)) {
-                    sb = appendLargerEqualThanSql(sb, AND, field.getName(), expandFieldName, startTime);
-                }
-                String endFieldName = field.getName() + "_end";
-                String end_time = request.getParameter(endFieldName);
-                if (StringUtils.isNotEmpty(end_time)) {
-                    sb = appendLessEqualThanSql(sb, AND, field.getName(), endFieldName, end_time);
-                }
+            String endFieldName = filedName + "_end";
+            String end_time = request.getParameter(endFieldName);
+            if (StringUtils.isNotEmpty(end_time)) {
+                sb = appendLessEqualThanSql(sb, AND, filedName, endFieldName, end_time);
             }
         }
         if (StringUtils.isNotEmpty(sb.toString())) {
