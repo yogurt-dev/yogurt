@@ -42,7 +42,7 @@ public class DonkishPageService<T> implements Condition,PageConvert<T> {
                     request.getParameter("sSortDir_0"));
         }
         //add by limiao 20161116 处理时间范围查询和联合查询
-        queryHandle.dateBetweenSearch().joinColumnsSearch();
+        //queryHandle.dateBetweenSearch().joinColumnsSearch();
     }
 
     @Override

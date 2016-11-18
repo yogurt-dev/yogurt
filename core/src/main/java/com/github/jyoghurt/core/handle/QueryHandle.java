@@ -2,9 +2,12 @@ package com.github.jyoghurt.core.handle;
 
 import com.github.jyoghurt.core.configuration.impl.PageConfiguration;
 import com.github.jyoghurt.core.dao.BaseMapper;
+import com.github.jyoghurt.core.domain.BaseEntity;
+import com.github.jyoghurt.core.enums.SeniorSearchConfigEnum;
 import com.github.jyoghurt.core.exception.BaseErrorException;
 import com.github.jyoghurt.core.utils.DateTimeFormatter;
 import com.github.jyoghurt.core.utils.JPAUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,23 +53,84 @@ public class QueryHandle {
     private LinkedList<CustomWhereHandle> customList = new LinkedList<>();
     private String groupBy;
 
-    //如果是null则是or like，如果是1则是 and like
-    private Boolean seniorSearch;
+    /**
+     * 已经拼上sql的字段集合
+     */
+    private Set<String> alreadyAppendFieldSet = new HashSet<>();
 
     /**
-     * 设置高级查询方法 add by limiao 20160214
+     * 新“高级”查询接口
      *
-     * @param object 高级查询涉及的对象
-     * @return QueryHandle
-     * @
+     * @param baseEntity 实体类
+     * @param enums      配置项集合
      */
-    public QueryHandle seniorSearch(Object object) {
-        Assert.notNull(object, "seniorSearch -> object can not be null!");
-        if (seniorSearch != null) {
-            customWhereSql(this.getSeniorSearchWhereSql(this.getSeniorSearchSqlOperate(), object));
+    public QueryHandle search(BaseEntity baseEntity, SeniorSearchConfigEnum... enums) {
+        Assert.notNull(baseEntity, "seniorSearch -> baseEntity can not be null!");
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        if (request == null) {
+            throw new BaseErrorException("getSeniorSearchWhereSql -> request can not be null!");
+        }
+        if (enums == null || enums.length == 0) {
+            this.joinColumnsSearch().dateBetweenSearch().commonColumnsSearch(baseEntity);
+            return this;
+        }
+        Set<SeniorSearchConfigEnum> configSet = new HashSet<>();
+        CollectionUtils.addAll(configSet, enums);
+        if (configSet.contains(SeniorSearchConfigEnum.JOIN_SEARCH)) {
+            this.joinColumnsSearch();
+        }
+        if (configSet.contains(SeniorSearchConfigEnum.DATE_BETWEEN_SEARCH)) {
+            this.dateBetweenSearch();
+        }
+        if (configSet.contains(SeniorSearchConfigEnum.OTHER_SEARCH)) {
+            this.commonColumnsSearch(baseEntity);
         }
         return this;
     }
+
+    /**
+     * 处理普通字段查询.可以查看SeniorSearchConfigEnum.OTHER_SEARCH配置说明。
+     *
+     * @return QueryHandle
+     */
+    public QueryHandle commonColumnsSearch(BaseEntity baseEntity) {
+        customWhereSql(this.getCommonColumnsSearchWhereSql(baseEntity));
+        return this;
+    }
+
+    /**
+     * 获取普通字段查询sql
+     *
+     * @return String sql
+     */
+    private String getCommonColumnsSearchWhereSql(BaseEntity baseEntity) {
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+        if (request == null) {
+            throw new BaseErrorException("getJoinColumnsSearchWhereSql -> request can not be null!");
+        }
+        List<Field> fieldList = JPAUtils.getAllFields(baseEntity.getClass());
+        StringBuilder sb = new StringBuilder();
+        for (Field field : fieldList) {
+            /*  如果是日期类型，那么去dateQueryParamsMap获取时间段条件 */
+            if (JPAUtils.fieldIsDateType(field) || alreadyAppendFieldSet.contains(field.getName())) {
+                continue;
+            }
+            Object value = JPAUtils.getValue(baseEntity, field);
+            if (value == null || "".equals(value)) {
+                continue;
+            }
+            if (JPAUtils.fieldIsStringType(field)) {
+                sb = appendLikeSql(sb, AND, field.getName());
+            } else {
+                sb = appendEqualsSql(sb, AND, field.getName());
+            }
+        }
+        if (StringUtils.isNotEmpty(sb.toString())) {
+            return "(" + sb.toString().replaceFirst(AND, "") + ")";
+        }
+        return null;
+    }
+
 
     /**
      * 处理联合字段查询
@@ -83,7 +147,7 @@ public class QueryHandle {
      *
      * @return String sql
      */
-    public String getJoinColumnsSearchWhereSql() {
+    private String getJoinColumnsSearchWhereSql() {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         if (request == null) {
             throw new BaseErrorException("getJoinColumnsSearchWhereSql -> request can not be null!");
@@ -99,6 +163,7 @@ public class QueryHandle {
         String[] fieldNames = joinColumnNames.split(",");
         StringBuilder sb = new StringBuilder();
         for (String filedName : fieldNames) {
+            alreadyAppendFieldSet.add(filedName);
             addExpandData(filedName, joinColumnValue);
             sb = appendLikeSql(sb, OR, filedName);
         }
@@ -123,7 +188,7 @@ public class QueryHandle {
      *
      * @return String sql
      */
-    public String getDateBetweenSearchWhereSql() {
+    private String getDateBetweenSearchWhereSql() {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         if (request == null) {
             throw new BaseErrorException("getSearchDateBetweenWhereSql -> request can not be null!");
@@ -148,75 +213,6 @@ public class QueryHandle {
         }
         if (StringUtils.isNotEmpty(sb.toString())) {
             return "(" + sb.toString().replaceFirst(AND, "") + ")";
-        }
-        return null;
-    }
-
-
-    /**
-     * 根据高级搜索的条件获取拼接sql的操作符
-     * add by limiao 20160214
-     *
-     * @return String AND或OR
-     */
-    private String getSeniorSearchSqlOperate() {
-        if (SENIOR_SEARCH && seniorSearch) {
-            return AND;
-        } else {
-            return OR;
-        }
-    }
-
-    /**
-     * 根据高级搜索标识和查询对象获取高级查询的sql add by limiao 20160214
-     *
-     * @param sqlOperate OR 或者 AND
-     * @param object     高级查询涉及的对象
-     * @return String sql
-     * @
-     */
-    //todo 异常修改成 UI异常
-    //todo 优化if else
-    public String getSeniorSearchWhereSql(String sqlOperate, Object object) {
-        StringBuilder sb = new StringBuilder();
-        /* init request and validate */
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-        if (request == null) {
-            throw new IllegalArgumentException("getSeniorSearchWhereSql -> request can not be null!");
-        }
-        /* 使用反射获取查询字段，拼sql */
-        List<Field> fieldList = JPAUtils.getAllFields(object.getClass());
-        for (Field field : fieldList) {
-            /*  如果是日期类型，那么去dateQueryParamsMap获取时间段条件 */
-            if (JPAUtils.fieldIsDateType(field)) {
-                /* 开始时间传值处理 */
-                String expandFieldName = field.getName() + "_start";
-                String start_time = request.getParameter(expandFieldName);
-                if (StringUtils.isNotEmpty(start_time)) {
-                    sb = appendLargerEqualThanSql(sb, sqlOperate, field.getName(), expandFieldName, start_time);
-                }
-                 /* 结束时间传值处理 */
-                expandFieldName = field.getName() + "_end";
-                String end_time = request.getParameter(expandFieldName);
-                if (StringUtils.isNotEmpty(end_time)) {
-                    sb = appendLessEqualThanSql(sb, sqlOperate, field.getName(), expandFieldName, end_time);
-                }
-            } else {
-                /* 如果不是日期类型，字段的值不为null，String类型的字段拼like,其他类型的字段拼=号 */
-                Object value = JPAUtils.getValue(object, field);
-                if (value == null || "".equals(value)) {
-                    continue;
-                }
-                if (JPAUtils.fieldIsStringType(field)) {
-                    sb = appendLikeSql(sb, sqlOperate, field.getName());
-                } else {
-                    sb = appendEqualsSql(sb, sqlOperate, field.getName());
-                }
-            }
-        }
-        /* 如果sql不为空，那么去掉第一个or或and，然后把sql括起来，否者返回null */
-        if (StringUtils.isNotEmpty(sb.toString())) {
-            return "(" + sb.toString().replaceFirst(sqlOperate, "") + ")";
         }
         return null;
     }
@@ -392,12 +388,5 @@ public class QueryHandle {
         return expandData;
     }
 
-    public Boolean getSeniorSearch() {
-        return seniorSearch;
-    }
-
-    public void setSeniorSearch(Boolean seniorSearch) {
-        this.seniorSearch = seniorSearch;
-    }
 }
 
