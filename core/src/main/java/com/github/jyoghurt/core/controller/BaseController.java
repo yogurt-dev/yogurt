@@ -49,13 +49,14 @@ public class BaseController {
     public HttpResultEntity<?> exceptionHandler(HttpServletRequest request, Exception ex) {
         request.setAttribute(EXCEPTION, ex);
         String logTemplate = "\n url:★{}★\n parameterValues : ★{}★";
+        String parameterValues = com.github.jyoghurt.core.utils.WebUtils.getParameterValues(request);
         if (ex instanceof BaseAccidentException) {
             if (((BaseAccidentException) ex).getLogFlag()) {
                 logger.error(ex.getMessage() + logTemplate, request.getServletPath(),
-                        WebUtils.getParametersStartingWith(request, null).toString(), ex);
+                        parameterValues, ex);
             } else {
                 logger.warn(ex.getMessage() + logTemplate, request.getServletPath(),
-                        WebUtils.getParametersStartingWith(request, null).toString(), ex);
+                        parameterValues, ex);
             }
             return HttpResultHandle.getErrorResult(((BaseAccidentException) ex).getErrorCode().replace(Constant.ERROR_CODE_PREFIX,
                     StringUtils.EMPTY), ex.getMessage());
@@ -63,13 +64,15 @@ public class BaseController {
 
         if (ex instanceof BaseErrorException) {
             logger.error(ex.getMessage() + logTemplate, request.getServletPath(),
-                    WebUtils.getParametersStartingWith(request, null).toString(), ex);
+                    parameterValues, ex);
             return HttpResultHandle.getErrorResult(ex.getMessage());
         }
         logger.error("uncaught  exception,"+logTemplate, request.getServletPath(),
-                WebUtils.getParametersStartingWith(request, null).toString(), ex);
+                parameterValues, ex);
         return HttpResultHandle.getErrorResult();
     }
+
+
 
 
     public HttpResultEntity<?> getSuccessResult() {
