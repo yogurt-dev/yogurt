@@ -11,7 +11,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.Assert;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -61,11 +60,9 @@ public class QueryHandle {
     /**
      * 新“高级”查询接口
      *
-     * @param baseEntity 实体类
-     * @param enums      配置项集合
+     * @param enums 配置项集合
      */
     public QueryHandle search(BaseEntity baseEntity, SeniorSearchConfigEnum... enums) {
-        Assert.notNull(baseEntity, "seniorSearch -> baseEntity can not be null!");
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         if (request == null) {
             throw new BaseErrorException("getSeniorSearchWhereSql -> request can not be null!");
@@ -119,11 +116,7 @@ public class QueryHandle {
             if (value == null || "".equals(value)) {
                 continue;
             }
-            if (JPAUtils.fieldIsStringType(field)) {
-                sb = appendLikeSql(sb, AND, field.getName());
-            } else {
-                sb = appendEqualsSql(sb, AND, field.getName());
-            }
+            sb = appendLikeSql(sb, AND, field.getName());
         }
         if (StringUtils.isNotEmpty(sb.toString())) {
             return "(" + sb.toString().replaceFirst(AND, "") + ")";
@@ -387,6 +380,7 @@ public class QueryHandle {
     public Map<String, Object> getExpandData() {
         return expandData;
     }
+
 
 }
 
