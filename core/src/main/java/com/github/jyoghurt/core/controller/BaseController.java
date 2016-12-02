@@ -72,8 +72,7 @@ public class BaseController {
         return HttpResultHandle.getErrorResult();
     }
 
-
-
+    
 
     public HttpResultEntity<?> getSuccessResult() {
         return HttpResultHandle.getSuccessResult();
