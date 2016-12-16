@@ -3,11 +3,9 @@ package com.github.jyoghurt.core.handle;
 import com.github.jyoghurt.core.configuration.impl.PageConfiguration;
 import com.github.jyoghurt.core.dao.BaseMapper;
 import com.github.jyoghurt.core.domain.BaseEntity;
-import com.github.jyoghurt.core.enums.SeniorSearchConfigEnum;
 import com.github.jyoghurt.core.exception.BaseErrorException;
 import com.github.jyoghurt.core.utils.DateTimeFormatter;
 import com.github.jyoghurt.core.utils.JPAUtils;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,41 +57,16 @@ public class QueryHandle {
 
     /**
      * 新“高级”查询接口
-     *
-     * @param enums 配置项集合
      */
-    public QueryHandle search(BaseEntity baseEntity, SeniorSearchConfigEnum... enums) {
+    public QueryHandle search() {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         if (request == null) {
             throw new BaseErrorException("getSeniorSearchWhereSql -> request can not be null!");
         }
-        if (enums == null || enums.length == 0) {
-            this.joinColumnsSearch().dateBetweenSearch().commonColumnsSearch(baseEntity);
-            return this;
-        }
-        Set<SeniorSearchConfigEnum> configSet = new HashSet<>();
-        CollectionUtils.addAll(configSet, enums);
-        if (configSet.contains(SeniorSearchConfigEnum.JOIN_SEARCH)) {
-            this.joinColumnsSearch();
-        }
-        if (configSet.contains(SeniorSearchConfigEnum.DATE_BETWEEN_SEARCH)) {
-            this.dateBetweenSearch();
-        }
-        if (configSet.contains(SeniorSearchConfigEnum.OTHER_SEARCH)) {
-            this.commonColumnsSearch(baseEntity);
-        }
+        this.joinColumnsSearch().dateBetweenSearch();
         return this;
     }
 
-    /**
-     * 处理普通字段查询.可以查看SeniorSearchConfigEnum.OTHER_SEARCH配置说明。
-     *
-     * @return QueryHandle
-     */
-    public QueryHandle commonColumnsSearch(BaseEntity baseEntity) {
-        customWhereSql(this.getCommonColumnsSearchWhereSql(baseEntity));
-        return this;
-    }
 
     /**
      * 获取普通字段查询sql
@@ -131,7 +104,7 @@ public class QueryHandle {
      * @return QueryHandle
      */
     public QueryHandle joinColumnsSearch() {
-        customWhereSql(this.getJoinColumnsSearchWhereSql());
+        addWhereSql(this.getJoinColumnsSearchWhereSql());
         return this;
     }
 
@@ -171,7 +144,7 @@ public class QueryHandle {
      * 目前支持 年月日格式，会自动把结束时间+1天。
      */
     public QueryHandle dateBetweenSearch() {
-        customWhereSql(this.getDateBetweenSearchWhereSql());
+        addWhereSql(this.getDateBetweenSearchWhereSql());
         return this;
     }
 
@@ -340,7 +313,9 @@ public class QueryHandle {
     }
 
     public QueryHandle addWhereSql(String whereSql) {
-        whereSqls.add(whereSql);
+        if (StringUtils.isNotEmpty(whereSql)) {
+            whereSqls.add(whereSql);
+        }
         return this;
     }
 
