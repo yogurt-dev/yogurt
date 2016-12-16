@@ -21,6 +21,7 @@ import java.util.*;
  */
 public class QueryHandle {
 
+    private static final String joinColumn_ = "joinColumn_";
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private static final String AND = " AND ";
@@ -130,7 +131,7 @@ public class QueryHandle {
         StringBuilder sb = new StringBuilder();
         for (String filedName : fieldNames) {
             alreadyAppendFieldSet.add(filedName);
-            addExpandData(filedName, joinColumnValue);
+            addExpandData(joinColumn_ +filedName, joinColumnValue);
             sb = appendLikeSql(sb, OR, filedName);
         }
         if (StringUtils.isNotEmpty(sb.toString())) {
@@ -185,7 +186,7 @@ public class QueryHandle {
 
     private StringBuilder appendLikeSql(StringBuilder sb, String sqlOperate, String fieldName) {
         return sb.append(sqlOperate).append(" t.").append(fieldName).append(" like CONCAT('%'," +
-                "#{" + StringUtils.join(BaseMapper.DATA + "." + fieldName) + "}" + ", '%')");
+                "#{" + StringUtils.join(BaseMapper.DATA , "." , joinColumn_, fieldName) + "}" + ", '%')");
     }
 
     private StringBuilder appendEqualsSql(StringBuilder sb, String sqlOperate, String fieldName) {
