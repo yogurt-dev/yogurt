@@ -7,8 +7,6 @@ import com.github.jyoghurt.core.exception.BaseErrorException;
 import com.github.jyoghurt.core.utils.DateTimeFormatter;
 import com.github.jyoghurt.core.utils.JPAUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -22,7 +20,6 @@ import java.util.*;
 public class QueryHandle {
 
     private static final String joinColumn_ = "joinColumn_";
-    protected Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private static final String AND = " AND ";
     private static final String OR = " OR ";
