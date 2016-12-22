@@ -170,6 +170,8 @@ public interface BaseService<T> {
      * @param queryHandle 查询辅助类
      * 
      */
-    void updateBySql(String customSql, T entity, QueryHandle queryHandle) ;
+    int updateBySql(String customSql, T entity, QueryHandle queryHandle) ;
+
+
 
 }

@@ -1,14 +1,19 @@
 package com.github.jyoghurt.core.service.impl;
 
+import com.github.jyoghurt.core.annotations.SnapshotEntity;
 import com.github.jyoghurt.core.configuration.impl.PageConfiguration;
 import com.github.jyoghurt.core.dao.BaseMapper;
 import com.github.jyoghurt.core.domain.BaseEntity;
+import com.github.jyoghurt.core.domain.BaseSnapshotEntity;
 import com.github.jyoghurt.core.exception.BaseErrorException;
+import com.github.jyoghurt.core.exception.DaoException;
 import com.github.jyoghurt.core.handle.QueryHandle;
 import com.github.jyoghurt.core.result.EasyUIResult;
 import com.github.jyoghurt.core.result.QueryResult;
 import com.github.jyoghurt.core.service.BaseService;
+import com.github.jyoghurt.core.utils.ChainMap;
 import com.github.jyoghurt.core.utils.JPAUtils;
+import com.github.jyoghurt.core.utils.beanUtils.BeanUtils;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -18,6 +23,9 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.io.Serializable;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -36,33 +44,149 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
 
     public abstract M getMapper();
 
+
     @Value("${tableJsLib}")
     private String tableJsLib;
 
+    private static final Integer VERSIONSTART = 1;
+
     @Override
     public void save(T entity) {
-
         if (entity instanceof BaseEntity) {
             ((BaseEntity) entity).setCreateDateTime(new Date());
             ((BaseEntity) entity).setModifyDateTime(((BaseEntity) entity).getCreateDateTime());
             setFounder((BaseEntity) entity);
         }
+
+        //modify by baoxiaobing@lvyushequ.com 增加历史版本处理
+        if (entity instanceof BaseSnapshotEntity) {
+            //设置版本
+            ((BaseSnapshotEntity) entity).setVersion(VERSIONSTART);
+            getMapper().save(entity);
+            saveHis(entity);
+            return;
+        }
         getMapper().save(entity);
     }
 
+
+    /**
+     * 处理包含历史注解的保存动作
+     * add by baoxiaobing@lvyushequ.com
+     *
+     * @param entity
+     * @Date 2016-12-20
+     */
+    private void saveHis(T entity) {
+        //获取注解
+        try {
+            getMapper().save((T) generateHisObj(entity));
+        } catch (Exception e) {
+            throw new DaoException(StringUtils.join("历史对象生成失败 entityClass =", entity.getClass().getName()));
+        }
+    }
+
+    /**
+     * 批量保存历史数据
+     * add by baoxiaobing@lvyushequ.com
+     *
+     * @param entities
+     * @Date 2016-12-20
+     */
+    private void saveHisBatch(List<T> entities) {
+        List<T> saveTarget = new ArrayList<>();
+        try {
+            for (T entity : entities) {
+                saveTarget.add((T) generateHisObj(entity));
+            }
+            getMapper().saveBatch(saveTarget);
+        } catch (Exception e) {
+            throw new DaoException(StringUtils.join("历史对象生成失败"));
+        }
+    }
+
+    /**
+     * 更新历史数据
+     * add by baoxiaobing@lvyushequ.com
+     *
+     * @param entity
+     * @Date 2016-12-20
+     */
+    private void updateHis(T entity) {
+        Integer version = getEntityVersion(entity);
+        try {
+            int record = checkConcurrency(entity, version);
+            if(record==0){
+                throw new DaoException(StringUtils.join("当前提交数据已过期，请重新编辑 entityClass =", entity.getClass().getName()));
+            }
+            ((BaseSnapshotEntity) entity).setVersion(version + 1);
+            getMapper().updateForSelective(entity);
+            saveHis(entity);
+        } catch (IllegalAccessException e) {
+            throw new DaoException(StringUtils.join("检测并发失败 entityClass =", entity.getClass().getName()));
+        }
+    }
+
+    /**
+     * 检测是否存在并发
+     *
+     * @param entity
+     * @return
+     */
+    private int checkConcurrency(T entity, Integer version) throws IllegalAccessException {
+        //更新version字段
+        Field field = JPAUtils.getIdField(entity.getClass());
+        field.setAccessible(true);
+        return getMapper().updateBySql((Class<T>) entity.getClass(), "t.version = t.version+1", new
+                ChainMap<String, Object>().chainPut("version", version).chainPut(field.getName(), field.get(entity)));
+    }
+
+    /**
+     * 生成历史数据对象
+     *
+     * @param entity
+     * @return
+     * @throws IllegalAccessException
+     * @throws InstantiationException
+     */
+    private Object generateHisObj(T entity) throws IllegalAccessException, InstantiationException {
+        //获取注解
+        Annotation his = entity.getClass().getAnnotation(SnapshotEntity.class);
+        if (null == his) {
+            throw new DaoException(StringUtils.join("实体未配置VersionTable注解 entityClass =", entity.getClass().getName()));
+        }
+        //获取类
+        Class hisEntity = ((SnapshotEntity) his).hisEntity();
+        Object obj = hisEntity.newInstance();
+        BeanUtils.copyPropertiesJ(entity, obj);
+        return obj;
+    }
+
+
     @Override
     public void saveBatch(List<T> entities) {
+        boolean isHisEntity = false;
         if (CollectionUtils.isEmpty(entities)) {
             return;
         }
-        if (BaseEntity.class.isAssignableFrom(entities.get(0).getClass())) {
+        if (BaseEntity.class.isAssignableFrom(entities.get(0).getClass()) || BaseSnapshotEntity.class.isAssignableFrom
+                (entities.get(0).getClass())) {
             for (T entity : entities) {
                 ((BaseEntity) entity).setCreateDateTime(new Date());
                 ((BaseEntity) entity).setModifyDateTime(((BaseEntity) entity).getCreateDateTime());
                 setFounder((BaseEntity) entity);
+                if (entity instanceof BaseSnapshotEntity) {
+                    //设置版本
+                    ((BaseSnapshotEntity) entity).setVersion(VERSIONSTART);
+                    isHisEntity = true;
+                }
+
             }
         }
         getMapper().saveBatch(entities);
+        if (isHisEntity) {
+            saveHisBatch(entities);
+        }
     }
 
     @Override
@@ -80,11 +204,14 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
         if (null == JPAUtils.gtIdValue(entity)) {
             return;
         }
-
         if (entity instanceof BaseEntity) {
             ((BaseEntity) entity).setModifyDateTime(new Date());
             //modify by limiao 20160811 处理修改的时候勿将创建人和创建时间更新成修改人和修改时间的问题
             this.setModifyFounder((BaseEntity) entity);
+        }
+        if (entity instanceof BaseSnapshotEntity) {
+            updateHis(entity);
+            return;
         }
         getMapper().update(entity);
     }
@@ -164,7 +291,29 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
             //add by limiao 20160811 处理修改的时候勿将创建人和创建时间更新成修改人和修改时间的问题
             this.setModifyFounder((BaseEntity) entity);
         }
+
+        if (entity instanceof BaseSnapshotEntity) {
+            //获取主键
+            updateHis(entity);
+            return;
+        }
         getMapper().updateForSelective(entity);
+    }
+
+    private Integer getEntityVersion(T entity) {
+        Integer version = null;
+        try {
+            Field idField = JPAUtils.getIdField(entity.getClass());
+            if (null == idField) {
+                throw new DaoException(StringUtils.join(entity.getClass().getName(), "实体未配置@Id "));
+            }
+            idField.setAccessible(true);
+            Object sourceObj = getMapper().selectById((Class<T>) entity.getClass(), (String) idField.get(entity));
+            version = ((BaseSnapshotEntity) sourceObj).getVersion();
+        } catch (IllegalAccessException e) {
+            throw new DaoException(StringUtils.join(entity.getClass().getName(), "获取version信息失败 "));
+        }
+        return version;
     }
 
     @Override
@@ -184,9 +333,10 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
     }
 
     @Override
-    public void updateBySql(String customSql, T entity, QueryHandle queryHandle) {
-        getMapper().updateBySql((Class<T>) entity.getClass(), customSql, getValueMap(queryHandle, entity).chainPutAll
-                (queryHandle == null ? null : queryHandle.getExpandData()));
+    public int updateBySql(String customSql, T entity, QueryHandle queryHandle) {
+        return getMapper().updateBySql((Class<T>) entity.getClass(), customSql, getValueMap(queryHandle, entity)
+                .chainPutAll
+                        (queryHandle == null ? null : queryHandle.getExpandData()));
     }
 
     @Override
@@ -229,5 +379,6 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
             entity.setModifierName(BaseEntity.DEFAULT_OPERATOR);
         }
     }
+
 
 }

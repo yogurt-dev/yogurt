@@ -4,6 +4,7 @@ package com.github.jyoghurt.core.utils.beanUtils;
 
 import com.github.jyoghurt.core.exception.UtilException;
 import com.github.jyoghurt.core.utils.ChainMap;
+import com.github.jyoghurt.core.utils.JPAUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.beans.BeanInfo;
@@ -41,7 +42,7 @@ public class BeanUtils {
      * @param source 源对象
      * @ {@inheritDoc}
      */
-    public static void copyProperties(Object source, Object target)  {
+    public static void copyProperties(Object source, Object target) {
         copyProperties(source, target, true);
     }
 
@@ -54,7 +55,7 @@ public class BeanUtils {
      * @param nullBeCopied 字段为null的是否复制
      * @ {@inheritDoc}
      */
-    public static void copyProperties(Object source, Object target, Boolean nullBeCopied)  {
+    public static void copyProperties(Object source, Object target, Boolean nullBeCopied) {
         copyProperties(source, target, null, null, nullBeCopied);
     }
 
@@ -66,7 +67,7 @@ public class BeanUtils {
      * @param effectiveProperties 需要复制的属性列表
      * @ {@inheritDoc}
      */
-    public static void copyProperties(Object source, Object target, String[] effectiveProperties)  {
+    public static void copyProperties(Object source, Object target, String[] effectiveProperties) {
         copyProperties(source, target, effectiveProperties, null);
     }
 
@@ -80,9 +81,32 @@ public class BeanUtils {
      * @ {@inheritDoc}
      */
     public static void copyProperties(Object source, Object target, String[] effectiveProperties,
-                                      String[] ignoreProperties)  {
+                                      String[] ignoreProperties) {
         copyProperties(source, target, effectiveProperties, ignoreProperties, true);
     }
+
+    /**
+     * copy 对象的属性到目标对象
+     *
+     * @param source
+     * @param target
+     */
+    public static void copyPropertiesJ(Object source, Object target) {
+        try {
+            for (Field sourceField : JPAUtils.getAllFields(source.getClass())) {
+                for (Field targetField : JPAUtils.getAllFields(target.getClass())) {
+                    if (targetField.getName().equals(sourceField.getName())) {
+                        targetField.setAccessible(true);
+                        sourceField.setAccessible(true);
+                        targetField.set(target, sourceField.get(source));
+                    }
+                }
+            }
+        } catch (IllegalAccessException e) {
+            throw new UtilException("copy bean error", e);
+        }
+    }
+
 
     /**
      * 指定目标对象需要复制的有效属性和无效属性 支持属性间类型转换 配置类型转换方法 eg：String赋值给Date
@@ -207,8 +231,8 @@ public class BeanUtils {
             }
             targetValue.clear();
             targetValue.addAll(tempList);
-        }catch (Exception e){
-            throw new UtilException("copy bean error",e);
+        } catch (Exception e) {
+            throw new UtilException("copy bean error", e);
         }
     }
 
@@ -298,7 +322,7 @@ public class BeanUtils {
      * @return 返回复制的实体
      * @ {@inheritDoc}
      */
-    public static Object deepClone(Object originObj)  {
+    public static Object deepClone(Object originObj) {
         ObjectOutputStream oos = null;
         ObjectInputStream ois = null;
         try {
@@ -323,7 +347,7 @@ public class BeanUtils {
     }
 
     public static void setPropertyValueByPName(Object targetObject, String property,
-                                               Object... args)  {
+                                               Object... args) {
         try {
             PropertyDescriptor pd = new PropertyDescriptor(property, targetObject.getClass());
             pd.getWriteMethod().invoke(targetObject, args);

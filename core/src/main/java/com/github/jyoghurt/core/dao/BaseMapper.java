@@ -57,7 +57,7 @@ public interface BaseMapper<T> {
      * @param entity 业务实体
      */
     @UpdateProvider(type = BaseMapperProvider.class, method = "updateForSelective")
-    void updateForSelective(@Param(ENTITY) T entity);
+    int updateForSelective(@Param(ENTITY) T entity);
 
     /**
      * 删除
@@ -176,6 +176,7 @@ public interface BaseMapper<T> {
      * @return
      */
     @UpdateProvider(type = BaseMapperProvider.class, method = "updateBySql")
-    void updateBySql(@Param(ENTITY_CLASS) Class<T> entityClass,@Param(CUSTOM_SQL) String customSql, @Param(DATA) Map<String, Object> data);
+    int updateBySql(@Param(ENTITY_CLASS) Class<T> entityClass,@Param(CUSTOM_SQL) String customSql, @Param(DATA)
+            Map<String, Object> data);
 
 }
