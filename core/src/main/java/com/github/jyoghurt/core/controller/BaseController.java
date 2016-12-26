@@ -2,6 +2,7 @@ package com.github.jyoghurt.core.controller;
 
 
 import com.github.jyoghurt.core.constant.Constant;
+import com.github.jyoghurt.core.domain.BaseEntity;
 import com.github.jyoghurt.core.exception.BaseAccidentException;
 import com.github.jyoghurt.core.exception.BaseErrorException;
 import com.github.jyoghurt.core.result.HttpResultEntity;
@@ -50,12 +51,17 @@ public class BaseController {
         request.setAttribute(EXCEPTION, ex);
         String logTemplate = "\n url:★{}★\n parameterValues : ★{}★";
         String parameterValues = com.github.jyoghurt.core.utils.WebUtils.getParameterValues(request);
+        String serverName = request.getServerName();
+        String operatorId = (String) WebUtils.getSessionAttribute(request, BaseEntity.OPERATOR_ID);
+        String operatorName = (String) WebUtils.getSessionAttribute(request, BaseEntity.OPERATOR_NAME);
+        String operatorLogStr = "\n ★{User-Agent:[" + request.getHeader("User-Agent") + "],serverName:[" + serverName + "]" +
+                ",operatorId:[" + operatorId + "],operatorName:[" + operatorName + "]}★ \n";
         if (ex instanceof BaseAccidentException) {
             if (((BaseAccidentException) ex).getLogFlag()) {
-                logger.error(ex.getMessage() + logTemplate, request.getServletPath(),
+                logger.error(operatorLogStr + ex.getMessage() + logTemplate, request.getServletPath(),
                         parameterValues, ex);
             } else {
-                logger.warn(ex.getMessage() + logTemplate, request.getServletPath(),
+                logger.warn(operatorLogStr + ex.getMessage() + logTemplate, request.getServletPath(),
                         parameterValues, ex);
             }
             return HttpResultHandle.getErrorResult(((BaseAccidentException) ex).getErrorCode().replace(Constant.ERROR_CODE_PREFIX,
@@ -63,16 +69,15 @@ public class BaseController {
         }
 
         if (ex instanceof BaseErrorException) {
-            logger.error(ex.getMessage() + logTemplate, request.getServletPath(),
+            logger.error(operatorLogStr + ex.getMessage() + logTemplate, request.getServletPath(),
                     parameterValues, ex);
             return HttpResultHandle.getErrorResult(ex.getMessage());
         }
-        logger.error("uncaught  exception,"+logTemplate, request.getServletPath(),
+        logger.error(operatorLogStr + "uncaught  exception," + logTemplate, request.getServletPath(),
                 parameterValues, ex);
         return HttpResultHandle.getErrorResult();
     }
 
-    
 
     public HttpResultEntity<?> getSuccessResult() {
         return HttpResultHandle.getSuccessResult();
