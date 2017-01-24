@@ -124,11 +124,12 @@ public class QueryHandle {
         if (StringUtils.isEmpty(joinColumnValue)) {
             return null;
         }
+        joinColumnValue = joinColumnValue.trim();
         String[] fieldNames = joinColumnNames.split(",");
         StringBuilder sb = new StringBuilder();
         for (String filedName : fieldNames) {
             alreadyAppendFieldSet.add(filedName);
-            addExpandData(joinColumn_ +filedName, joinColumnValue);
+            addExpandData(joinColumn_ + filedName, joinColumnValue);
             sb = appendLikeSql(sb, OR, filedName);
         }
         if (StringUtils.isNotEmpty(sb.toString())) {
@@ -183,7 +184,7 @@ public class QueryHandle {
 
     private StringBuilder appendLikeSql(StringBuilder sb, String sqlOperate, String fieldName) {
         return sb.append(sqlOperate).append(" t.").append(fieldName).append(" like CONCAT('%'," +
-                "#{" + StringUtils.join(BaseMapper.DATA , "." , joinColumn_, fieldName) + "}" + ", '%')");
+                "#{" + StringUtils.join(BaseMapper.DATA, ".", joinColumn_, fieldName) + "}" + ", '%')");
     }
 
     private StringBuilder appendEqualsSql(StringBuilder sb, String sqlOperate, String fieldName) {
