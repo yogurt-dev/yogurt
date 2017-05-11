@@ -48,6 +48,10 @@ public class QueryHandle {
     private LinkedList<CustomWhereHandle> customList = new LinkedList<>();
     private String groupBy;
 
+    //处理查询列问题 add by limiao 20170508
+    //指定查询列sql，例如“ t.name,t.pass”
+    protected String selectColumnSql;
+
     /**
      * 已经拼上sql的字段集合
      */
@@ -252,6 +256,14 @@ public class QueryHandle {
         return this;
     }
 
+    public QueryHandle setSelectColumnSql(String sql) {
+        //增加了不为null的判断 modify by limiao 20160216
+        if (StringUtils.isNotEmpty(sql)) {
+            this.selectColumnSql = sql;
+        }
+        return this;
+    }
+
     public QueryHandle addJoinHandle(SQLJoinHandle sqlJoinHandle) {
         this.sqlJoinHandle.add(sqlJoinHandle);
         return this;
@@ -355,6 +367,9 @@ public class QueryHandle {
         return expandData;
     }
 
+    public String getSelectColumnSql() {
+        return selectColumnSql;
+    }
 
 }
 

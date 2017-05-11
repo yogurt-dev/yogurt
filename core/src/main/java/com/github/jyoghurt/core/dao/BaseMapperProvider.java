@@ -57,15 +57,19 @@ public class BaseMapperProvider {
      */
     public String findAll(Map<String, Object> param) {
         beginWithClass(param);
-        if (((Map<String, Object>) param.get(BaseMapper.DATA)).containsKey("distinct")) {
-            SELECT_DISTINCT("t.*");
+        //处理查询列问题 add by limiao 20170508
+        Map<String, Object> map = ((Map<String, Object>) param.get(BaseMapper.DATA));
+        String selectColumnSql = createSelectColumnSql(map);
+        if (map.containsKey("distinct")) {
+            SELECT_DISTINCT(selectColumnSql);
         } else {
-            SELECT("t.*");
+            SELECT(selectColumnSql);
         }
         FROM(getTableNameWithAlias(entityClass));
-        createAllWhere((Map<String, Object>) param.get(BaseMapper.DATA), false);
+        createAllWhere(map, false);
         return StringUtils.join(sql(), limit);
     }
+
 
     protected void createAllWhere(Map<String, Object> param, boolean usePage) {
         createAllWhere(param, usePage, false);
@@ -630,13 +634,16 @@ public class BaseMapperProvider {
 
     public String pageData(Map<String, Object> param) {
         beginWithClass(param);
-        if (((Map<String, Object>) param.get(BaseMapper.DATA)).containsKey("distinct")) {
-            SELECT_DISTINCT("t.*");
+        //处理查询列问题 add by limiao 20170508
+        Map<String, Object> map = ((Map<String, Object>) param.get(BaseMapper.DATA));
+        String selectColumnSql = createSelectColumnSql(map);
+        if (map.containsKey("distinct")) {
+            SELECT_DISTINCT(selectColumnSql);
         } else {
-            SELECT("t.*");
+            SELECT(selectColumnSql);
         }
         FROM(getTableNameWithAlias(entityClass));
-        createAllWhere((Map<String, Object>) param.get(BaseMapper.DATA), true);
+        createAllWhere(map, true);
         return StringUtils.join(sql(), limit);
     }
 
@@ -747,5 +754,13 @@ public class BaseMapperProvider {
         return StringUtils.join(sql(), limit);
     }
 
+    //处理查询列问题 add by limiao 20170508
+    protected String createSelectColumnSql(Map<String, Object> map) {
+        String selectColumnSql = " t.* ";
+        if (map.containsKey("selectColumnSql") && map.get("selectColumnSql") != null) {
+            selectColumnSql = " " + map.get("selectColumnSql").toString() + " ";
+        }
+        return selectColumnSql;
+    }
 
 }
