@@ -638,7 +638,7 @@ public class BaseMapperProvider {
         Map<String, Object> map = ((Map<String, Object>) param.get(BaseMapper.DATA));
         String selectColumnSql = createSelectColumnSql(map);
         if (map.containsKey("distinct")) {
-            SELECT_DISTINCT("t.*");
+            SELECT_DISTINCT(selectColumnSql);
         } else {
             SELECT(selectColumnSql);
         }
@@ -649,7 +649,7 @@ public class BaseMapperProvider {
 
     public String pageTotalRecord(Map<String, Object> param) {
         beginWithClass(param);
-        SELECT("count(distinct t." + JPAUtils.getIdField((Class<?>) param.get(BaseMapper.ENTITY_CLASS)).getName() + ")");
+        SELECT(createSelectCountColumnSql(param));
         FROM(getTableNameWithAlias(entityClass));
         createAllWhere((Map<String, Object>) param.get(BaseMapper.DATA), false, true);
         return sql();
@@ -762,5 +762,15 @@ public class BaseMapperProvider {
         }
         return selectColumnSql;
     }
+
+    protected String createSelectCountColumnSql(Map<String, Object> param) {
+        Map<String, Object> map = ((Map<String, Object>) param.get(BaseMapper.DATA));
+        String selectColumnSql = "count(distinct t." + JPAUtils.getIdField((Class<?>) param.get(BaseMapper.ENTITY_CLASS)).getName() + ")";
+        if (map.containsKey("selectColumnSql") && map.get("selectColumnSql") != null) {
+            selectColumnSql = " count(distinct " + map.get("selectColumnSql").toString() + ") ";
+        }
+        return selectColumnSql;
+    }
+
 
 }
