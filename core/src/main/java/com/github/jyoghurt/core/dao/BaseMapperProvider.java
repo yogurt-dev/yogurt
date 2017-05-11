@@ -638,7 +638,7 @@ public class BaseMapperProvider {
         Map<String, Object> map = ((Map<String, Object>) param.get(BaseMapper.DATA));
         String selectColumnSql = createSelectColumnSql(map);
         if (map.containsKey("distinct")) {
-            SELECT_DISTINCT(selectColumnSql);
+            SELECT_DISTINCT("t.*");
         } else {
             SELECT(selectColumnSql);
         }
