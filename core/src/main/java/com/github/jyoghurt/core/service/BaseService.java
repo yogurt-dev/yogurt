@@ -6,6 +6,7 @@ import com.github.jyoghurt.core.result.QueryResult;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 服务接口的基类
@@ -173,5 +174,13 @@ public interface BaseService<T> {
     int updateBySql(String customSql, T entity, QueryHandle queryHandle) ;
 
 
+    /**
+     * 获取数据 add by baoxiaobing@lvyushequ.com 20170512
+     * @param mapperMethodName mapperId
+     * @param param 查询参数
+     * @param queryHandle 分页信息
+     * @return
+     */
+    QueryResult getData(String mapperMethodName, Map<String,Object> param, QueryHandle queryHandle);
 
 }

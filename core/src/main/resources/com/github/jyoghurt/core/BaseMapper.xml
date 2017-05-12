@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.jyoghurt.core.BaseMapper">
+    <!-- 分页查询代码片段 -->
+    <sql id="pageSql">
+        LIMIT #{data.start},
+        #{data.limit}
+    </sql>
+
+    <!-- 统计数量 -->
+    <sql id="countSqlStart">
+        select count(*) from (
+    </sql>
+
+    <sql id="countSqlEnd">
+        ) as total
+    </sql>
+</mapper>

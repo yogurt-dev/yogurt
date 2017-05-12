@@ -14,6 +14,7 @@ import com.github.jyoghurt.core.service.BaseService;
 import com.github.jyoghurt.core.utils.ChainMap;
 import com.github.jyoghurt.core.utils.JPAUtils;
 import com.github.jyoghurt.core.utils.beanUtils.BeanUtils;
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -25,9 +26,12 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import static com.github.jyoghurt.core.utils.beanUtils.BeanUtils.getValueMap;
 
@@ -49,6 +53,8 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
     private String tableJsLib;
 
     private static final Integer VERSIONSTART = 1;
+
+    private static final String COUNTSUFFIX = "Count";
 
     @Override
     public void save(T entity) {
@@ -116,7 +122,7 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
         Integer version = getEntityVersion(entity);
         try {
             int record = checkConcurrency(entity, version);
-            if(record==0){
+            if (record == 0) {
                 throw new DaoException(StringUtils.join("当前提交数据已过期，请重新编辑 entityClass =", entity.getClass().getName()));
             }
             ((BaseSnapshotEntity) entity).setVersion(version + 1);
@@ -381,4 +387,35 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
     }
 
 
+    @Override
+    public QueryResult getData(String mapperQueryMethodName, Map<String, Object> param, QueryHandle queryHandle) {
+        if (param == null) {
+            param = new HashedMap();
+        }
+        if (StringUtils.isBlank(mapperQueryMethodName)) {
+            throw new BaseErrorException("未指定xml查询ID");
+        }
+        String countMethodName = mapperQueryMethodName + COUNTSUFFIX;
+        //获取分页信息
+        int pageRows = queryHandle.configPage().getRows();
+        int pageStart = (queryHandle.getPage() - 1) * queryHandle.getRows();
+        param.put("limit", pageRows);
+        param.put("start", pageStart);
+        QueryResult queryResult = this.newQueryResult();
+        try {
+            Class z = getMapper().getClass();
+            Method queryMethod = z.getDeclaredMethod(mapperQueryMethodName, Map.class);
+            Method countMethod = z.getDeclaredMethod(countMethodName, Map.class);
+            List data = (List) queryMethod.invoke(getMapper(), param);
+            int totalNumber = ((Integer) countMethod.invoke(getMapper(), param)).intValue();
+            queryResult.setData(data);
+            queryResult.setRecordsTotal(totalNumber);
+        } catch (NoSuchMethodException e) {
+            throw new BaseErrorException("未定义方法：" + mapperQueryMethodName + "或" + countMethodName);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            logger.error("异常",e);
+            throw new BaseErrorException("调用方法异常");
+        }
+        return queryResult;
+    }
 }
