@@ -76,6 +76,17 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
     }
 
 
+    @Override
+    public void saveByAppendTableName(T entity, String appendTableName) {
+        if (entity instanceof BaseEntity) {
+            ((BaseEntity) entity).setCreateDateTime(new Date());
+            ((BaseEntity) entity).setModifyDateTime(((BaseEntity) entity).getCreateDateTime());
+            setFounder((BaseEntity) entity);
+        }
+        getMapper().saveByAppendTableName(entity, appendTableName);
+    }
+
+
     /**
      * 处理包含历史注解的保存动作
      * add by baoxiaobing@lvyushequ.com

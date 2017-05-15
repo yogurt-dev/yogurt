@@ -433,8 +433,11 @@ public class BaseMapperProvider {
     public String save(Map<String, Object> param) {
         entityClass = param.get(BaseMapper.ENTITY).getClass();
         begin();
-        INSERT_INTO(getTableName(entityClass));
-
+        String tableName = getTableName(entityClass);
+        if (param.containsKey(BaseMapper.APPEND_TABLE_NAME) &&  param.get(BaseMapper.APPEND_TABLE_NAME) != null) {
+            tableName = tableName + param.get(BaseMapper.APPEND_TABLE_NAME).toString().trim();
+        }
+        INSERT_INTO(tableName);
         Field idField = null;
         for (Field field : JPAUtils.getAllFields(entityClass)) {
             if (!ClassUtils.isPrimitiveOrWrapper(field.getClass()) && !Enum.class.isAssignableFrom(LogSystemType.class)) {

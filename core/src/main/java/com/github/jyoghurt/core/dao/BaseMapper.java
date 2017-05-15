@@ -18,6 +18,7 @@ public interface BaseMapper<T> {
     String ID = "id";
     String DATA = "data";
     String CUSTOM_SQL = "customSql";
+    String APPEND_TABLE_NAME = "appendTableName";
 
     /**
      * 插入一条记录
@@ -26,6 +27,15 @@ public interface BaseMapper<T> {
      */
     @InsertProvider(type = BaseMapperProvider.class, method = "save")
     void save(@Param(ENTITY) T entity);
+
+
+    /**
+     * 插入一条记录，自定义表名
+     *
+     * @param entity 业务实体
+     */
+    @InsertProvider(type = BaseMapperProvider.class, method = "save")
+    void saveByAppendTableName(@Param(ENTITY) T entity, @Param(APPEND_TABLE_NAME) String appendTableName);
 
     /**
      * 批量插入
