@@ -26,9 +26,9 @@ public interface BaseService<T> {
      * 保存实体
      *
      * @param entity          待保存的实体
-     * @param appendTableName 表名
+     * @param tableName 表名
      */
-    void saveByAppendTableName(T entity, String appendTableName);
+    void save(T entity, String tableName);
 
     /**
      * 批量保存

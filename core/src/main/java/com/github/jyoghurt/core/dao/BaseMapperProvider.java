@@ -434,8 +434,8 @@ public class BaseMapperProvider {
         entityClass = param.get(BaseMapper.ENTITY).getClass();
         begin();
         String tableName = getTableName(entityClass);
-        if (param.containsKey(BaseMapper.APPEND_TABLE_NAME) &&  param.get(BaseMapper.APPEND_TABLE_NAME) != null) {
-            tableName = tableName + param.get(BaseMapper.APPEND_TABLE_NAME).toString().trim();
+        if (param.containsKey(BaseMapper.TABLE_NAME) &&  param.get(BaseMapper.TABLE_NAME) != null) {
+            tableName = param.get(BaseMapper.TABLE_NAME).toString().trim();
         }
         INSERT_INTO(tableName);
         Field idField = null;
