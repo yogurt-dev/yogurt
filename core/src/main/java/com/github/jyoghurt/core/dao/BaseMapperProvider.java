@@ -60,7 +60,7 @@ public class BaseMapperProvider {
         //处理查询列问题 add by limiao 20170508
         Map<String, Object> map = ((Map<String, Object>) param.get(BaseMapper.DATA));
         String selectColumnSql = createSelectColumnSql(map);
-        if (map.containsKey("distinct")) {
+        if (MapUtils.isNotEmpty(map) && map.containsKey("distinct")) {
             SELECT_DISTINCT(selectColumnSql);
         } else {
             SELECT(selectColumnSql);
@@ -434,7 +434,7 @@ public class BaseMapperProvider {
         entityClass = param.get(BaseMapper.ENTITY).getClass();
         begin();
         String tableName = getTableName(entityClass);
-        if (param.containsKey(BaseMapper.TABLE_NAME) &&  param.get(BaseMapper.TABLE_NAME) != null) {
+        if (param.containsKey(BaseMapper.TABLE_NAME) && param.get(BaseMapper.TABLE_NAME) != null) {
             tableName = param.get(BaseMapper.TABLE_NAME).toString().trim();
         }
         INSERT_INTO(tableName);
@@ -640,7 +640,7 @@ public class BaseMapperProvider {
         //处理查询列问题 add by limiao 20170508
         Map<String, Object> map = ((Map<String, Object>) param.get(BaseMapper.DATA));
         String selectColumnSql = createSelectColumnSql(map);
-        if (map.containsKey("distinct")) {
+        if (MapUtils.isNotEmpty(map) && map.containsKey("distinct")) {
             SELECT_DISTINCT(selectColumnSql);
         } else {
             SELECT(selectColumnSql);
@@ -760,7 +760,7 @@ public class BaseMapperProvider {
     //处理查询列问题 add by limiao 20170508
     protected String createSelectColumnSql(Map<String, Object> map) {
         String selectColumnSql = " t.* ";
-        if (map.containsKey("selectColumnSql") && map.get("selectColumnSql") != null) {
+        if (MapUtils.isNotEmpty(map) && map.containsKey("selectColumnSql") && map.get("selectColumnSql") != null) {
             selectColumnSql = " " + map.get("selectColumnSql").toString() + " ";
         }
         return selectColumnSql;
