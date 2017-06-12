@@ -5,6 +5,7 @@ import com.github.jyoghurt.core.exception.UtilException;
 import com.github.jyoghurt.core.utils.beanUtils.AnnotationBinder;
 import com.github.jyoghurt.core.utils.beanUtils.AnnotationReader;
 import com.github.jyoghurt.core.utils.beanUtils.EntityBinder;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -233,5 +234,70 @@ public class JPAUtils {
         return field.getType().equals(Date.class);
     }
 
+    /**
+     * 返回一个map,key是id，value是propertyName的值
+     * @param propertyName 属性名
+     * @param entityCollection 对象集合
+     * @param <T> 泛型
+     * @return idPropertyMap
+     */
+    public static <T>Map<String, Object> getIdPropertyMap(String propertyName, Collection<T> entityCollection){
+        Map<String, Object> result = new LinkedHashMap<>();
+        if(CollectionUtils.isNotEmpty(entityCollection)){
+            for (T entity : entityCollection) {
+                try {
+                    Field idField = getIdField(entity.getClass());
+                    idField.setAccessible(true);
+                    Object propertyObj = getValue(entity, entity.getClass().getDeclaredField(propertyName));
+                    result.put((String)idField.get(entity), propertyObj);
+                } catch (Exception e) {
+                    logger.error("JPAUtils getValue 异常！", e);
+                    return null;
+                }
+            }
+        }
+        return result;
+    }
 
+    /**
+     * 返回一个map,key是id,value是对象本身
+     * @param entityCollection 对象集合
+     * @param <T> 泛型
+     * @return id对象Map
+     */
+    public static <T>Map<String, T> getIdEntityMap(Collection<T> entityCollection){
+        Map<String, T> result = new LinkedHashMap<>();
+        if(CollectionUtils.isNotEmpty(entityCollection)){
+            for (T entity : entityCollection) {
+                try {
+                    Field idField = getIdField(entity.getClass());
+                    result.put((String)getValue(entity, idField), entity);
+                } catch (UtilException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * 返回一个集合,key是propertyName,value是list遍历出来的对象
+     * @param propertyName 属性名
+     * @param entityCollection 对象集合
+     */
+    public static <T>Map<Object, T> propertyEntityMap(String propertyName, Collection<T> entityCollection){
+        Map<Object, T> result = new LinkedHashMap<>();
+        if(CollectionUtils.isNotEmpty(entityCollection)){
+            for (T entity : entityCollection) {
+                try {
+                    Field propertyField  = entity.getClass().getDeclaredField(propertyName);
+                    result.put(getValue(entity, propertyField), entity);
+                } catch (NoSuchFieldException e) {
+                    logger.error("JPAUtils getValue 异常！", e);
+                    return null;
+                }
+            }
+        }
+        return result;
+    }
 }
