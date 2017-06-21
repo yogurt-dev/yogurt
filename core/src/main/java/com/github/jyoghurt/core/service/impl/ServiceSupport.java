@@ -266,19 +266,28 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
     @Override
     public QueryResult<T> getData(T entity, QueryHandle queryHandle) {
         QueryResult<T> qr = newQueryResult();
-        qr.setData(getMapper().pageData((Class<T>) entity.getClass(), getValueMap(queryHandle, entity).chainPutAll
-                (queryHandle == null ? null : queryHandle.getExpandData())));
+
         qr.setRecordsTotal(getMapper().pageTotalRecord((Class<T>) entity.getClass(), getValueMap(queryHandle, entity)
                 .chainPutAll(queryHandle == null ? null : queryHandle.getExpandData())));
+        if(qr.getRecordsTotal() == 0){
+            qr.setData(new ArrayList<T>());
+            return qr;
+        }
+        qr.setData(getMapper().pageData((Class<T>) entity.getClass(), getValueMap(queryHandle, entity).chainPutAll
+                (queryHandle == null ? null : queryHandle.getExpandData())));
         return qr;
     }
 
     @Override
     public QueryResult<T> findListBySql(String customSql, QueryHandle queryHandle) {
         QueryResult<T> qr = newQueryResult();
-        qr.setData(getMapper().findListBySql(customSql, getValueMap(queryHandle).chainPutAll
-                (queryHandle == null ? null : queryHandle.getExpandData())));
         qr.setRecordsTotal(getMapper().findListTotalRecordBySql(customSql, getValueMap(queryHandle).chainPutAll
+                (queryHandle == null ? null : queryHandle.getExpandData())));
+        if(qr.getRecordsTotal() == 0){
+            qr.setData(new ArrayList<T>());
+            return qr;
+        }
+        qr.setData(getMapper().findListBySql(customSql, getValueMap(queryHandle).chainPutAll
                 (queryHandle == null ? null : queryHandle.getExpandData())));
         return qr;
     }
@@ -352,8 +361,7 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
     @Override
     public int updateBySql(String customSql, T entity, QueryHandle queryHandle) {
         return getMapper().updateBySql((Class<T>) entity.getClass(), customSql, getValueMap(queryHandle, entity)
-                .chainPutAll
-                        (queryHandle == null ? null : queryHandle.getExpandData()));
+                .chainPutAll(queryHandle == null ? null : queryHandle.getExpandData()));
     }
 
     @Override
@@ -373,7 +381,6 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
 
     private void setFounder(BaseEntity entity) {
         try {
-
             entity.setFounderId(null == getSessionAttr(BaseEntity.OPERATOR_ID) ? BaseEntity.DEFAULT_OPERATOR :
                     (String) getSessionAttr(BaseEntity.OPERATOR_ID));
             entity.setFounderName(null == getSessionAttr(BaseEntity.OPERATOR_NAME) ? BaseEntity.DEFAULT_OPERATOR :
