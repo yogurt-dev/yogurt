@@ -1,5 +1,6 @@
 package com.github.jyoghurt.core.domain;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import javax.persistence.Column;
@@ -42,6 +43,7 @@ public class BaseEntity<T extends BaseEntity<T>> implements Serializable {
     private Boolean deleteFlag;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @JSONField(format= "yyyy-MM-dd HH:mm:ss")
     public Date getModifyDateTime() {
         return modifyDateTime;
     }
@@ -51,6 +53,7 @@ public class BaseEntity<T extends BaseEntity<T>> implements Serializable {
         return (T) this;
     }
 
+    @JSONField(format= "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public Date getCreateDateTime() {
         return createDateTime;
