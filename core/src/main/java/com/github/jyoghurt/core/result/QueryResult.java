@@ -36,8 +36,9 @@ public class QueryResult<T> {
         return data;
     }
 
-    public void setData(List<T> data) {
+    public QueryResult<T> setData(List<T> data) {
         this.data = data;
+        return this;
     }
 
     @JsonView(BaseResult.class)
@@ -45,7 +46,8 @@ public class QueryResult<T> {
         return recordsTotal;
     }
 
-    public void setRecordsTotal(long recordsTotal) {
+    public QueryResult<T> setRecordsTotal(long recordsTotal) {
         this.recordsTotal = recordsTotal;
+        return this;
     }
 }
