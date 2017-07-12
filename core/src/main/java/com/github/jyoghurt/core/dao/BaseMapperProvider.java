@@ -5,11 +5,9 @@ import com.github.jyoghurt.core.domain.BaseEntity;
 import com.github.jyoghurt.core.enums.LogSystemType;
 import com.github.jyoghurt.core.exception.DaoException;
 import com.github.jyoghurt.core.exception.UtilException;
-import com.github.jyoghurt.core.handle.CustomWhereHandle;
 import com.github.jyoghurt.core.handle.OperatorHandle;
 import com.github.jyoghurt.core.handle.SQLJoinHandle;
 import com.github.jyoghurt.core.utils.JPAUtils;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -82,40 +80,6 @@ public class BaseMapperProvider {
         try {
             Map<String, OperatorHandle> operatorMap = param.containsKey("operatorHandles") ?
                     (Map) param.get("operatorHandles") : new HashMap();
-            if (CollectionUtils.isNotEmpty((LinkedList) param.get("customList"))) {
-                boolean operatorTag = false;
-                for (CustomWhereHandle customWhereHandle : (LinkedList<CustomWhereHandle>) param.get("customList")) {
-                    switch (customWhereHandle.getType()) {
-                        case FIELD: {
-                            operatorTag = createFieldWhereSql(operatorMap, entityClass.getDeclaredField
-                                    (customWhereHandle.getSql()), param);
-                            break;
-                        }
-                        case OR: {
-                            if (operatorTag) {
-                                OR();
-                                operatorTag = false;
-                            }
-                            break;
-                        }
-                        case AND: {
-                            if (operatorTag) {
-                                AND();
-                                operatorTag = false;
-                            }
-                            break;
-                        }
-                        case SQL: {
-                            WHERE(customWhereHandle.getSql());
-                            operatorTag = true;
-                            break;
-                        }
-                    }
-                }
-                parseQueryHandle(param, usePage, isCount);
-                return;
-            }
-
             createFieldsWhereSql(operatorMap, param);
             parseQueryHandle(param, usePage, isCount);
         } catch (Exception e) {
@@ -123,146 +87,20 @@ public class BaseMapperProvider {
         }
     }
 
-    private boolean createFieldWhereSql(Map<String, OperatorHandle> operatorMap, Field declaredField, Map<String, Object> param) {
-        return createFieldWhereSql(operatorMap, declaredField, param, null);
-    }
-
-    private boolean createFieldWhereSql(Map<String, OperatorHandle> operatorMap, Field field, Map<String, Object>
-            param, String tableAlias) {
-        //验证是否需要拼装该属性
-        if (!validateField2WhereSql(operatorMap, field, param, tableAlias)) {
-            return false;
-        }
-
-        //封装类型递归处理，拼装成级联查询
-        if (null != field.getType().getAnnotation(Table.class)) {
-            parseCascade(operatorMap, field, param);
-            return false;
-        }
-        String fieldNameKey = StringUtils.isEmpty(tableAlias) ? field.getName() : tableAlias + "." + field.getName();
-        String prefix = StringUtils.isEmpty(tableAlias) ? "t." : StringUtils.join(tableAlias, ".");
-        if (!operatorMap.containsKey(fieldNameKey)) {
-            WHERE(StringUtils.join(prefix, getEqualsValue(field
-                    .getName(), StringUtils.join(addSuffix(BaseMapper.DATA + ".", tableAlias), field.getName()))));
-            return true;
-        }
-        /*
-         * 将参数变量的"."改成"_"，eg table.id改成table_id,
-         * 不改mybatis会将解释成table对象的id属性，而非table.id变量
-         */
-
-        for (String key : operatorMap.keySet()) {
-            if (key.contains(".")) {
-                operatorMap.put(key.replace(".", "_"), operatorMap.get(key));
-            }
-        }
-        //用户自定义值优先
-        Object value = ArrayUtils.isEmpty((operatorMap.get(fieldNameKey)).getValues())
-                ? "#{" + StringUtils.join(BaseMapper.DATA + "." + fieldNameKey) + "}"
-                : "#{" + BaseMapper.DATA + ".operatorHandles." + fieldNameKey.replace(".", "_") + ".values[0]}";
-
-        switch ((operatorMap.get(fieldNameKey)).getOperator()) {
-            case EQUAL: {
-                WHERE(StringUtils.join(prefix, field.getName(), " = ", value));
-                break;
-            }
-            case LIKE: {
-                WHERE(StringUtils.join(prefix, field.getName(), " like CONCAT('%',", value, ", '%')"));
-                break;
-            }
-            case LESS_THEN: {
-                WHERE(StringUtils.join(prefix, field.getName(), " < ", value));
-                break;
-            }
-            case MORE_THEN: {
-                WHERE(StringUtils.join(prefix, field.getName(), " > ", value));
-                break;
-            }
-            case LESS_EQUAL: {
-                WHERE(StringUtils.join(prefix, field.getName(), " <= ", value));
-                break;
-            }
-            case MORE_EQUAL: {
-                WHERE(StringUtils.join(prefix, field.getName(), " >= ", value));
-                break;
-            }
-            case NOT_IN: {
-                createInOrNotIn(operatorMap, field, fieldNameKey, prefix, " not in ");
-                break;
-            }
-            case IN: {
-                createInOrNotIn(operatorMap, field, fieldNameKey, prefix, " in ");
-                break;
-            }
-            case FIND_IN_SET: {
-                WHERE("find_in_set(" + value + ",t." + field.getName() + ")");
-                break;
-            }
-            /* add by limiao 20160203 ,新增NOT_EQUAL, NOT_LIKE,IS_NULL ,IS_NOT_NULL   */
-            case NOT_EQUAL: {
-                WHERE(StringUtils.join(prefix, getNotEqualsValue(field.getName(), StringUtils.join(addSuffix(BaseMapper.DATA + ".", tableAlias), field.getName()))));
-                break;
-            }
-            case NOT_LIKE: {
-                WHERE(StringUtils.join(prefix, field.getName(), " not like CONCAT('%'," + value + ", '%')"));
-                break;
-            }
-            case IS_NULL: {
-                WHERE(StringUtils.join(prefix, field.getName(), " is null "));
-                break;
-            }
-            case IS_NOT_NULL: {
-                WHERE(StringUtils.join(prefix, field.getName(), " is not null "));
-                break;
-            }
-        }
-        return true;
-    }
-
-    private void createInOrNotIn(Map<String, OperatorHandle> operatorMap, Field field, String fieldNameKey, String prefix, String operate) {
+    private void createInOrNotIn(Map<String, OperatorHandle> operatorMap, String fieldNameKey, String prefix, String operate, String fieldName) {
         List inValues = new ArrayList<>();
         if (ArrayUtils.isNotEmpty(operatorMap.get(fieldNameKey).getValues())) {
             for (int i = 0; i < operatorMap.get(fieldNameKey).getValues().length; i++) {
-                inValues.add(" #{" + BaseMapper.DATA + ".operatorHandles." + field
-                        .getName() + ".values[" + i + "]}");
+                inValues.add(" #{" + BaseMapper.DATA + ".operatorHandles." + fieldName + ".values[" + i + "]}");
             }
         }
 
         //add by limiao 20160811 处理拼in的时候，数组为空，不想查询的问题
         String inValueSql = inValues.isEmpty() ? " ( null ) "
                 : StringUtils.join(" (", StringUtils.join(inValues, ","), ")");
-        WHERE(StringUtils.join(prefix, field.getName(), operate + inValueSql));
+        WHERE(StringUtils.join(prefix, fieldName, operate + inValueSql));
     }
 
-    /**
-     * 验证该字段是否有需要拼装到sql中
-     *
-     * @param operatorMap 扩展运算集合
-     * @param field       字段
-     * @param param       数据集合
-     * @param tableAlias  字段所属表别名
-     * @return boolean值, 是否需要验证
-     * @
-     */
-    private boolean validateField2WhereSql(Map<String, OperatorHandle> operatorMap, Field field, Map<String, Object>
-            param, String tableAlias) {
-        if (null != field.getAnnotation(Transient.class) || field.getType().isAssignableFrom(Class.class)) {
-            return false;
-        }
-        return validateFieldInParam(field, param, tableAlias) || validateFieldInOperatorMap(field, operatorMap,
-                tableAlias);
-    }
-
-    private boolean validateFieldInParam(Field field, Map<String, Object> param, String tableAlias) {
-        return (StringUtils.isEmpty(tableAlias) && param.containsKey(field.getName())) ||
-                (StringUtils.isNotEmpty(tableAlias) && null == JPAUtils.getValue(param.get(tableAlias), field.getName()));
-    }
-
-    private boolean validateFieldInOperatorMap(Field field, Map<String, OperatorHandle> operatorMap, String tableAlias) {
-        String fieldNameKey = StringUtils.isEmpty(tableAlias) ? field.getName() : tableAlias + "." + field.getName();
-//        return (operatorMap.containsKey(fieldNameKey) && ArrayUtils.isNotEmpty(operatorMap.get(fieldNameKey).getValues()));
-        return operatorMap.containsKey(fieldNameKey);
-    }
 
     private void parseCascade(Map<String, OperatorHandle> operatorMap, Field field, Map<String, Object> param) {
         //不是PO不做任何处理,没有配置级联关系不处理
@@ -294,9 +132,143 @@ public class BaseMapperProvider {
 
     private void createFieldsWhereSql(Map<String, OperatorHandle> operatorMap, Map<String, Object> param,
                                       String tableAlias, Class clazz) {
+//        处理非本类字段
+//        for (String key : operatorMap.keySet()) {
+//            if (key.contains(".")) {
+//                operatorMap.put(key.replace(".", "_"), operatorMap.get(key));
+//            }
+//        }
+//        处理本类字段
         for (Field field : JPAUtils.getAllFields(clazz)) {
             createFieldWhereSql(operatorMap, field, param, tableAlias);
         }
+    }
+
+    private boolean createFieldWhereSql(Map<String, OperatorHandle> operatorMap, Field field, Map<String, Object>
+            param, String tableAlias) {
+        //验证是否需要拼装该属性
+        if (!validateField2WhereSql(operatorMap, field, param, tableAlias)) {
+            return false;
+        }
+
+        //封装类型递归处理，拼装成级联查询
+        if (null != field.getType().getAnnotation(Table.class)) {
+            parseCascade(operatorMap, field, param);
+            return false;
+        }
+        String fieldNameKey = StringUtils.isEmpty(tableAlias) ? field.getName() : tableAlias + "." + field.getName();
+        String prefix = StringUtils.isEmpty(tableAlias) ? "t." : StringUtils.join(tableAlias, ".");
+        if (!operatorMap.containsKey(fieldNameKey)) {
+            WHERE(StringUtils.join(prefix, getEqualsValue(field.getName(),
+                    StringUtils.join(addSuffix(BaseMapper.DATA + ".", tableAlias), field.getName()))));
+            return true;
+        }
+        createColumnWhereSql(operatorMap, tableAlias, fieldNameKey, prefix, field.getName());
+        return true;
+    }
+
+    private void createColumnWhereSql(Map<String, OperatorHandle> operatorMap,  String tableAlias, String fieldNameKey,
+                                 String prefix, String fieldName) {
+    /*
+     * 将参数变量的"."改成"_"，eg table.id改成table_id,
+     * 不改mybatis会将解释成table对象的id属性，而非table.id变量
+     */
+
+        for (String key : operatorMap.keySet()) {
+            if (key.contains(".")) {
+                operatorMap.put(key.replace(".", "_"), operatorMap.get(key));
+            }
+        }
+        //用户自定义值优先
+        Object value = ArrayUtils.isEmpty((operatorMap.get(fieldNameKey)).getValues())
+                ? "#{" + StringUtils.join(BaseMapper.DATA + "." + fieldNameKey) + "}"
+                : "#{" + BaseMapper.DATA + ".operatorHandles." + fieldNameKey.replace(".", "_") + ".values[0]}";
+
+        switch ((operatorMap.get(fieldNameKey)).getOperator()) {
+            case EQUAL: {
+                WHERE(StringUtils.join(prefix, fieldName, " = ", value));
+                break;
+            }
+            case LIKE: {
+                WHERE(StringUtils.join(prefix, fieldName, " like CONCAT('%',", value, ", '%')"));
+                break;
+            }
+            case LESS_THEN: {
+                WHERE(StringUtils.join(prefix, fieldName, " < ", value));
+                break;
+            }
+            case MORE_THEN: {
+                WHERE(StringUtils.join(prefix, fieldName, " > ", value));
+                break;
+            }
+            case LESS_EQUAL: {
+                WHERE(StringUtils.join(prefix, fieldName, " <= ", value));
+                break;
+            }
+            case MORE_EQUAL: {
+                WHERE(StringUtils.join(prefix, fieldName, " >= ", value));
+                break;
+            }
+            case NOT_IN: {
+                createInOrNotIn(operatorMap, fieldNameKey, prefix, " not in ", fieldName);
+                break;
+            }
+            case IN: {
+                createInOrNotIn(operatorMap,  fieldNameKey, prefix, " in ", fieldName);
+                break;
+            }
+            case FIND_IN_SET: {
+                WHERE("find_in_set(" + value + ",t." + fieldName + ")");
+                break;
+            }
+            /* add by limiao 20160203 ,新增NOT_EQUAL, NOT_LIKE,IS_NULL ,IS_NOT_NULL   */
+            case NOT_EQUAL: {
+                WHERE(StringUtils.join(prefix, getNotEqualsValue(fieldName, StringUtils.join(addSuffix(BaseMapper.DATA + ".", tableAlias), fieldName))));
+                break;
+            }
+            case NOT_LIKE: {
+                WHERE(StringUtils.join(prefix, fieldName, " not like CONCAT('%'," + value + ", '%')"));
+                break;
+            }
+            case IS_NULL: {
+                WHERE(StringUtils.join(prefix, fieldName, " is null "));
+                break;
+            }
+            case IS_NOT_NULL: {
+                WHERE(StringUtils.join(prefix, fieldName, " is not null "));
+                break;
+            }
+        }
+    }
+
+    /**
+     * 验证该字段是否有需要拼装到sql中
+     *
+     * @param operatorMap 扩展运算集合
+     * @param field       字段
+     * @param param       数据集合
+     * @param tableAlias  字段所属表别名
+     * @return boolean值, 是否需要验证
+     * @
+     */
+    private boolean validateField2WhereSql(Map<String, OperatorHandle> operatorMap, Field field, Map<String, Object>
+            param, String tableAlias) {
+        if (null != field.getAnnotation(Transient.class) || field.getType().isAssignableFrom(Class.class)) {
+            return false;
+        }
+        return validateFieldInParam(field, param, tableAlias) || validateFieldInOperatorMap(field, operatorMap,
+                tableAlias);
+    }
+
+    private boolean validateFieldInParam(Field field, Map<String, Object> param, String tableAlias) {
+        return (StringUtils.isEmpty(tableAlias) && param.containsKey(field.getName())) ||
+                (StringUtils.isNotEmpty(tableAlias) && null == JPAUtils.getValue(param.get(tableAlias), field.getName()));
+    }
+
+    private boolean validateFieldInOperatorMap(Field field, Map<String, OperatorHandle> operatorMap, String tableAlias) {
+        String fieldNameKey = StringUtils.isEmpty(tableAlias) ? field.getName() : tableAlias + "." + field.getName();
+//        return (operatorMap.containsKey(fieldNameKey) && ArrayUtils.isNotEmpty(operatorMap.get(fieldNameKey).getValues()));
+        return operatorMap.containsKey(fieldNameKey);
     }
 
     /*

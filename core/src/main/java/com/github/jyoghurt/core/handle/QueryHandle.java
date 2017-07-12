@@ -2,16 +2,13 @@ package com.github.jyoghurt.core.handle;
 
 import com.github.jyoghurt.core.configuration.impl.PageConfiguration;
 import com.github.jyoghurt.core.dao.BaseMapper;
-import com.github.jyoghurt.core.domain.BaseEntity;
 import com.github.jyoghurt.core.exception.BaseErrorException;
 import com.github.jyoghurt.core.utils.DateTimeFormatter;
-import com.github.jyoghurt.core.utils.JPAUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
-import java.lang.reflect.Field;
 import java.util.*;
 
 /**
@@ -23,9 +20,6 @@ public class QueryHandle {
 
     private static final String AND = " AND ";
     private static final String OR = " OR ";
-
-    private static final Boolean SENIOR_SEARCH = true;
-    private static final Boolean COMMON_SEARCH = false;
 
     // 当前页
     private int page = 1;
@@ -44,8 +38,7 @@ public class QueryHandle {
     private List<String> whereSqls = new ArrayList<>();
     //扩展数据
     private Map<String, Object> expandData = new HashMap<>();
-    //自定义sql开关，如果自定义sql打开
-    private LinkedList<CustomWhereHandle> customList = new LinkedList<>();
+
     private String groupBy;
 
     //处理查询列问题 add by limiao 20170508
@@ -70,34 +63,34 @@ public class QueryHandle {
     }
 
 
-    /**
-     * 获取普通字段查询sql
-     *
-     * @return String sql
-     */
-    private String getCommonColumnsSearchWhereSql(BaseEntity baseEntity) {
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-        if (request == null) {
-            throw new BaseErrorException("getJoinColumnsSearchWhereSql -> request can not be null!");
-        }
-        List<Field> fieldList = JPAUtils.getAllFields(baseEntity.getClass());
-        StringBuilder sb = new StringBuilder();
-        for (Field field : fieldList) {
-            /*  如果是日期类型，那么去dateQueryParamsMap获取时间段条件 */
-            if (JPAUtils.fieldIsDateType(field) || alreadyAppendFieldSet.contains(field.getName())) {
-                continue;
-            }
-            Object value = JPAUtils.getValue(baseEntity, field);
-            if (value == null || "".equals(value)) {
-                continue;
-            }
-            sb = appendLikeSql(sb, AND, field.getName());
-        }
-        if (StringUtils.isNotEmpty(sb.toString())) {
-            return "(" + sb.toString().replaceFirst(AND, "") + ")";
-        }
-        return null;
-    }
+//    /**
+//     * 获取普通字段查询sql
+//     *
+//     * @return String sql
+//     */
+//    private String getCommonColumnsSearchWhereSql(BaseEntity baseEntity) {
+//        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+//        if (request == null) {
+//            throw new BaseErrorException("getJoinColumnsSearchWhereSql -> request can not be null!");
+//        }
+//        List<Field> fieldList = JPAUtils.getAllFields(baseEntity.getClass());
+//        StringBuilder sb = new StringBuilder();
+//        for (Field field : fieldList) {
+//            /*  如果是日期类型，那么去dateQueryParamsMap获取时间段条件 */
+//            if (JPAUtils.fieldIsDateType(field) || alreadyAppendFieldSet.contains(field.getName())) {
+//                continue;
+//            }
+//            Object value = JPAUtils.getValue(baseEntity, field);
+//            if (value == null || "".equals(value)) {
+//                continue;
+//            }
+//            sb = appendLikeSql(sb, AND, field.getName());
+//        }
+//        if (StringUtils.isNotEmpty(sb.toString())) {
+//            return "(" + sb.toString().replaceFirst(AND, "") + ")";
+//        }
+//        return null;
+//    }
 
 
     /**
@@ -191,11 +184,6 @@ public class QueryHandle {
                 "#{" + StringUtils.join(BaseMapper.DATA, ".", joinColumn_, fieldName) + "}" + ", '%')");
     }
 
-    private StringBuilder appendEqualsSql(StringBuilder sb, String sqlOperate, String fieldName) {
-        return sb.append(sqlOperate).append(" t.").append(fieldName).append("= ").append("#{" +
-                StringUtils.join(BaseMapper.DATA + "." + fieldName) + "}");
-    }
-
     private StringBuilder appendLargerEqualThanSql(StringBuilder sb, String sqlOperate, String fieldName,
                                                    String expandFieldName, String value) {
         addExpandData(expandFieldName, value);
@@ -217,42 +205,6 @@ public class QueryHandle {
 
     public QueryHandle addGroupBy(String groupBy) {
         this.groupBy = groupBy;
-        return this;
-    }
-
-    public QueryHandle customWhereField(String fieldName) {
-        customList.add(new CustomWhereHandle(CustomWhereHandle.TYPE.FIELD, fieldName));
-        return this;
-    }
-
-    public QueryHandle customWhereField(String fieldName, OperatorHandle.operatorType operatorType, Object... values) {
-        customList.add(new CustomWhereHandle(CustomWhereHandle.TYPE.FIELD, fieldName));
-        addOperatorHandle(fieldName, operatorType, values);
-        return this;
-    }
-
-
-    public QueryHandle customWhereField(String sql, CustomWhereHandle.TYPE type) {
-        customList.add(new CustomWhereHandle(CustomWhereHandle.TYPE.SQL, sql));
-        return this;
-    }
-
-
-    public QueryHandle OR() {
-        customList.add(new CustomWhereHandle(CustomWhereHandle.TYPE.OR, null));
-        return this;
-    }
-
-    public QueryHandle AND() {
-        customList.add(new CustomWhereHandle(CustomWhereHandle.TYPE.AND, null));
-        return this;
-    }
-
-    public QueryHandle customWhereSql(String sql) {
-        //增加了不为null的判断 modify by limiao 20160216
-        if (sql != null) {
-            customList.add(new CustomWhereHandle(CustomWhereHandle.TYPE.SQL, sql));
-        }
         return this;
     }
 
