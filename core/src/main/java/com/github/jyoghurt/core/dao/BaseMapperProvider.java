@@ -109,9 +109,8 @@ public class BaseMapperProvider {
             return false;
         }
 
-        //封装类型递归处理，拼装成级联查询
+        //封装类型递归处理
         if (null != field.getType().getAnnotation(Table.class)) {
-//            parseCascade(operatorMap, field, param);
             return false;
         }
         if (!operatorMap.containsKey(field.getName())) {
@@ -135,7 +134,10 @@ public class BaseMapperProvider {
             }
         }
 
-        String value = getColumnValues(operatorMap, fieldName);
+//        String value = getColumnValues(operatorMap, fieldName);
+        String value = ArrayUtils.isEmpty((operatorMap.get(fieldName)).getValues())
+                ? "#{" + StringUtils.join(BaseMapper.DATA + "." + fieldName) + "}"
+                : "#{" + BaseMapper.DATA + ".operatorHandles." + fieldName.replace(".", "_") + ".values[0]}";
 
         switch ((operatorMap.get(fieldName)).getOperator()) {
             case EQUAL: {
@@ -163,11 +165,11 @@ public class BaseMapperProvider {
                 break;
             }
             case NOT_IN: {
-                WHERE(StringUtils.join(tableAlias, fieldName, " not in ", value));
+                WHERE(StringUtils.join(tableAlias, fieldName, " not in ", getInValuesSql(operatorMap, fieldName)));
                 break;
             }
             case IN: {
-                WHERE(StringUtils.join(tableAlias, fieldName, " in ", value));
+                WHERE(StringUtils.join(tableAlias, fieldName, " in ", getInValuesSql(operatorMap, fieldName)));
                 break;
             }
             case FIND_IN_SET: {
@@ -194,12 +196,8 @@ public class BaseMapperProvider {
         }
     }
 
-    private String getColumnValues(Map<String, OperatorHandle> operatorMap, String fieldName) {
+    private String getInValuesSql(Map<String, OperatorHandle> operatorMap, String fieldName) {
         fieldName = StringUtils.replace(fieldName,".","_");
-        //用户自定义值优先
-        if (ArrayUtils.isEmpty((operatorMap.get(fieldName)).getValues())) {
-            return "#{" + StringUtils.join(BaseMapper.DATA + "." + fieldName) + "}";
-        }
         List inValues = new ArrayList<>();
         for (int i = 0; i < operatorMap.get(fieldName).getValues().length; i++) {
             inValues.add(" #{" + BaseMapper.DATA + ".operatorHandles." + fieldName + ".values[" + i + "]}");
@@ -207,8 +205,8 @@ public class BaseMapperProvider {
 
         //add by limiao 20160811 处理拼in的时候，数组为空，不想查询的问题
         return inValues.isEmpty() ? " ( null ) " : StringUtils.join(" (", StringUtils.join(inValues, ","), ")");
-
     }
+
 
 
     /**

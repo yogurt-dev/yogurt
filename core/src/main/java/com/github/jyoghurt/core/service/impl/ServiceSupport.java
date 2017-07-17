@@ -132,8 +132,7 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
     private void updateHis(T entity) {
         Integer version = getEntityVersion(entity);
         try {
-            int record = checkConcurrency(entity, version);
-            if (record == 0) {
+            if (!checkConcurrency(entity, version)) {
                 throw new DaoException(StringUtils.join("当前提交数据已过期，请重新编辑 entityClass =", entity.getClass().getName()));
             }
             ((BaseSnapshotEntity) entity).setVersion(version + 1);
@@ -150,12 +149,13 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
      * @param entity
      * @return
      */
-    private int checkConcurrency(T entity, Integer version) throws IllegalAccessException {
+    private Boolean checkConcurrency(T entity, Integer version) throws IllegalAccessException {
         //更新version字段
         Field field = JPAUtils.getIdField(entity.getClass());
         field.setAccessible(true);
-        return getMapper().updateBySql((Class<T>) entity.getClass(), "t.version = t.version+1", new
+        int record =  getMapper().updateBySql((Class<T>) entity.getClass(), "t.version = t.version+1", new
                 ChainMap<String, Object>().chainPut("version", version).chainPut(field.getName(), field.get(entity)));
+        return record == 1;
     }
 
     /**
