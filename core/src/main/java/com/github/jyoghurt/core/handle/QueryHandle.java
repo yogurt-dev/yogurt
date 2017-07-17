@@ -10,6 +10,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by jtwu on 2015/1/13.
@@ -31,7 +32,7 @@ public class QueryHandle {
     //sql join 辅助类
     private LinkedList<SQLJoinHandle> sqlJoinHandle = new LinkedList<>();
     //sql 操作符辅助类
-    private Map<String, OperatorHandle> operatorHandles = new HashMap();
+    private Map<String, OperatorHandle> operatorHandles = new ConcurrentHashMap();
     //是否使用distinct
     private Boolean distinct;
     //扩展的whereSql
