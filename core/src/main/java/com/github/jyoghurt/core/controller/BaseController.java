@@ -11,6 +11,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.util.WebUtils;
 
@@ -73,6 +76,19 @@ public class BaseController {
                     parameterValues, ex);
             return HttpResultHandle.getErrorResult(ex.getMessage());
         }
+
+        if (ex instanceof MethodArgumentNotValidException) {
+            String message = StringUtils.EMPTY;
+            BindingResult bindingResult = ((MethodArgumentNotValidException) ex).getBindingResult();
+            for (ObjectError objectError : bindingResult.getAllErrors()) {
+                message = StringUtils.join(message, objectError.getDefaultMessage(), ",");
+            }
+            logger.error(operatorLogStr + ex.getMessage() + logTemplate, request.getServletPath(),
+                    parameterValues, ex);
+            return new HttpResultEntity(HttpResultHandle.HttpResultEnum.ERROR.getErrorCode()
+                    , StringUtils.stripEnd(message, ","));
+        }
+
         logger.error(operatorLogStr + "uncaught  exception," + logTemplate, request.getServletPath(),
                 parameterValues, ex);
         return HttpResultHandle.getErrorResult();
