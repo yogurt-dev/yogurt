@@ -1,7 +1,9 @@
 package com.github.jyoghurt.core.dao;
 
 import org.apache.ibatis.annotations.*;
+import org.springframework.validation.annotation.Validated;
 
+import javax.validation.Valid;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
@@ -10,7 +12,7 @@ import java.util.Map;
  * Created by jtwu on 2015/4/21.
  * mybatis通用处理类
  */
-
+@Validated
 public interface BaseMapper<T> {
     String ENTITY_CLASS = "entityClass";
     String ENTITY = "entity";
@@ -26,7 +28,7 @@ public interface BaseMapper<T> {
      * @param entity 业务实体
      */
     @InsertProvider(type = BaseMapperProvider.class, method = "save")
-    void save(@Param(ENTITY) T entity);
+    void save(@Valid @Param(ENTITY) T entity);
 
 
     /**
@@ -43,7 +45,7 @@ public interface BaseMapper<T> {
      * @param entities 插入结果集
      */
     @InsertProvider(type = BaseMapperProvider.class, method = "saveBatch")
-    void saveBatch(@Param(ENTITIES) List<T> entities);
+    void saveBatch(@Valid @Param(ENTITIES) List<T> entities);
 
     /**
      * 插入非空字段
