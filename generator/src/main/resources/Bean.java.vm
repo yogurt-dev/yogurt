@@ -2,7 +2,8 @@ package ${modulePackage}.domain;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.github.jyoghurt.core.domain.BaseEntity;
-
+import org.hibernate.validator.constraints.NotEmpty;
+import org.hibernate.validator.constraints.Length;
 
 
 ##@JsonSerialize(include= JsonSerialize.Inclusion.NON_NULL)

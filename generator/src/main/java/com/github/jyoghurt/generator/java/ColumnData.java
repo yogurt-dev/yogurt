@@ -14,6 +14,7 @@ public class ColumnData {
     private Boolean isPriKey;
 	private Long columnLength;
 	private Boolean isNullable;
+	private String columnDefault;
 
     public Boolean getIsPriKey() {
         return isPriKey;
@@ -61,5 +62,13 @@ public class ColumnData {
 
 	public void setIsNullable(Boolean isNullable) {
 		this.isNullable = isNullable;
+	}
+
+	public String getColumnDefault() {
+		return columnDefault;
+	}
+
+	public void setColumnDefault(String columnDefault) {
+		this.columnDefault = columnDefault;
 	}
 }
