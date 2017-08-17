@@ -1,0 +1,257 @@
+<!-- Basic Setup Start-->
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">功能管理</h3>
+
+
+    </div>
+    <div class="panel-body">
+        <table id="table" class="table  table-bordered table-hover" cellspacing="0" width="100%">
+            <thead>
+            <tr>
+                <th>id</th>
+                <th>菜单名称</th>
+                <th>父菜单ID</th>
+                <th>菜单链接</th>
+                <th>图标</th>
+                <th>排序ID</th>
+                <th>是否设置待办</th>
+                <th>待办类型</th>
+                <th>待办详情链接</th>
+                <th class="width130">操作</th>
+            </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+        <script type="text/javascript">
+            (function ($){
+
+                /**
+                 *编辑或者新建 逻辑判断 无后台
+                 * rowdata 行数据
+                 */
+                function editRow(rowdata) {
+                    if(rowdata){
+                        $("#forMenuId").val(rowdata.parentId);
+                    }
+                    //编辑还是保存
+                    var flag = rowdata?true:false;
+                    //弹出菜单的业务逻辑方法
+                    function saveHandler(modal) {
+                        saveOrUPdate(modal, flag, function (data, status) {
+                            DF.toast.success(data.message);
+                            DF.hideModal(modal);
+                            reloadGrid();
+                        });
+                    }
+
+                    //modal窗口的配置项目
+                    var config = {
+                        dom: $('#securityMenuTForm'),
+                        title: flag ? '编辑页面' : '新建页面',
+                        btns: [{
+                            text: '保存',
+                            icon: 'btn-info',
+                            fn: saveHandler
+                        }]
+                    };
+                    DF.showModal(config, function (modal) {
+//                        /*回调函数中的参数
+//                         * modal为当前的模块窗口 其中提供 getForm()方法 返回 业务的form 此form为 jq对象
+//                         */
+//                        /*如果是根节点，那么隐藏上级角色*/
+//                        $($("#parentId").parent()).removeClass();
+//                        if(rowdata&&rowdata.parentId=='-1'){
+//
+//                            $($("#parentId").parent()).addClass("form-group hidden");
+//                        }else{
+//                            $($("#parentId").parent()).addClass("form-group no-margin");
+//                        }
+                        flag && loadForm(modal, rowdata);
+                    });
+                };
+                //删除 走后台
+                function deleteRow(rowdata) {
+                    if (confirm('确认删除吗？')) {
+                        var sfn = function (data, status) {
+                            reloadGrid();
+                            DF.toast.success(data.message);
+                        };
+                        DF.ajax({
+                            url:'service/securityMenuT/'+rowdata.menuId,
+                            type:'DELETE',
+                            success: sfn
+                        });
+                    }
+                };
+                //加载列表  走后台
+                function reloadGrid() {
+                    grid.ajax.reload();
+                };
+                //加载表单  如果rowdata 数据满足  可以直接赋值 不用走后台
+                function loadForm(modal, rowdata) {
+                    var form = modal.getForm();
+
+                    if (rowdata) {
+                        DF.setFormValues(rowdata, form);
+                    }
+                };
+                //保存表单or编辑表单  走后台
+                function saveOrUPdate(modal, flag, fn) {
+                    var form = modal.getForm();
+                    var data = form.serializeObject();
+                    var type = flag ? 'PUT' : 'POST';
+                    var sfn = function (data, status) {
+                        fn && fn(data, status);
+                    };
+                    DF.ajax({
+                        data: JSON.stringify(data),
+                        type: type,
+                        url: "service/securityMenuT",
+                        success: sfn
+                    });
+                };
+                var grid = DF.dataTable({
+                    id: "table",
+                    ajax: "service/securityMenuT/list",
+                    joinColumn:false,
+                    columns: [
+                        {"data": "menuId", "visible": false},
+                        {"data": "menuName"},
+                        {"data": "parentId", "visible": false},
+                        {"data": "menuUrl"},
+                        {"data": "isLeaf", "visible": false},
+                        {"data": "sortId", "visible": false},
+                        {"data": "isGtask", "visible": false},
+                        {"data": "gTaskType", "visible": false},
+                        {"data": "gTaskUrl", "visible": false},
+                    ],
+                    rowbtns : [
+                        {text:'编辑',name:'edit',class:'btn-success',fn:editRow},
+                        {text:'删除',name:'delete',class:'btn-danger',fn:deleteRow}
+                    ],
+                    toolbtns:[
+                        {text:'新建',name:'create',class:'btn-success',icon:'fa fa-plus',fn:editRow}
+                    ],
+                    columnDefs: [{
+                        render: function (data, type, row) {
+                            return data;
+                        },
+                        "targets": 2
+                    }],
+                    createdRow: function (row, data, index) {
+                        $('td', row).click(function () {
+                        })
+                    },
+                    //新建行函数
+                    createItem: editRow,
+                    //编辑函数
+                    editItem: editRow,
+                    //删除函数
+                    deleteItem: deleteRow,
+                    //重新加载
+                    reloadGrid: reloadGrid,
+                    //初始化结束后回调
+                    initComplete: function () {
+                    }
+                });
+
+            })(jQuery);
+        </script>
+        <input style="display: none" id="forMenuId">
+    </div>
+</div>
+<!-- Basic Setup  End-->
+<script type="text/template" id="securityMenuTForm">
+    <form class="validate">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group hidden">
+                    <label class="control-label"></label>
+                    <input type="text" id="menuId" name="menuId">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group no-margin">
+                    <label for="parentId" class="control-label">父菜单</label>
+                    <!--   <input type="text" name="parentId" class="form-control" id="parentId"
+                              placeholder="" maxlength="36">-->
+                    <select id="parentId" dataurl="service/securityMenuT/queryMenuDic" key="menuId" parseValue="menuName"
+                            autoload="true" searchable="true" name="parentId" required="true" class="form-control">
+                        <option></option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group no-margin">
+                    <label for="menuName" class="control-label">菜单名称</label>
+                    <input type="text" name="menuName" class="form-control" id="menuName"
+                           placeholder="" maxlength="20" required="true">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group no-margin">
+                    <label for="menuUrl" class="control-label">菜单链接</label>
+                    <input type="text" name="menuUrl" class="form-control" id="menuUrl"
+                           placeholder="" maxlength="200">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group no-margin">
+                    <label class="control-label">是否为子节点</label>
+                    <select id="isLeaf" name="isLeaf" class="form-control" required="true">
+                        <option value="1">是</option>
+                        <option value="0">否</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group no-margin">
+                    <label class="control-label">是否设置待办</label>
+                    <select id="isGtask" name="isGtask" class="form-control" required="true">
+                        <option value="0">是</option>
+                        <option value="1">否</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group no-margin">
+                    <label for="menuUrl" class="control-label">待办类型</label>
+                    <input type="text" name="gTaskType" class="form-control" id="gTaskType"
+                           placeholder="" maxlength="100">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group no-margin">
+                    <label for="menuUrl" class="control-label">待办详情链接</label>
+                    <input type="text" name="gTaskUrl" class="form-control" id="gTaskUrl"
+                           placeholder="" maxlength="100">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group no-margin">
+                    <label for="sortId" class="control-label">排序ID</label>
+                    <input type="text" name="sortId" class="form-control" id="sortId"
+                           placeholder="" maxlength="3" required="true" digits="true">
+                </div>
+            </div>
+        </div>
+    </form>
+</script>
+

@@ -1,0 +1,200 @@
+<!-- 微信消息发送-->
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h4 class="panel-title lymsg_tab"><a id="msgsend">消息发送</a> <a id="msgsended"> 已发消息</a></h4>
+        <div class="panel-options">
+            <!--<i class="fa-info-circle text-warning">(今天还能发送1条)</i>-->
+            <button id="groupSend" type="button" class="btn btn-success icon-right">消息群发 <i class="linecons-paper-plane"></i></button>
+        </div>
+    </div>
+    <div class="panel-body lymsg_tab_body">
+        <div class="row">
+            <div class="col-sm-10" style="margin-bottom: 20px;">
+                <h4 class="panel-title">为保障用户体验，微信公众平台严禁恶意营销以及诱导分享朋友圈，严禁发布色情低俗、暴力血腥、政治谣言等各类违反法律法规及相关政策规定的信息。一旦发现，我们将严厉打击和处理。</h4>
+            </div>
+        </div>
+        <div id="target">
+
+        </div>
+    </div>
+    <div class="panel-body lymsg_tab_body">
+        <div class="row">
+            <table id="table" class="table  table-hover" cellspacing="0" width="100%">
+                <thead>
+                <tr>
+                    <th>messageId</th>
+                    <th>公告内容</th>
+                    <th>发送时间</th>
+                    <!--<th class="width130">操作</th>-->
+                </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+    <script type="text/javascript">
+        (function ($) {
+            var param = DF.getUrlParam();
+            //注册tab
+            $('.lymsg_tab a').click(function(){
+                var $this = $(this);
+                if(!$this.hasClass('active')){
+                    $('.lymsg_tab a').removeClass('active');
+                    !$this.hasClass('active') && $this.addClass('active');
+                    toggleShowTab($this.index())
+                }
+            })
+            $('#msgsend').trigger('click');
+            //判断组件是否存在 如果存在 销毁
+            //组件调用
+            var cmtId = DF.create({id:'df_component_msg_autoReply',codes:{'text':1,'mpnews':1}},'target', function (target,exports) {
+//                console.log(target,exports);
+//                exports.setValue('','mpnews');
+//                exports.setValue('5PnmpP8Z92nRCan2zESNXwVxdjaQ_akTcUwN2_KKEtE','mpnews');
+            });
+
+            $('#groupSend').click(function () {
+                var $btn = $(this);
+                var param = DF.getUrlParam();
+                var com = DF.getComponent(cmtId);
+                var content = com.getValue();
+                var type = com.getType();
+
+                if(!content){
+                    DF.toast.warning('输入内容或者选择素材');
+                    return
+                }
+                if('text'==type){
+                    var $btn = $(this);
+                    var sfn = function (data, status) {
+                        $btn.hideLoading();
+                        if(data.errorCode == '0'){
+                            return
+                        }
+                        DF.toast.success(data.message);
+                    }
+                    if (param.type && content) {
+                        $btn.showLoading();
+                        DF.ajax({
+                            type: 'POST',
+                            url: 'weChatSendMsgT/' + content + '/' + param.type + '/text',
+                            success: sfn
+                        });
+                    }
+                }else{
+                    if(content && content.media_id){
+                        var url = 'weChatSendMsgT/'+content.media_id;
+                        if (param) {
+                            var p = param.type;
+                            url += '/' + p;
+                        }
+                        url += '/'+'mpnews';
+                        $btn.showLoading();
+                        DF.ajax({
+                            type: 'post',
+                            url: url,
+                            success: function (data) {
+                                DF.reloadPage();
+                                $btn.hideLoading();
+                                if(data.errorCode == '0'){
+                                    return
+                                }
+                                DF.toast.success(data.message);
+                            }
+                        });
+                    }else{
+                        DF.toast.warning('请选择素材！');
+                    }
+                }
+            });
+            function showSendHis(){
+                //参数
+                var url = "weChatSendMsgT/list"
+                if (param) {
+                    var p = param.type;
+                    url += '/' + p;
+                }
+                var grid = DF.dataTable({
+                    id: "table",
+                    searchable:false,
+                    ajax: url,
+                    rowbtns : [
+//                        {text:'删除',name:'delete',class:'btn-danger',fn: function (rowdata) {
+//                            if (confirm('确认删除吗？')) {
+//                                var sfn = function (data, status) {
+//                                    reloadGrid();
+//                                    DF.toast.success(data.message);
+//                                };
+//                                console.log(rowdata);
+//                                return
+//                                var msgId = rowdata.msgId;
+//                                var type = param.type;
+//                                DF.ajax({
+//                                    type: 'delete',
+//                                    url: 'weChatMsgT/delMaterial/'+mid+'/'+type,
+//                                    success: sfn
+//                                });
+//                            }
+//                        }}
+                    ],
+                    columns: [
+                        {"data": "msgId", "visible": false, "orderable": false},
+                        {"data": "content", "orderable": false},
+                        {"data": "createDateTime", "orderable": false}
+                    ],
+                    columnDefs: [
+                        {
+                            render: function (data, type, row) {
+                                if(row.msgType=='mpnews'){
+                                    return renderGrid(JSON.parse(data));
+                                }else{
+                                    return '【文字】 '+data;
+                                }
+                            },
+                            "targets": 1
+                        }],
+                    //重新加载
+                    reloadGrid: function () {
+                        grid.ajax.reload();
+                    }
+                });
+            };
+            function renderGrid(row) {
+                var dom = '<li class="" id="">' +
+                        '<div class="innerbody">' +
+                        '<div class="leftContent">' +
+                        '<img src="" style="width:96px;height:125px">' +
+                        '<div class="sublist">' +
+                        '</div>' +
+                        '</div>' +
+                        '</div>' +
+                        '</li>';
+                var element = $(dom);
+                var list = row.content.news_item;
+                for (var j = 0; j < list.length; j++) {
+                    if (j == 0) {
+                        var thumUrl = list[0].downloadPath;
+                        var url = list[0].url;
+                        element.find('img').attr('src', thumUrl);
+                    }
+                    var p = '<p>【图文】 <a href="'+url+'" target="_blank">'+(j+1)+'.' + list[j].title + '</a></p>';
+                    var _p = $(p);
+                    _p.click(function () {
+                        console.log($(this).find('a').attr('id'));
+                    });
+                    element.find('.sublist').append(_p);
+                }
+                return element.html();
+            }
+            function toggleShowTab(index){
+                $('.lymsg_tab_body').hide().eq(index).show();
+                if(index==1){
+                    showSendHis();
+                    $('#groupSend').hide();
+                }else{
+                    $('#groupSend').show();
+                }
+            }
+        })(jQuery);
+    </script>
+</div>

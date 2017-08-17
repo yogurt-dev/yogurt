@@ -1,0 +1,774 @@
+<script src="js/securirtyCustomGZ.js"></script>
+<style type="text/css">
+    .ztree li span.button.linecons-truck_ico_open, .linecons-truck_ico_close, .linecons-truck_ico_docu {
+        font-family: linecons;
+        font-style: normal;
+        font-weight: 400;
+        speak: none;
+        display: inline-block !important;
+        text-decoration: inherit;
+        width: 1.2em !important;
+        margin-right: .2em !important;
+        text-align: center;
+        font-variant: normal;
+        text-transform: none;
+        line-height: 1em !important;
+        margin-left: .2em !important;
+        background-image: none !important;
+    }
+
+    .linecons-truck_ico_open:before, .linecons-truck_ico_close:before, .linecons-truck_ico_docu:before {
+        content: '\e829';
+    }
+
+    /*人的样式*/
+    .ztree li span.button.linecons-hum_ico_open, .linecons-hum_ico_close, .linecons-hum_ico_docu {
+        font-family: linecons;
+        font-style: normal;
+        font-weight: 400;
+        speak: none;
+        display: inline-block !important;
+        text-decoration: inherit;
+        width: 1.2em !important;
+        margin-right: .2em !important;
+        text-align: center;
+        font-variant: normal;
+        text-transform: none;
+        line-height: 1em !important;
+        margin-left: .2em !important;
+        background-image: none !important;
+    }
+
+    .linecons-hum_ico_open:before, .linecons-hum_ico_close:before, .linecons-hum_ico_docu:before {
+        content: '\e805';
+    }
+
+    /*公司的样式*/
+    .ztree li span.button.linecons-comp_ico_open, .linecons-comp_ico_close, .linecons-comp_ico_docu {
+        font-family: linecons;
+        font-style: normal;
+        font-weight: 400;
+        speak: none;
+        display: inline-block !important;
+        text-decoration: inherit;
+        width: 1.2em !important;
+        margin-right: .2em !important;
+        text-align: center;
+        font-variant: normal;
+        text-transform: none;
+        line-height: 1em !important;
+        margin-left: .2em !important;
+        background-image: none !important;
+    }
+
+    .linecons-comp_ico_open:before, .linecons-comp_ico_close:before, .linecons-comp_ico_docu:before {
+        content: '\e82c';
+    }
+
+    /*部门的样式*/
+    .ztree li span.button.linecons-dept_ico_open, .linecons-dept_ico_close, .linecons-dept_ico_docu {
+        font-family: linecons;
+        font-style: normal;
+        font-weight: 400;
+        speak: none;
+        display: inline-block !important;
+        text-decoration: inherit;
+        width: 1.2em !important;
+        margin-right: .2em !important;
+        text-align: center;
+        font-variant: normal;
+        text-transform: none;
+        line-height: 1em !important;
+        margin-left: .2em !important;
+        background-image: none !important;
+    }
+
+    .linecons-dept_ico_open:before, .linecons-dept_ico_close:before, .linecons-dept_ico_docu:before {
+        content: '\e80c';
+    }
+
+    /*根节点样式*/
+    .ztree li span.button.linecons-root_ico_open, .linecons-root_ico_close, .linecons-root_ico_docu {
+        font-family: linecons;
+        font-style: normal;
+        font-weight: 400;
+        speak: none;
+        display: inline-block !important;
+        text-decoration: inherit;
+        width: 1.2em !important;
+        margin-right: .2em !important;
+        text-align: center;
+        font-variant: normal;
+        text-transform: none;
+        line-height: 1em !important;
+        margin-left: .2em !important;
+        background-image: none !important;
+    }
+
+    .linecons-root_ico_open:before, .linecons-root_ico_close:before, .linecons-root_ico_docu:before {
+        content: '\e820';
+    }
+
+</style>
+
+<script type="text/javascript">
+    //是否变化标识
+    (function ($) {
+        //ajax后台访问失败公共回掉
+        var selectedNodeId;
+        function humRenderTxl (content,selectedNodeId) {
+            //初始化标志位为查询状态
+            $("#flag").val("0");
+            //初始化form表单，设置各类控件为指定样式
+
+            DF.renderPage(content, $("#showCompany"), function () {
+                DF.setFormReadOnly($("#securityUserTFormU"), true);
+                function sfn(datas, status) {
+                    userInfo = datas.result;
+                    $("#forUnitId").val(datas.belongOrg);
+                    DF.setFormValues(datas.result, $("#securityUserTFormU"));
+                }
+
+                //后台请求查询当前用户信息
+                DF.ajax({
+                    url: "service/securityUserT/getUserById/" + selectedNodeId,
+                    success: sfn
+                });
+            });
+        }
+
+
+        /*初始化通讯录树*/
+        KendoTreeView.init("securityUnitT/findUnitByUserInfo", "treeview", $("#infoSearch"));
+        GUID.setTreeViewObj(KendoTreeView.show(function (event, treeId, treeNode) {
+            var content = null;
+            selectedNodeId = treeNode.id;
+            var compType = treeNode.compType;
+            $("#forCompType").val(compType);
+            /*如果点击的是人员，那么渲染右侧区域为人员表单*/
+            if (compType == '3') {
+                content = $("#securityUserTForm").html();
+                humRenderTxl(content,selectedNodeId);
+            }
+            //如果点击的是部门，那么右侧区域清空
+            else if (compType == '1') {
+                $("#showCompany").children().remove();
+            }
+            /*如果点击的是组织机构，那么渲染右侧区域为组织机构表单*/
+            else {
+                content = $("#securityUnitTForm").html();
+                KendoTreeView.compRender(content, true, selectedNodeId);
+            }
+        }));
+    })(jQuery);
+
+</script>
+<!--最外层容器-->
+<div class="page-container">
+    <!--页面头部定义 1、标题 2、导航定义-->
+    <!--    <div class="page-title">
+            &lt;!&ndash;标题定义&ndash;&gt;
+            <div class="title-env">
+                <h1 class="title">通讯录</h1>
+                <p class="description">可查看通讯录基本信息</p>
+            </div>
+            &lt;!&ndash;导航定义&ndash;&gt;
+            <div class="breadcrumb-env">
+                <ol class="breadcrumb bc-1">
+                    <li>
+                        <a href="javascript:void(0)"><i class="fa-home"></i>系统管理</a>
+                    </li>
+                    <li class="active">
+                        <strong>通讯录</strong>
+                    </li>
+                </ol>
+            </div>
+        </div>-->
+    <!--页体定义 1、左侧通讯录树 2、右侧内容展现区-->
+    <section class="gallery-env">
+        <div class="row">
+            <!--通讯录树-->
+            <!--<div class="col-sm-3 gallery-left">-->
+                <!--&lt;!&ndash;<div class="gallery-sidebar">&ndash;&gt;-->
+                    <!--<div class="DFTree" style="margin-top: 15px;padding: 0 20px;">-->
+                        <!--&lt;!&ndash;<div class="input-group input-group-minimal">&ndash;&gt;-->
+                        <!--&lt;!&ndash;<input type="text" class="form-control" >&ndash;&gt;-->
+                        <!--&lt;!&ndash;<div class="input-group-addon">&ndash;&gt;-->
+                        <!--&lt;!&ndash;<a href="javascript:;"><i class="linecons-search"></i></a>&ndash;&gt;-->
+                        <!--&lt;!&ndash;</div>&ndash;&gt;-->
+                        <!--&lt;!&ndash;</div>&ndash;&gt;-->
+                        <!--<div id="treeview" class="ztree"></div>-->
+                    <!--</div>-->
+                <!--&lt;!&ndash;</div>&ndash;&gt;-->
+            <!--</div>-->
+
+            <div class="col-sm-3">
+                <div class="panel panel-default">
+                    <div class="DFTree" style="margin-top: 15px;padding: 0 20px;">
+                        <!--<div class="input-group input-group-minimal">-->
+                        <!--<input type="text" class="form-control" >-->
+                        <!--<div class="input-group-addon">-->
+                        <!--<a href="javascript:;"><i class="linecons-search"></i></a>-->
+                        <!--</div>-->
+                        <!--</div>-->
+                        <div id="treeview" class="ztree"></div>
+                    </div>
+                </div>
+            </div>
+            <!--右侧内容展现区-->
+            <div class="col-sm-9 gallery-right">
+                <div>
+                    <div style="width: 100%"
+                         id="showCompany" class="album-header">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!------------------------模块共享变量区---------------------------------------->
+
+    <!--操作类型 0修改 1新增-->
+    <input style="display: none" id="flag">
+    <!--全局共享，组织机构ID-->
+    <input style="display:none" id="forUnitId">
+    <!--公司类型 0公司 1部门-->
+    <input style="display: none" id="forCompType">
+    <!--操作类型 0修改 1新增-->
+    <input style="display:none" id="operType"/>
+    <!--角色ID-->
+    <input style="display:none" id="forRoleId"/>
+
+    <!--<input style="display:none" id="forUserId"/>-->
+</div>
+
+<!--用户基本信息模板-->
+<script type="text/template" id="securityUserTForm">
+    <form class="validate" id="securityUserTFormU">
+        <input id="belongOrg" name="belongOrg" style="display: none">
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group hidden">
+                    <label class="control-label"></label>
+                    <input type="text" name="userId" id="userId">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group no-margin">
+                    <label for="userName" class="control-label">姓名</label>
+                    <input type="text" name="userName" class="form-control" id="userName"
+                           placeholder="" maxlength="30" required="true">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group no-margin">
+                    <label for="linkWay" class="control-label">联系电话</label>
+                    <input type="text" name="linkWay" class="form-control" id="linkWay"
+                           placeholder="" maxlength="20" required="true">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group no-margin">
+                    <label for="userAccount" class="control-label">账号</label>
+                    <input name="userAccount" class="form-control" id="userAccount"
+                           placeholder="" maxlength="20" required="true">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group no-margin">
+                    <label for="emailAddr" class="control-label">邮箱地址</label>
+                    <input type="text" name="emailAddr" class="form-control" id="emailAddr"
+                           placeholder="" maxlength="20" required="true" email="true">
+                </div>
+            </div>
+        </div>
+    </form>
+
+</script>
+
+<script type="text/template" id="securityUnitTForm">
+    <form class="validate" id="unitForm">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group hidden">
+                    <label class="control-label"></label>
+                    <input type="text" name="unitId">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group no-margin">
+                    <label for="parentId" class="control-label">上级单位</label>
+                    <select class="form-control" id="parentId" name="parentId" required="true" disabled="disabled">
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group no-margin">
+                    <label for="type" class="control-label">组织机构类型</label>
+                    <select class="form-control" id="type" name="type" required="true" disabled="disabled">
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group no-margin">
+                    <label for="type" class="control-label">单位类型</label>
+                    <select class="form-control" id="compType" name="compType" required="true">
+                        <option value="0">公司</option>
+                        <option value="1">部门</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group no-margin"
+                     style="border-bottom-color: #A9A9A9 ! important; border-bottom-style: solid; border-bottom-width: 1px ! important; margin-bottom: 20px ! important;">
+                    <label for="unitName" class="control-label">组织机构名称</label>
+                    <input type="text" name="unitName" class="form-control" id="unitName"
+                           placeholder="" maxlength="20" required="true">
+                </div>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group no-margin">
+                    <label for="appId" class="control-label">订阅号AppId</label>
+                    <input type="text" name="appId" class="form-control" id="appId"
+                           placeholder="" maxlength="50">
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group no-margin">
+                    <label for="secretKey" class="control-label">订阅号密钥</label>
+                    <input type="text" name="secretKey" class="form-control" id="secretKey"
+                           placeholder="" maxlength="50">
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group no-margin">
+                    <label for="appIdAccount" class="control-label">订阅号账号</label>
+                    <input type="text" name="appIdAccount" class="form-control" id="appIdAccount"
+                           placeholder="" maxlength="50">
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group no-margin"
+                     style="border-bottom-color: #A9A9A9 ! important; border-bottom-style: solid; border-bottom-width: 1px ! important; margin-bottom: 20px ! important;">
+                    <label for="appIdPwd" class="control-label">订阅号密码</label>
+                    <input type="password" name="appIdPwd" class="form-control" id="appIdPwd"
+                           placeholder="" maxlength="50">
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group no-margin">
+                    <label for="appIdF" class="control-label">服务号appId</label>
+                    <input type="text" name="appIdF" class="form-control" id="appIdF"
+                           placeholder="" maxlength="50">
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group no-margin">
+                    <label for="secretKeyF" class="control-label">服务号密钥</label>
+                    <input type="text" name="secretKeyF" class="form-control" id="secretKeyF"
+                           placeholder="" maxlength="50">
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group no-margin">
+                    <label for="appIdFAccount" class="control-label">服务号账号</label>
+                    <input type="text" name="appIdFAccount" class="form-control" id="appIdFAccount"
+                           placeholder="" maxlength="50">
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group no-margin"
+                     style="border-bottom-color: #A9A9A9 ! important; border-bottom-style: solid; border-bottom-width: 1px ! important; margin-bottom: 20px ! important;">
+                    <label for="appIdFPwd" class="control-label">服务号密码</label>
+                    <input type="password" name="appIdFPwd" class="form-control" id="appIdFPwd"
+                           placeholder="" maxlength="50">
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group no-margin">
+                    <label for="appIdQ" class="control-label">企业AppId</label>
+                    <input type="text" name="appIdQ" class="form-control" id="appIdQ"
+                           placeholder="" maxlength="50">
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group no-margin">
+                    <label for="secretKeyQ" class="control-label">企业密钥</label>
+                    <input type="text" name="secretKeyQ" class="form-control" id="secretKeyQ"
+                           placeholder="" maxlength="50">
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group no-margin">
+                    <label for="appIdQAccount" class="control-label">企业号账号</label>
+                    <input type="text" name="appIdQAccount" class="form-control" id="appIdQAccount"
+                           placeholder="" maxlength="50">
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group no-margin"
+                     style="border-bottom-color: #A9A9A9 ! important; border-bottom-style: solid; border-bottom-width: 1px ! important; margin-bottom: 20px ! important;">
+                    <label for="appIdQPwd" class="control-label">企业号密码</label>
+                    <input type="password" name="appIdQPwd" class="form-control" id="appIdQPwd"
+                           placeholder="" maxlength="50">
+                </div>
+            </div>
+        </div>
+
+        <!--<div class="row">-->
+        <!--<div class="col-md-12">-->
+        <!--<div class="form-group no-margin">-->
+        <!--<label for="acol1ColAssessor" class="control-label">公估属性1</label>-->
+        <!--<input type="text" name="acol1ColAssessor" class="form-control" id="acol1ColAssessor"-->
+        <!--placeholder="" maxlength="20">-->
+        <!--</div>-->
+        <!--</div>-->
+        <!--</div>-->
+        <!--<div class="row">-->
+        <!--<div class="col-md-12">-->
+        <!--<div class="form-group no-margin">-->
+        <!--<label for="acol2ColAssessor" class="control-label">公估属性2</label>-->
+        <!--<input type="text" name="acol2ColAssessor" class="form-control" id="acol2ColAssessor"-->
+        <!--placeholder="" maxlength="20">-->
+        <!--</div>-->
+        <!--</div>-->
+        <!--</div>-->
+        <!--<div class="row">-->
+        <!--<div class="col-md-12">-->
+        <!--<div class="form-group no-margin">-->
+        <!--<label for="pcol1ColProxy" class="control-label">代理属性1</label>-->
+        <!--<input type="text" name="pcol1ColProxy" class="form-control" id="pcol1ColProxy"-->
+        <!--placeholder="" maxlength="20">-->
+        <!--</div>-->
+        <!--</div>-->
+        <!--</div>-->
+        <!--<div class="row">-->
+        <!--<div class="col-md-12">-->
+        <!--<div class="form-group no-margin">-->
+        <!--<label for="pcol2ColProxy" class="control-label">代理属性2</label>-->
+        <!--<input type="text" name="pcol2ColProxy" class="form-control" id="pcol2ColProxy"-->
+        <!--placeholder="" maxlength="20">-->
+        <!--</div>-->
+        <!--</div>-->
+        <!--</div>-->
+        <!--<div class="row">-->
+        <!--<div class="col-md-12">-->
+        <!--<div class="form-group no-margin">-->
+        <!--<label for="col1Col4s" class="control-label">4s自定义属性1</label>-->
+        <!--<input type="text" name="col1Col4s" class="form-control" id="col1Col4s"-->
+        <!--placeholder="" maxlength="20">-->
+        <!--</div>-->
+        <!--</div>-->
+        <!--</div>-->
+        <!--<div class="row">-->
+        <!--<div class="col-md-12">-->
+        <!--<div class="form-group no-margin">-->
+        <!--<label for="col2Col4s" class="control-label">4s自定义属性2</label>-->
+        <!--<input type="text" name="col2Col4s" class="form-control" id="col2Col4s"-->
+        <!--placeholder="" maxlength="20">-->
+        <!--</div>-->
+        <!--</div>-->
+        <!--</div>-->
+    </form>
+
+    <script type="text/javascript">
+        <![CDATA[
+        //删除 走后台
+        function deleteRow(id) {
+
+            if (confirm('确认删除吗？')) {
+                id = kendoTreeObj.getSelectedNodeId();
+                if (id != '-1') {
+                    //清空区域
+                    $("#showCompany").children().remove();
+                    var sfn = function (data, status) {
+                        kendoTreeObj.removeSelectedNode();
+                        DF.toast.success(data.message);
+                    };
+                    DF.ajax({
+                        data: {unitId: id},
+                        url: 'securityUnitT/delete.do',
+                        success: sfn
+                    });
+                } else {
+                    DF.toast.error("根节点无法删除");
+                }
+            }
+        }
+        ;
+
+        /*========================处理保存表单事件=======================*/
+        //保存表单or编辑表单  走后台
+        function saveOrUPdate(form, flag, fn) {
+            $("#parentId").attr("disabled", false);
+            $("#type").attr("disabled", false);
+            form.validate({
+                debug: true
+            });
+            if (form.valid()) {
+                var data = form.serializeArray();
+                var id = kendoTreeObj.getSelectedNodeId();
+                if (id == '-1') {
+                    var obj = new Object();
+                    obj.name = 'parentId';
+                    obj.value = '9999';
+                    data.push(obj);
+                }
+                var url = flag == "0" ? 'securityUnitT/edit.do' : 'securityUnitT/add.do';
+                var sfn = function (data, status) {
+
+                    $("#parentId").attr("disabled", true);
+                    $("#type").attr("disabled", true);
+                    kendoTreeObj.nodeOper(flag, data, 'comp');
+                    fn && fn(data, status);
+                };
+                DF.ajax({
+                    data: data,
+                    type: 'post',
+                    url: url,
+                    success: sfn
+                });
+            }
+
+        }
+        ;
+
+
+        //下一步保存人员基本信息
+        function saveHandler(form, flag) {
+            saveOrUPdate(form, flag, function (data, status) {
+                DF.toast.success(data.message);
+            });
+        }
+
+
+        //新增单位处理动作
+        var append = handleTextBox(function (e) {
+            $("#securityUnitTForm").reset();
+            var content = $("#securityUnitTForm").html();
+            //设置模板状态为新增状态
+            $("#flag").val("1");
+
+            DF.renderPage(content, $("#showCompany"), function () {
+                function sigleUnitSuccess(data, status) {
+                    //如果是新增动作
+                    if ($("#flag").val() == '1') {
+                        var insertData = new Object();
+                        data.result.parentId = kendoTreeObj.getSelectedNodeId();
+                        /*设置父节点ID*/
+                        insertData.parentId = data.result.parentId;
+                    }
+                    DF.setFormValues(insertData, $("#unitForm"));
+                }
+
+                //根据组织机构ID查询组织机构信息
+                DF.ajax({
+                    url: "securityUnitT/find/" + $("#forUnitId").val(),
+                    success: sigleUnitSuccess,
+                    type: 'GET',
+                    async: false
+                });
+            });
+        });
+
+        //初始化，隐藏所有个性化字段
+        $("input[id*='Col']").parent().parent().parent().css("display", "none");
+        function unitSuccess(data, status) {
+            $("#parentId").empty();
+            var data = data.result;
+            for (var i = 0; i < data.length; i++) {
+                var option = $('<option>');
+                option.val(data[i].unitId);
+                option.text(data[i].unitName);
+                $("#parentId").append(option);
+            }
+        }
+
+        //初始化上级单位下拉菜单
+        DF.ajax({
+            url: "securityUnitT/findUnitAll",
+            success: unitSuccess,
+            type: 'GET',
+            async: false
+        });
+
+        function treeSuccess(data, status) {
+            $("#type").empty();
+            var dataSingle = data.result;
+            for (var i = 0; i < dataSingle.length; i++) {
+                var option = $('<option>');
+                option.val(dataSingle[i].key);
+                option.text(dataSingle[i].value);
+                $("#type").append(option);
+            }
+        }
+
+
+        //初始化公司类型下拉菜单
+        DF.ajax({
+            url: "securityUnitT/queryUnitTypeByUser",
+            success: treeSuccess,
+            type: 'GET',
+            async: false
+        });
+
+        //渲染组织机构类型下拉单选框事件
+        $("#type").selectBoxIt().on('open', function () {
+            $(this).data('selectBoxSelectBoxIt').list.perfectScrollbar();
+        }).on('change', function () {
+            if ($(this).val() == "0") {
+                changeColState("4s");
+            } else if ($(this).val() == "1") {
+                changeColState("Proxy");
+            } else {
+                changeColState("Assessor");
+            }
+        });
+        function changeColState(col) {
+            $("input[id*='Col']").parent().parent().parent().css("display", "none");
+            $("input[id*='Col']").val("");
+            $("input[id$='" + col + "']").parent().parent().parent().css("display", "block");
+        }
+
+
+        /*渲染单位类型下拉菜单事件*/
+
+        $("#compType").selectBoxIt().on('open', function () {
+            $(this).data('selectBoxSelectBoxIt').list.perfectScrollbar();
+        }).on('change', function () {
+            if ("1" == $(this).val()) {
+                deptHideControl();
+            } else {
+                deptShowControl();
+            }
+        });
+
+        //渲染所属单位下拉单选框事件
+        $("#parentId").selectBoxIt().on('open', function () {
+            $(this).data('selectBoxSelectBoxIt').list.perfectScrollbar();
+        });
+
+
+        $("#appendNodeText").keypress(append);
+
+
+        var appendHum = handleTextBox(function (e) {
+            var content = $("#guidForm").html();
+            //设置模板状态为新增状态
+            $("#flag").val("1");
+
+            DF.renderPage(content, $("#showCompany"), function () {
+                DF.renderPage($("#securityUserTForm").html(), $("#userInfo"));
+            });
+
+
+        });
+
+
+        $("#appendNodeText").keypress(appendHum);
+
+
+        //设置上级单位、组织机构类型状态
+        $("#type").removeAttr("disabled");
+
+        if ($("#flag").val() == '1') { //新增操作，清空所有input的值
+            $("#unitForm input").val('');
+        }
+
+
+        if ($("#flag").val() == '1') { //新增操作，清空所有input的值
+            $("#unitForm input").val('');
+        }
+
+        /*如果当前结点不是公司，那么隐藏掉多余的属性*/
+        function deptHideControl() {
+            var s = $("#unitForm").find("div .form-group label").next();
+            for (var i = 0; i < s.length; i++) {
+                if (i != 1 && i != 2 && i != 3 && i != 4) {
+                    $(s[i]).parent().css("display", "none");
+                }
+            }
+        }
+
+        /*当前点击节点为非公司并且不是新增操作时候，隐藏公司属性*/
+        if (("0" != $("#forCompType").val()) && $("#flag").val() != '1') {
+            var s = $("#unitForm").find("div .form-group label").next();
+            for (var i = 0; i < s.length; i++) {
+                if (i != 1 && i != 2 && i != 3 && i != 4) {
+                    $(s[i]).parent().css("display", "none");
+                }
+            }
+        }
+
+        /*如果选择的是公司，显示属性*/
+        function deptShowControl() {
+            var s = $("#unitForm").find("div .form-group label").next();
+            for (var i = 0; i < s.length; i++) {
+                if (i != 0 && i != 1 && i != 2 && i != 3 && i != 4) {
+                    $(s[i]).parent().css("display", "block");
+                }
+            }
+        }
+
+        ]]>
+</script>
+
+
+</script>

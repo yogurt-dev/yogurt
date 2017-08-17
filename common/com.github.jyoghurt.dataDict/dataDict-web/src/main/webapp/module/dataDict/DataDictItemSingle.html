@@ -1,0 +1,36 @@
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">数据项</h3>
+
+    </div>
+    <div class="page-body">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="form-group">
+                    <label class="control-label"></label>
+
+                    <div id="dataDictValue"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        (function ($) {
+            var param = DF.getUrlParam();
+
+            var sfn = function (data, status) {
+                var cmtId = DF.create({codes:{single:0},id:'dataDictValue_component_layOut'},$("#dataDictValue"));
+                var dataDictValueObj = DF.getComponent(cmtId);
+                dataDictValueObj.initPanel(data.result);
+            };
+            DF.ajax({
+                type: 'GET',
+                url: "dataDict/"+param.dataDictItemId,
+                dataType: 'json',
+                success: sfn
+            });
+        })(jQuery);
+    </script>
+</div>
+

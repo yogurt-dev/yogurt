@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.github.jyoghurt</groupId>
+        <artifactId>security</artifactId>
+        <version>COMMON-1.0-DEV-SNAPSHOT</version>
+        <relativePath>../</relativePath>
+    </parent>
+    <artifactId>security-service</artifactId>
+    <version>${parent.version}</version>
+    <dependencies>
+        <dependency>
+            <groupId>com.github.jyoghurt</groupId>
+            <artifactId>qqEmail</artifactId>
+            <version>${com.github.jyoghurt.qqEmail.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.jyoghurt</groupId>
+            <artifactId>emailPlugin</artifactId>
+            <version>${com.github.jyoghurt.emailPlugin.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.jyoghurt</groupId>
+            <artifactId>webscoket-service</artifactId>
+            <version>${com.github.jyoghurt.webscoket.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.jyoghurt</groupId>
+            <artifactId>vertx-service</artifactId>
+            <version>COMMON-1.0-DEV-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.jyoghurt</groupId>
+            <artifactId>image</artifactId>
+            <version>${com.github.jyoghurt.image.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.jyoghurt</groupId>
+            <artifactId>quartz-core</artifactId>
+            <version>${com.github.jyoghurt.quartz.version}</version>
+        </dependency>
+        <!--文件上传下载-->
+
+        <dependency>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15on</artifactId>
+            <version>1.54</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.jyoghurt</groupId>
+            <artifactId>msgcen-core</artifactId>
+            <version>${com.github.jyoghurt.msgcen}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.aliyun.openservices</groupId>
+            <artifactId>aliyun-log</artifactId>
+            <version>0.6.6</version>
+        </dependency>
+    </dependencies>
+</project>

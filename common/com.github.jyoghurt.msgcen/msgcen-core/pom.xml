@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.github.jyoghurt</groupId>
+        <artifactId>msgcen</artifactId>
+        <version>COMMON-1.0-DEV-SNAPSHOT</version>
+        <relativePath>../</relativePath>
+    </parent>
+    <artifactId>msgcen-core</artifactId>
+    <version>${parent.version}</version>
+    <packaging>jar</packaging>
+    <dependencies>
+        <dependency>
+            <groupId>com.github.jyoghurt</groupId>
+            <artifactId>emailPlugin</artifactId>
+            <version>${com.github.jyoghurt.emailPlugin.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.jyoghurt</groupId>
+            <artifactId>sms</artifactId>
+            <version>${com.github.jyoghurt.sms.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.jyoghurt</groupId>
+            <artifactId>wechatbasic-service</artifactId>
+            <version>${com.github.jyoghurt.wechatbasic}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.jyoghurt</groupId>
+            <artifactId>switch</artifactId>
+            <version>${com.github.jyoghurt-switch.version}</version>
+        </dependency>
+    </dependencies>
+</project>

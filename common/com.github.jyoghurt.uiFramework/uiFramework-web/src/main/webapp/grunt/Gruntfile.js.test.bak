@@ -1,0 +1,35 @@
+//包装函数
+module.exports = function(grunt){
+	//任务配置，所有插件的配置信息
+	grunt.initConfig({
+		//获取 package.json  的信息
+		pkg:grunt.file.readJSON('package.json'),
+		cache:{
+			js: {
+			options: {
+			},
+			assetUrl:'demo/js/hello.js',
+			files: {
+			  'tmp': ['demo/index.html'],
+			},
+			},
+		  css: {
+			options: {
+			},
+			assetUrl:'demo/css/hello.css',
+			files: {
+			  'tmp': ['demo/index.html'],
+			},
+		  }
+		}
+		
+	});
+	//加载 插件
+	grunt.loadNpmTasks('asset-cache-control');
+	
+	grunt.registerTask('default',function(){
+		//清除
+		//grunt.task.run(['clean']);
+
+	});
+};

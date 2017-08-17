@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.df.wechatbasic.dao.WeChatWebsiteTMapper">
+    <!-- Result Map-->
+    <resultMap id="websitetResultMap" type="com.df.wechatbasic.domain.WeChatWebsiteT">
+        <result column="webId" property="webId"/>
+        <result column="webName" property="webName"/>
+        <result column="webImg" property="webImg"/>
+        <result column="mouldId" property="mouldId"/>
+        <result column="appId" property="appId"/>
+        <result column="state" property="state"/>
+        <result column="createDateTime" property="createDateTime"/>
+        <collection property="list" ofType="com.df.wechatbasic.domain.WeChatWebsiteMenuT">
+            <result column="menuId" property="menuId"/>
+            <result column="webId" property="webId"/>
+            <result column="parentId" property="parentId"/>
+            <result column="menuName" property="menuName"/>
+            <result column="menuImg" property="menuImg"/>
+            <result column="clickType" property="clickType"/>
+            <result column="url" property="url"/>
+            <result column="resume" property="resume"/>
+            <result column="text" property="text"/>
+            <result column="sort" property="sort"/>
+        </collection>
+    </resultMap>
+
+</mapper>   

@@ -1,0 +1,1 @@
+INSERT INTO cxm.SecurityMenuT (menuId, parentId, menuName, menuUrl, isLeaf, createDateTime, modifyDateTime, icon, sortId, operatorId, operatorName) VALUES ('e677f082-20cc-47c1-8e78-cda93280e680', '087feead-4e9e-4a32-95e5-cd6fc894133a', '字典管理', '/dataDict/DataDictItem', '1', '2016-01-18 13:30:22', '2016-01-18 13:30:22', null, 11, '7d6007e5-9659-441d-be00-5us484f8856d', '系统超级管理员');

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.github.jyoghurt.community</groupId>
+    <artifactId>common-modules</artifactId>
+    <packaging>pom</packaging>
+    <version>COMMUNITY-1.0-DEV-SNAPSHOT</version>
+
+    <modules>
+        <module>com.github.jyoghurt.version</module>
+        <module>com.github.jyoghurt.dataDict</module>
+        <module>com.github.jyoghurt.email</module>
+        <module>com.github.jyoghurt.emailPlugin</module>
+        <module>com.github.jyoghurt.excel</module>
+        <module>com.github.jyoghurt.image</module>
+        <module>com.github.jyoghurt.qqEmail</module>
+        <module>com.github.jyoghurt.msgcen</module>
+        <module>com.github.jyoghurt.quartz</module>
+        <module>com.github.jyoghurt.switch</module>
+        <module>com.github.jyoghurt.security</module>
+        <module>com.github.jyoghurt.serviceLog</module>
+        <module>com.github.jyoghurt.sms</module>
+        <module>com.github.jyoghurt.uiFramework</module>
+        <module>com.github.jyoghurt.uploadAnnex</module>
+        <module>com.github.jyoghurt.webscoket</module>
+		<module>com.github.jyoghurt.vertx</module>
+        <module>com.github.jyoghurt.weChat</module>
+        <module>com.github.jyoghurt.wechatbasic</module>
+        <module>com.github.jyoghurt.activiti</module>
+        <module>com.github.jyoghurt.applet</module>
+        <module>com.github.jyoghurt.j2ee</module>
+    </modules>
+</project>

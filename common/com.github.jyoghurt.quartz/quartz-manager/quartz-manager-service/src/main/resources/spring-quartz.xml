@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="
+   http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+    <!-- 注册调度任务 -->
+    <bean id="schedulerFactoryBean" lazy-init="false" autowire="no"
+          class="org.springframework.scheduling.quartz.SchedulerFactoryBean" destroy-method="destroy">
+        <!--可选，QuartzScheduler 启动时更新己存在的Job，这样就不用每次修改targetObject后删除qrtz_job_details表对应记录了 -->
+        <property name="overwriteExistingJobs" value="true"/>
+        <!--必须的，QuartzScheduler 延时启动，应用启动完后 QuartzScheduler 再启动 -->
+        <property name="startupDelay" value="30"/>
+        <!-- 设置自动启动 -->
+        <property name="autoStartup" value="false"/>
+        <property name="applicationContextSchedulerContextKey" value="applicationContext"/>
+        <property name="jobFactory">
+            <bean class="com.github.jyoghurt.quartz.factory.JobFactory"/>
+        </property>
+        <property name="configLocation" value="classpath:${MANAGER_ENV}-config.properties"/>
+    </bean>
+</beans>

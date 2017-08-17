@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.jyoghurt.security.securityMenuRoleR.dao.SecurityMenuRoleRMapper">
+    <!-- Result Map-->
+    <resultMap id="securityMenuRoleRMap" type="com.github.jyoghurt.security.securityMenuRoleR.domain.SecurityMenuRoleR">
+        <result column="relId" property="relId"/>
+        <result column="createDateTime" property="createDateTime"/>
+        <result column="modifyDateTime" property="modifyDateTime"/>
+        <result column="operatorId" property="operatorId"/>
+        <result column="operatorName" property="operatorName"/>
+
+        <!--添加对角色的关系-->
+        <association property="roleId" column="roleId"
+                     javaType="com.github.jyoghurt.security.securityRoleT.domain.SecurityRoleT">
+            <result column="roleId" property="roleId"/>
+            <result column="roleName" property="roleName"/>
+            <result column="belongUnit" property="belongUnit"/>
+            <result column="createDateTime" property="createDateTime"/>
+            <result column="modifyDateTime" property="modifyDateTime"/>
+            <result column="operatorId" property="operatorId"/>
+            <result column="operatorName" property="operatorName"/>
+        </association>
+
+        <!--添加对菜单的关系-->
+        <association property="menuId" column="menuId"
+                     javaType="com.github.jyoghurt.security.securityMenuT.domain.SecurityMenuT">
+            <result column="menuId" property="menuId"/>
+            <result column="parentId" property="parentId"/>
+            <result column="menuName" property="menuName"/>
+            <result column="menuUrl" property="menuUrl"/>
+            <result column="createDateTime" property="createDateTime"/>
+            <result column="modifyDateTime" property="modifyDateTime"/>
+            <result column="icon" property="icon"/>
+            <result column="sortId" property="sortId"/>
+            <result column="operatorId" property="operatorId"/>
+            <result column="operatorName" property="operatorName"/>
+        </association>
+    </resultMap>
+
+</mapper>   

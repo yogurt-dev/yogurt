@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.github.jyoghurt.security.securityUserRoleR.dao.SecurityUserRoleRMapper">
+    <!-- Result Map-->
+    <resultMap id="securityUserRoleRMap" type="com.github.jyoghurt.security.securityUserRoleR.domain.SecurityUserRoleR">
+        <result column="relId" property="relId"/>
+        <!--<result column="roleId" property="roleId"/>-->
+        <result column="userId" property="userId"/>
+        <result column="createDateTime" property="createDateTime"/>
+        <result column="modifyDateTime" property="modifyDateTime"/>
+        <result column="operatorId" property="operatorId"/>
+        <result column="operatorName" property="operatorName"/>
+        <!--&lt;!&ndash;添加对角色的关系&ndash;&gt;
+        <association property="roleId" column="roleId"
+                     javaType="com.df.motorInsurance.security.securityRoleT.domain.SecurityRoleT">
+            <result column="roleId" property="roleId"/>
+            <result column="roleName" property="roleName"/>
+            <result column="belongUnit" property="belongUnit"/>
+            <result column="createDateTime" property="createDateTime"/>
+            <result column="modifyDateTime" property="modifyDateTime"/>
+            <result column="operatorId" property="operatorId"/>
+            <result column="createrName" property="createrName"/>
+        </association>-->
+    </resultMap>
+
+</mapper>   

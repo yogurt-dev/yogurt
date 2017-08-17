@@ -1,0 +1,1 @@
+UPDATE `SecurityMenuT` SET `menuName`='活动列表' WHERE (`menuName`='新建活动');

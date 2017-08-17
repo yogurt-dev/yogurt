@@ -1,0 +1,731 @@
+<script src="js/securirtyCustomGZ.js"></script>
+<script type="text/template" id="df_component_security_resourceChoose">
+    <style type="text/css">
+        .ztree li span.button.linecons-truck_ico_open, .linecons-truck_ico_close, .linecons-truck_ico_docu {
+            font-family: linecons;
+            font-style: normal;
+            font-weight: 400;
+            speak: none;
+            display: inline-block !important;
+            text-decoration: inherit;
+            width: 1.2em !important;
+            margin-right: .2em !important;
+            text-align: center;
+            font-variant: normal;
+            text-transform: none;
+            line-height: 1em !important;
+            margin-left: .2em !important;
+            background-image: none !important;
+        }
+
+        .linecons-truck_ico_open:before, .linecons-truck_ico_close:before, .linecons-truck_ico_docu:before {
+            content: '\e829';
+        }
+
+        /*人的样式*/
+        .ztree li span.button.linecons-hum_ico_open, .linecons-hum_ico_close, .linecons-hum_ico_docu {
+            font-family: linecons;
+            font-style: normal;
+            font-weight: 400;
+            speak: none;
+            display: inline-block !important;
+            text-decoration: inherit;
+            width: 1.2em !important;
+            margin-right: .2em !important;
+            text-align: center;
+            font-variant: normal;
+            text-transform: none;
+            line-height: 1em !important;
+            margin-left: .2em !important;
+            background-image: none !important;
+        }
+
+        .linecons-hum_ico_open:before, .linecons-hum_ico_close:before, .linecons-hum_ico_docu:before {
+            content: '\e805';
+        }
+
+        /*公司的样式*/
+        .ztree li span.button.linecons-comp_ico_open, .linecons-comp_ico_close, .linecons-comp_ico_docu {
+            font-family: linecons;
+            font-style: normal;
+            font-weight: 400;
+            speak: none;
+            display: inline-block !important;
+            text-decoration: inherit;
+            width: 1.2em !important;
+            margin-right: .2em !important;
+            text-align: center;
+            font-variant: normal;
+            text-transform: none;
+            line-height: 1em !important;
+            margin-left: .2em !important;
+            background-image: none !important;
+        }
+
+        .linecons-comp_ico_open:before, .linecons-comp_ico_close:before, .linecons-comp_ico_docu:before {
+            content: '\e82c';
+        }
+
+        /*部门的样式*/
+        .ztree li span.button.linecons-dept_ico_open, .linecons-dept_ico_close, .linecons-dept_ico_docu {
+            font-family: linecons;
+            font-style: normal;
+            font-weight: 400;
+            speak: none;
+            display: inline-block !important;
+            text-decoration: inherit;
+            width: 1.2em !important;
+            margin-right: .2em !important;
+            text-align: center;
+            font-variant: normal;
+            text-transform: none;
+            line-height: 1em !important;
+            margin-left: .2em !important;
+            background-image: none !important;
+        }
+
+        .linecons-dept_ico_open:before, .linecons-dept_ico_close:before, .linecons-dept_ico_docu:before {
+            content: '\e80c';
+        }
+
+        /*根节点样式*/
+        .ztree li span.button.linecons-root_ico_open, .linecons-root_ico_close, .linecons-root_ico_docu {
+            font-family: linecons;
+            font-style: normal;
+            font-weight: 400;
+            speak: none;
+            display: inline-block !important;
+            text-decoration: inherit;
+            width: 1.2em !important;
+            margin-right: .2em !important;
+            text-align: center;
+            font-variant: normal;
+            text-transform: none;
+            line-height: 1em !important;
+            margin-left: .2em !important;
+            background-image: none !important;
+        }
+
+        .linecons-root_ico_open:before, .linecons-root_ico_close:before, .linecons-root_ico_docu:before {
+            content: '\e820';
+        }
+
+    </style>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <label for="resourceTree" class="control-label">包含资源</label>
+
+            <div class="DFTree" style="margin-top: 15px;padding: 0 20px;">
+                <div id="resourceTree" class="ztree"></div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        <![CDATA[
+        (function ($) {
+            var selector = '{{id}}';
+            /**
+             * checkable:是否支持多选，默认false
+             * dragable:是否支持拖拽，默认false
+             */
+            var checkable,dragable,exports = {},result=[],resultData=[],
+            checkable = '{{checkable}}'?'{{checkable}}':false,
+            dragable = '{{dragable}}'?'{{dragable}}':false,
+            url = '{{url}}',checkedNodes = '{{checkedNodes}}';
+            var config = {
+                checkable:checkable,
+                dragable:dragable,
+                defaultSelect:false
+            }
+
+            KendoTreeView.init(url, "resourceTree",null,config);
+            var treeObj_ = KendoTreeView.show();
+            GUID.setTreeViewObj(treeObj_);
+
+            //设置节点选中
+            function checkedNodeMenuIds(nodes, menuId) {
+                var menuIds = menuId.split(',');
+                if (menuIds) {
+                    for (var i = 0; i < nodes.length; i++) {
+                        treeObj_.checkNode(nodes[i], false, true);
+                        for (var j = 0; j < menuIds.length; j++) {
+                            if (nodes[i].id == menuIds[j]) {
+                                treeObj_.checkNode(nodes[i], true, true);
+                                break;
+                            }
+                        }
+                        treeObj_.updateNode(nodes[i]);
+                        if (nodes[i].children.length) {
+                            checkedNodeMenuIds(nodes[i].children, menuId);
+                        }
+                    }
+                }
+            }
+            checkedNodeMenuIds(treeObj_.getNodes(),checkedNodes);
+            exports.getCheckedNodes = function () {
+                var selectedNodes = treeObj_.getCheckedNodes();
+                for(var i in selectedNodes){
+                    if(selectedNodes[i].id!='-1'){
+                        var personObj={
+                            nodeId:selectedNodes[i].id,
+                            nodeName:selectedNodes[i].unitName,
+                            pNodeId:selectedNodes[i].parentId
+                        }
+                        resultData.push(personObj)
+                    }
+                }
+                return resultData;
+            }
+            result[selector] = exports;
+            DF.callbackComponent(result);
+        })(jQuery);
+        ]]>
+</script>
+
+
+
+<!-- 资源选择模版 -->
+<script type="text/html" id="resourceForm">
+    <style type="text/css">
+        .ztree li span.button.linecons-truck_ico_open, .linecons-truck_ico_close, .linecons-truck_ico_docu {
+            font-family: linecons;
+            font-style: normal;
+            font-weight: 400;
+            speak: none;
+            display: inline-block !important;
+            text-decoration: inherit;
+            width: 1.2em !important;
+            margin-right: .2em !important;
+            text-align: center;
+            font-variant: normal;
+            text-transform: none;
+            line-height: 1em !important;
+            margin-left: .2em !important;
+            background-image: none !important;
+        }
+
+        .linecons-truck_ico_open:before, .linecons-truck_ico_close:before, .linecons-truck_ico_docu:before {
+            content: '\e829';
+        }
+
+        /*人的样式*/
+        .ztree li span.button.linecons-hum_ico_open, .linecons-hum_ico_close, .linecons-hum_ico_docu {
+            font-family: linecons;
+            font-style: normal;
+            font-weight: 400;
+            speak: none;
+            display: inline-block !important;
+            text-decoration: inherit;
+            width: 1.2em !important;
+            margin-right: .2em !important;
+            text-align: center;
+            font-variant: normal;
+            text-transform: none;
+            line-height: 1em !important;
+            margin-left: .2em !important;
+            background-image: none !important;
+        }
+
+        .linecons-hum_ico_open:before, .linecons-hum_ico_close:before, .linecons-hum_ico_docu:before {
+            content: '\e805';
+        }
+
+        /*公司的样式*/
+        .ztree li span.button.linecons-comp_ico_open, .linecons-comp_ico_close, .linecons-comp_ico_docu {
+            font-family: linecons;
+            font-style: normal;
+            font-weight: 400;
+            speak: none;
+            display: inline-block !important;
+            text-decoration: inherit;
+            width: 1.2em !important;
+            margin-right: .2em !important;
+            text-align: center;
+            font-variant: normal;
+            text-transform: none;
+            line-height: 1em !important;
+            margin-left: .2em !important;
+            background-image: none !important;
+        }
+
+        .linecons-comp_ico_open:before, .linecons-comp_ico_close:before, .linecons-comp_ico_docu:before {
+            content: '\e82c';
+        }
+
+        /*部门的样式*/
+        .ztree li span.button.linecons-dept_ico_open, .linecons-dept_ico_close, .linecons-dept_ico_docu {
+            font-family: linecons;
+            font-style: normal;
+            font-weight: 400;
+            speak: none;
+            display: inline-block !important;
+            text-decoration: inherit;
+            width: 1.2em !important;
+            margin-right: .2em !important;
+            text-align: center;
+            font-variant: normal;
+            text-transform: none;
+            line-height: 1em !important;
+            margin-left: .2em !important;
+            background-image: none !important;
+        }
+
+        .linecons-dept_ico_open:before, .linecons-dept_ico_close:before, .linecons-dept_ico_docu:before {
+            content: '\e80c';
+        }
+
+        /*根节点样式*/
+        .ztree li span.button.linecons-root_ico_open, .linecons-root_ico_close, .linecons-root_ico_docu {
+            font-family: linecons;
+            font-style: normal;
+            font-weight: 400;
+            speak: none;
+            display: inline-block !important;
+            text-decoration: inherit;
+            width: 1.2em !important;
+            margin-right: .2em !important;
+            text-align: center;
+            font-variant: normal;
+            text-transform: none;
+            line-height: 1em !important;
+            margin-left: .2em !important;
+            background-image: none !important;
+        }
+
+        .linecons-root_ico_open:before, .linecons-root_ico_close:before, .linecons-root_ico_docu:before {
+            content: '\e820';
+        }
+
+    </style>
+
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="tabs-vertical-env tabs-vertical-bordered">
+                <input id="selectedCity" type="hidden">
+                <!--<input id="selectedStock" type="hidden">-->
+                <!--<input id="selectedStore" type="hidden">-->
+                <input id="selectedUnit" type="hidden">
+                <input id="selectedRole" type="hidden">
+                <input id="selectedThirdPartCompany" type="hidden">
+                <ul class="nav tabs-vertical">
+                    <li class="active"><a href="#v4-city" data-toggle="tab">城市</a></li>
+                    <li><a href="#v4-stock" data-toggle="tab">仓库</a></li>
+                    <li><a href="#v4-store" data-toggle="tab">门店</a></li>
+                    <li><a href="#v4-profile" data-toggle="tab">机构</a></li>
+                    <li><a href="#v4-messages" data-toggle="tab">角色</a></li>
+                    <li><a href="#v4-thirdPartCompany" data-toggle="tab">销售公司</a></li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="v4-city">
+                        <div class="ztree" id="cityResource">
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="v4-stock">
+                        <div class="ztree" id="stockResource">
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="v4-store">
+                        <div class="ztree" id="storeResource">
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="v4-profile">
+                        <div id="unitResource" class="ztree">
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="v4-messages">
+                        <div class="row" id="roleResource">
+                            <table id="roleList" class="table  table-bordered table-hover" cellspacing="0"
+                                   width="100%">
+                                <thead>
+                                <tr>
+                                    <th width="20px"></th>
+                                    <th></th>
+                                    <th></th>
+                                    <th>角色名称</th>
+                                    </th>
+                                </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="tab-pane" id="v4-thirdPartCompany">
+                        <div id="thirdPartCompanyResource" class="ztree">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        <![CDATA[
+        (function ($) {
+            var checkedNodesStr = $("#contentResource").attr('module');
+            var defultContent = new Array(),unitSelected;
+            var thirdPartCompanyTree = '123';
+
+            var isNew = false, checkedUnitNodes=[];
+//            var menuId = $('#contentUnit').attr("contentresourceid");
+            var trees = new Array(),selectRolesContent = [],checkedNodes = [];
+
+            if ("" == checkedNodesStr) {
+                isNew = true;
+                setResourceAlreadyChecked(checkedNodes);
+                setCheckedUnit(checkedNodes);
+            } else {
+                checkedNodes = JSON.parse(checkedNodesStr);
+                setResourceAlreadyChecked(checkedNodes);
+                setCheckedUnit(checkedNodes);
+            }
+            function setResourceAlreadyChecked(checkedNodes){
+                var notIn = [];
+                if(GUID.resourceList){
+                    for(var i=0;i<GUID.resourceList.length;i++){
+                        var isIn = false;
+                        for(var j=0;j<checkedNodes.length;j++){
+                            if(GUID.resourceList[i].resourceId==checkedNodes[j].resourceId){
+                                isIn = true;
+                                break;
+                            }
+                        }
+                        if(!isIn){
+                            notIn.push(GUID.resourceList[i]);
+                        }
+                    }
+                    for(var notInLength=0;notInLength<notIn.length;notInLength++){
+                        checkedNodes.push(notIn[notInLength]);
+                    }
+                }
+            }
+
+            function setCheckedUnit(checkedNodes){
+                for(var i=0;i<checkedNodes.length;i++){
+                    if('unit'==checkedNodes[i].resourceType){
+                        checkedUnitNodes.push(checkedNodes[i]);
+                    }
+                }
+            }
+
+            //页面初始化
+            function pageInit(){
+                selectRolesContent.length = 0;
+                //加载城市
+                loadCityResourceTree();
+                //加载仓库
+                loadStockResource();
+                //加载门店
+                loadStoreResource();
+                //加载组织资源
+                loadUnitResourceTree();
+                //加载角色资源
+                loadRoleResource();
+                //加载销售公司
+                loadThirdPartCompany();
+
+                for(var i=0;i<checkedNodes.length;i++){
+                    var _this = checkedNodes[i];
+                    if('role'==_this.resourceType){
+                        setRoleResourceData(_this.resourceId,_this.userId,_this.resourceName,_this.belongModel,_this.resourceType,_this.resourceId);
+                    }
+                }
+
+            }
+
+
+
+            function clearRoleSelect(){
+                $('#selectedRole').attr('resourcecontent','');
+            }
+
+            function setRoleResourceData(userResourceRId,userId,resourceName,belongModel,resourceType,resourceId){
+                var selectRole = {
+                    userResourceRId:'',
+                    userId:'',
+                    resourceName:resourceName,
+                    belongModel:belongModel,
+                    resourceType:resourceType,
+                    resourceId:resourceId
+                }
+                selectRolesContent.push(selectRole);
+                $('#selectedRole').attr('resourcecontent',JSON.stringify(selectRolesContent));
+            }
+
+            /**
+             * 城市不可选回调
+             * @param treeObject
+             */
+            function uncheckCityCallbackMethod(treeObject) {
+                var allNodes = treeObject.getNodesByParam("isAjaxing", false, null)
+                for (var i = 0; i < allNodes.length; i++) {
+                    if (allNodes[i].dictItemCode == 'City') {
+                        allNodes[i].nocheck = true;
+                        treeObject.updateNode(allNodes[i]);
+                    }
+                }
+            }
+
+            /**
+             * 加载树
+             * @param url
+             * @param treeId
+             * @param treeIndex
+             * @param resourceType
+             * @param callbackMethod
+             */
+            function loadTree(url, treeId, treeIndex, resourceType, callbackMethod) {
+                function setCheckedNodes(treeObject, resourceType) {
+                    debugger;
+                    // 设置选择的节点
+//                    if (checkedNodesStr) {
+                        var allNodes = treeObject.getNodesByParam("isAjaxing", false, null)
+                        for (var i = 0; i < allNodes.length; i++) {
+                            for (var j = 0; j < checkedNodes.length; j++) {
+                                if (allNodes[i].id == checkedNodes[j].resourceId
+                                        && allNodes[i].dictItemCode == resourceType) {
+                                    allNodes[i].checked = true;
+                                    treeObject.updateNode(allNodes[i]);
+                                    break;
+                                }
+                            }
+                        }
+//                    }
+                }
+
+                function setCSelected(){
+                    debugger;
+                    var allCheckedNodes = new Array();
+                    for (var i = 0; i < trees.length; i++) {
+                        var checkedNodes = trees[i].getCheckedNodes();
+                        for (var j = 0; j < checkedNodes.length; j++) {
+                            checkedNodes[j].module = checkedNodes[j].dictValueDesc
+                        }
+                        allCheckedNodes = allCheckedNodes.concat(checkedNodes);
+                    }
+                    $("#selectedCity").attr('resourceContent',JSON.stringify(allCheckedNodes));
+                }
+
+                function setDefult(treeObj){
+                    var checkedNodes = treeObj.getCheckedNodes();
+                    for (var j = 0; j < checkedNodes.length; j++) {
+                        checkedNodes[j].module = checkedNodes[j].dictValueDesc
+                    }
+                    defultContent = defultContent.concat(checkedNodes);
+                    $("#selectedCity").attr('resourceContent',JSON.stringify(defultContent));
+                }
+
+                DF.ajax({
+                    type: 'get',
+                    url: url,
+                    dataType: 'json',
+                    success: function (data) {
+                        trees[treeIndex] = DF.zTree({
+                            id: treeId,
+                            idKey: 'dictValueCode',
+                            textKey: 'dictValueName',
+                            pidKey: 'parentDictValueCode',
+                            checkable: true,
+                            treeData: data.result,
+                            chkboxType: {'Y': '', 'N': ''},
+                            callback: {
+                                onCheck:setCSelected
+                            },
+                            onComplete: function (treeObject) {
+                                if (callbackMethod) {
+                                    callbackMethod(treeObject);
+                                }
+                                treeObject.expandAll(true);
+                                // 设置选择的节点
+//                                if (!isNew) {
+                                    setCheckedNodes(treeObject, resourceType);
+//                                }
+                                setDefult(treeObject);
+                            }
+                        });
+
+                    }
+                });
+            }
+
+            function loadCityResourceTree(){
+                loadTree('supportsBasicShop/cityList', 'cityResource', 0, 'City');
+            }
+
+            function loadStockResource(){
+                loadTree('supportsBasicShop/cityShopList?type=', 'stockResource', 1, 'stock', uncheckCityCallbackMethod);
+            }
+
+            function loadStoreResource(){
+                loadTree('supportsBasicShop/cityShopList?type=STORE', 'storeResource', 2, 'store', uncheckCityCallbackMethod);
+            }
+
+            //加载销售公司资源
+            function loadThirdPartCompany(){
+                loadTree('shopThirdPartCompany/listAll', 'thirdPartCompanyResource', 3, 'thirdPartyCompany',uncheckCityCallbackMethod);
+            }
+
+
+            //加载组织机构资源树
+            function loadUnitResourceTree(){
+                var config = {
+                    checkable:true,
+                    dragable:false,
+                    defaultSelect:false
+                }
+
+                KendoTreeView.init("securityUnitT/generateUnitTree", "unitResource",null,config,onCheckCallBack);
+                var treeObj_ = KendoTreeView.show();
+                GUID.setTreeViewObj(treeObj_);
+
+                function onCheckCallBack(){
+                    var resultData = [];
+                    var selectedNodes = treeObj_.getCheckedNodes();
+                    for(var i in selectedNodes){
+                        if(selectedNodes[i].id!='-1'){
+                            var personObj={
+                                nodeId:selectedNodes[i].id,
+                                nodeName:selectedNodes[i].unitName,
+                                pNodeId:selectedNodes[i].parentId
+                            }
+                            resultData.push(personObj)
+                        }
+                    }
+                    $("#selectedUnit").attr('resourceContent',JSON.stringify(resultData));
+                    return resultData;
+                }
+
+                //设置节点选中
+                function checkedNodeMenuIds(nodes, checkedUnitNodes) {
+                    if(checkedUnitNodes){
+                        for (var i = 0; i < nodes.length; i++) {
+                            treeObj_.checkNode(nodes[i], false, true);
+                            for (var j = 0; j < checkedUnitNodes.length; j++) {
+                                if (nodes[i].id == checkedUnitNodes[j].resourceId) {
+                                    treeObj_.checkNode(nodes[i], true, true);
+                                    break;
+                                }
+                            }
+                            treeObj_.updateNode(nodes[i]);
+                            if (nodes[i].children.length) {
+                                checkedNodeMenuIds(nodes[i].children, checkedUnitNodes);
+                            }
+                        }
+                        onCheckCallBack();
+                    }
+                }
+                checkedNodeMenuIds(treeObj_.getNodes(),checkedUnitNodes);
+
+            }
+
+            //加载角色资源
+            function loadRoleResource(){
+                //获得当前选择的用户ID
+                var userId = $("#userId").val();
+                /*根据用户ID查询其具备的角色*/
+                DF.ajax({
+                    url: "service/securityRoleT/queryRoleByUserIdSelected/" + (userId ? userId : "null"),
+                    success: unitSuccess
+                });
+
+
+
+                /*角色列表对象*/
+                function unitSuccess(data, status) {
+                    //获得当前选中节点的ID
+                    //定义角色列表
+                    var grid = DF.dataTable({
+                        id: "roleList",
+                        ajax: "service/securityRoleT/listForGuid/" + (userId ? userId : "null"),
+                        bPaginate: false,
+                        searchCol: 2,
+                        searchable: false,
+                        columns: [
+                            {bVisible: true, bSortable: false},
+                            {data: "roleId", bVisible: false, bSortable: false},
+                            {data: "menuTs", bVisible: false},
+                            {data: "roleName", bSortable: false}
+                        ],
+                        createdRow: function (row, data, index) {
+                            $('input', row).click(function () {
+                                //初始化
+                                clearRoleSelect();
+                                selectRolesContent.length = 0;
+                                $('#roleList input:checkbox:checked').each(function(i){
+                                    var _this = $(this);
+                                    setRoleResourceData('','',_this.attr('rolename'),'securityUser','role',_this.attr('id'));
+                                });
+                            })
+                        },
+                        columnDefs: [
+                            {
+                                targets: 0,
+                                render: function (data, type, row) {
+                                    var ischeck = "0";
+                                    var td;
+                                    var selectedRoleAll = checkedNodes;
+                                    if(selectedRoleAll){
+                                        for (var i = 0; i < selectedRoleAll.length; i++) {
+                                            //如果是当前角色已具备角色，那么设置为选中
+                                            if (selectedRoleAll[i].resourceId == row.roleId) {
+                                                ischeck = "1";
+                                                break;
+                                            }
+                                        }
+                                    }
+
+                                    if (ischeck == "1") {
+                                        td = '<td>' +
+                                                "<input type='checkbox' class='cbr' id='" + row.roleId +
+                                                "' menuIds='" + row.menuTs + "' roleName='" +row.roleName+
+                                                "' checked='checked'>" +
+                                                '</td>';
+                                    } else {
+                                        td = '<th>' +
+                                                "<input type='checkbox' class='cbr' id='" + row.roleId +
+                                                "' menuIds='" + row.menuTs + "' roleName='"+row.roleName+"'>" +
+                                                '</td>';
+                                    }
+                                    return td;
+                                }
+                            },
+                            {
+                                targets: 3,
+                                render: function (data, type, row) {
+                                    var before = "";
+                                    if(row.roleType=='1'){
+                                        before = "系统角色-";
+                                    }
+                                    else{
+                                        before = row.belongUnitName==null?'':row.belongUnitName+'-';
+                                    }
+                                    return before+data;
+                                }
+                            }
+                        ],
+                        //重新加载
+                        reloadGrid: function () {
+                            grid.ajax.reload();
+                        },
+                        //初始化结束后回调
+                        initComplete: function () {
+                            $('#roleList').next().remove();
+                        }
+                    });
+                }
+            }
+
+
+            pageInit();
+        })(jQuery);
+        ]]>
+</script>
+
+
+
+
+
+
+
+
+

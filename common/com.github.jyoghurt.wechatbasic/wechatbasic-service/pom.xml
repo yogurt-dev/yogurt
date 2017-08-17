@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>com.github.jyoghurt</groupId>
+        <artifactId>wechatbasic</artifactId>
+        <version>COMMON-1.0-DEV-SNAPSHOT</version>
+        <relativePath>../</relativePath>
+    </parent>
+    <artifactId>wechatbasic-service</artifactId>
+    <version>${parent.version}</version>
+    <packaging>jar</packaging>
+    <dependencies>
+        <dependency>
+            <groupId>com.github.jyoghurt</groupId>
+            <artifactId>j2ee</artifactId>
+            <version>${com.github.jyoghurt.j2ee}</version>
+            <type>pom</type>
+        </dependency>
+        <dependency>
+            <groupId>org.dom4j</groupId>
+            <artifactId>dom4j</artifactId>
+            <version>2.0.0-RC1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.thoughtworks.xstream</groupId>
+            <artifactId>xstream</artifactId>
+            <version>1.4.8</version>
+        </dependency>
+
+        <!--fastJson-->
+
+        <dependency>
+            <groupId>org.freemarker</groupId>
+            <artifactId>freemarker</artifactId>
+            <version>2.3.23</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.3.4</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.jyoghurt</groupId>
+            <artifactId>image</artifactId>
+            <version>${com.github.jyoghurt.image.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.jyoghurt</groupId>
+            <artifactId>dataDict-service</artifactId>
+            <version>${com.github.jyoghurt.dataDict.version}</version>
+        </dependency>
+    </dependencies>
+</project>

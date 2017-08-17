@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://www.mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.df.wechatbasic.dao.WeChatMsgTMapper">
+    <!-- Result Map-->
+    <resultMap id="cascadeResultMap" type="com.df.wechatbasic.domain.WeChatMsgT">
+        <result column="messageId" property="messageId"/>
+        <result column="textContent" property="textContent"/>
+        <result column="msgtype" property="msgtype"/>
+        <result column="title" property="title"/>
+        <result column="url" property="url"/>
+        <result column="accountType" property="accountType"/>
+        <result column="state" property="state"/>
+        <result column="createDateTime" property="createDateTime"/>
+        <collection property="list" ofType="com.df.wechatbasic.domain.WeChatMpnewsMsgT">
+            <result column="mpnewsId" property="mpnewsId"/>
+            <result column="messageId" property="messageId"/>
+            <result column="author" property="author"/>
+            <result column="newsTitle" property="newsTitle"/>
+            <result column="contentSourceUrl" property="contentSourceUrl"/>
+            <result column="content" property="content"/>
+            <result column="digest" property="digest"/>
+            <result column="thumUrl" property="thumUrl"/>
+            <result column="sort" property="sort"/>
+            <result column="showCoverPic" property="showCoverPic"/>
+        </collection>
+    </resultMap>
+
+</mapper>   

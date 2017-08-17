@@ -1,0 +1,602 @@
+<div class="panel panel panel-default" data-intro="这是4" data-step="4">
+    <div class="panel-heading">
+        <h4 class="panel-title lymsg_tab"><a id="pwmsg">本地素材库</a></h4>
+        <div class="panel-options">
+            <button id="save" type="button" class="btn btn-success icon-right" data-intro="点击保存" data-step="6">保存 <i
+                    class="fa fa-save"></i></button>
+
+            <button id="back" data-intro="这是2" data-step="2" type="button" class="btn btn btn-primary">返回</button>
+        </div>
+    </div>
+    <div class="panel-body" id="pwmsg-body">
+        <div class="row">
+            <!-- 左边PANEL BEGIN -->
+            <div class="col-sm-5 text-center" data-intro="这是显示区域" data-step="1">
+                <div class="lymsgview" id="lymsgview" style="display: inline-block;">
+                    <div id="lymsgitem" class="lymsgitem">
+                        <div class="lymsgitem_body">
+                            <div>封面图片</div>
+                            <img style="display: none;width: 100%;height: 160px;vertical-align: 0;"/>
+                            <h4 class="lymsgitem_title no-margin">标题</h4>
+                        </div>
+                        <div class="lymsgitem_mask">
+                            <i class="linecons-pencil"></i>
+                        </div>
+                    </div>
+                    <div class="lymsgitem_create" id="lymsgcreate">
+                        <div class="lymsg_dash" title="新建"><i class="fa fa-plus" style="font-size: 32px"></i></div>
+                    </div>
+                </div>
+            </div>
+            <!-- 左边PANEL END -->
+            <!-- 右边PANEL BEGIN
+             <i class="df_arrow arrow_out "></i>
+                    <i class="df_arrow arrow_in"></i>
+            -->
+            <div class="col-sm-7" data-intro="这是操作区域有3部分组成" data-step="2">
+                <form role="form" class="validate" id="lymsgForm">
+                    <div class="inner">
+                        <div class="panel-heading" style="padding:10px 0;border-bottom: none;" data-intro="1.标题"
+                             data-step="3">
+                            <div>标题<span id="wordNum">（0/64）</span></div>
+                        </div>
+                        <div class="form-group ">
+                            <label class="control-label" for="title">标题</label>
+                            <input type="text" class="form-control" id="title" name="title" required="true"
+                                   maxlength="64">
+                        </div>
+                        <div class="form-group-separator"></div>
+                        <div class="form-group ">
+                            <label class="control-label" for="title">作者</label>
+                            <input type="text" class="form-control" id="title" name="author" required="true"
+                                   maxlength="64">
+                        </div>
+                        <div class="form-group-separator"></div>
+                        <!-- Auto initialization -->
+                        <div class="panel-heading" style="padding: 10px 0;border-bottom: none;" data-intro="2.封面"
+                             data-step="4">
+                            <div>封面</div>
+                        </div>
+                        <div id="dropfile" class="dropzone"></div>
+                        <div class="form-group" style="margin-bottom: 0">
+                            <label class="col-sm-2 control-label filelabel" for="showContent"
+                                   style="display: block !important;">封面图片显示在正文中</label>
+                            <input type="checkbox" checked id="showContent"
+                                   class="iswitch iswitch-secondary no-placeholder">
+                        </div>
+                        <div class="hidden" id="summaryDIV">
+                            <div class="form-group-separator"></div>
+                            <div class="form-group ">
+                                <label class="col-sm-2 control-label" for="summary">摘要</label>
+                                <textarea type="text" class="form-control" id="summary" name="summary" rows="3"
+                                          style=""></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group-separator"></div>
+                        <div class="form-group">
+                            <div class="panel-heading" style="padding:0;border-bottom: none;" data-intro="3.正文"
+                                 data-step="5">
+                                <div style="margin-bottom: 10px;">正文 (<a href="http://www.135editor.com" target="_blank"
+                                                                         style="text-decoration: underline">在这里<a/>编辑内容很炫哦，编辑完后复制回来就OK啦)
+                                </div>
+                                <label class="col-sm-2 control-label" for="contentMessageMain"></label>
+                                <div id="contentMessageMain" class="uEditor" name="content">
+                                </div>
+                            </div>
+                        </div>
+                </form>
+            </div>
+            <!-- 右边PANEL END -->
+        </div>
+    </div>
+
+    <script>
+        (function ($) {
+            var editor = UE.getEditor('contentMessageMain');
+            var param = DF.getUrlParam();
+            console.log(param)
+            var messageId = param ? param.localMaterialId : '';
+            var ValueBox = {
+                'lymsgitem': {
+                    url: '',
+                    digest: '',
+                    author: '',
+                    content_source_url: '',
+                    title: '',
+                    content: '',
+                    thumb_media_id: '',
+                    dataBase64: '',
+                    downloadPath: '',
+                    show_cover_pic: 1
+                }
+            };
+            var dropFile = null;
+            var File = null;
+            var self = null;
+            //console.log(messageId);
+            if (messageId) {
+                //修改 不可以新增 删除
+                $('#lymsgcreate').hide();
+                //为dropfile赋值
+                setDropImg('#dropfile');
+                //初始化左边的列表
+                var result = param.content.news_item;
+                if (result && result.length > 0) {
+                    var lymsgitem = $("div[id^='lymsgitem']");
+                    lymsgitem.find('img').attr('src', result[0].downloadPath).fadeIn(350).prev().hide();
+                    lymsgitem.find('h4.lymsgitem_title').text(result[0].title);
+                    //初始化数据
+                    $.extend(ValueBox['lymsgitem'], result[0]);
+                    for (var i = 1; i < result.length; i++) {
+                        var dom = createNewItem();
+                        var id = dom.attr('id');
+                        dom.find('img').attr('src', result[i].downloadPath).fadeIn(350).prev().hide();
+                        dom.find('.lymsgitem_title2').text(result[i].title);
+                        //初始化数据
+                        $.extend(ValueBox[id], result[i]);
+                    }
+                    $('#lymsgitem .linecons-pencil').trigger('click');
+                }
+            }
+
+            function initLeftPanelEvent() {
+                //保存
+                $('#save').click(function () {
+                    //验证
+               //     var valid = validLymsgForm();
+                    var $btn = $(this);
+         /*           if (!valid.valid) {
+                        showInValidMsg(valid.key, valid.attr);
+                        return
+                    }*/
+                    //处理数据
+                    var data = {media_id: '', content: {news_item: []}};
+                    if (messageId) {
+                        data.media_id = messageId;
+                    }
+                    for (var k in ValueBox) {
+                        data.content.news_item.push(ValueBox[k]);
+                    }
+                    if (param.type) {
+                        var p = param.type;
+                        var url = messageId ? 'localMaterialMsg/addMaterialNews/' + p :
+                        'localMaterialMsg/addMaterialNews/' + p;
+                        var sfn = function (data, status) {
+                            DF.toast.success(data.message);
+                            $btn.hideLoading();
+                            DF.gotoPage('/wxManage/materiaBase/MessageList', {type: param.type});
+                        }
+                        $btn.showLoading();
+                        DF.ajax({
+                            data: JSON.stringify(data),
+                            type: messageId ? 'PUT' : 'POST',
+                            url: url,
+                            success: sfn
+                        });
+                    }
+                });
+                //保存并发送
+/*                $('#saveAndSend').click(function () {
+                    var valid = validLymsgForm();
+                    var $btn = $(this);
+                    if (!valid.valid) {
+                        showInValidMsg(valid.key, valid.attr);
+                        return
+                    }
+                    //处理数据
+                    var data = {media_id: '', content: {news_item: []}};
+                    if (messageId) {
+                        data.media_id = messageId;
+                    }
+                    for (var k in ValueBox) {
+                        data.content.news_item.push(ValueBox[k]);
+                    }
+
+                    if (param.type) {
+                        var p = param.type;
+                        var url = messageId ? 'localMaterialMsg/addMaterialNews/' + p :
+                        'localMaterialMsg/addMaterialNews/' + p;
+                        var sfn = function (data, status) {
+                            $btn.hideLoading();
+                            DF.gotoPage('/wxManage/materiaBase/MessageList', {type: param.type});
+                            if (data.errorCode == '0') {
+                                return
+                            }
+                            DF.toast.success(data.message);
+                        }
+                        $btn.showLoading();
+                        DF.ajax({
+                            data: JSON.stringify(data),
+                            type: messageId ? 'PUT' : 'POST',
+                            url: url,
+                            success: sfn
+                        });
+                    }
+                });*/
+                $("div[id^='lymsgitem']").hover(function () {
+                    $(this).find('.lymsgitem_mask').fadeIn(250);
+                }, function () {
+                    $(this).find('.lymsgitem_mask').fadeOut(250);
+                });
+                DF.initCustomFormPlaceHolder($('#lymsgForm'));
+                dropFile = $("#dropfile").dropzone({
+                    url: "weChatMediaT/uploadImg/wx/" + param.type,
+                    maxFiles: 1,
+                    maxFilesize: 2,
+                    addRemoveLinks: true,
+                    dictRemoveFile: '删除',
+                    dictMaxFilesExceeded: '只允许提交一个文件',
+                    dictRemoveLinks: "loading",
+                    dictCancelUpload: "上传中...",
+                    dictDefaultMessage: '点击灰色区域上传图片',
+                    dictResponseError: '上传失败，请确认图片服务器正常',
+                    dictFallbackMessage: '您的浏览器不支持此插件',
+                    acceptedFiles: ".png,.jpeg,.jpg",
+                    init: function () {
+                        this.on("success", function (file, resp) {
+                            if (resp.errorCode == 1 && resp.result) {
+                                if ($("#dropfile").find('.dz-preview').length == 1) {
+                                    //图片缩略图 预览路径
+                                    var thumb_media_id = resp.result.thumb_media_id;
+                                    var downloadPath = resp.result.downloadPath;
+                                    if (thumb_media_id && downloadPath) {
+                                        setActiveThumbImgSrc(thumb_media_id, downloadPath);
+                                    }
+                                    File = file;
+                                }
+                            } else {
+                                DF.toast.error(resp.message);
+                            }
+                        });
+                        this.on("removedfile", function (file) {
+                            if ($("#dropfile").find('.dz-preview').length == 0) {
+                                removeActiveThumbImgSrc();
+                            }
+                        });
+                        this.on("thumbnail", function (file, dataUrl) {
+                            //获得缩略图的数据
+                            var itemid = $('#lymsgview .active').parent().attr('id');
+                            ValueBox[itemid].dataBase64 = dataUrl;
+                        });
+                        this.on("complete", function (file) {
+                            self = this;
+                            File = file;
+//                            if($("#dropfile").find('.dz-preview').length>1){
+//                                this.removeFile(file);
+//                                alert('只能上传一个文件！');
+//                            }
+                        });
+                        this.on("error", function (file, errorMsg, a) {
+                            DF.toast.error('文件过大，请上传小于2M的文件');
+                        });
+                    }
+                });
+
+                $('#lymsgitem .linecons-pencil').click(function () {
+                    //样式效果
+                    $('#lymsgForm').animate({'marginTop': '0px'});
+                    $('#lymsgview').find('.lymsgitem_list_body').removeClass('active');
+                    $('#lymsgitem .lymsgitem_body').addClass('active');
+                    bindActiveTitle($('#lymsgitem'));
+                    //数据处理
+                    var id = 'lymsgitem';
+                    var data = (ValueBox[id]);
+                    $('#title').val(data.title);
+                    editor.ready(function () {
+                        this.setContent(data.content);
+                    })
+                    $(document).scrollTop(0)
+                    if ($('#showContent:checked').length != data.show_cover_pic) {
+                        $('#showContent').trigger('click');
+                    }
+                    dealwidthImg(data);
+                }).trigger('click');
+                $('#back').click(function () {
+                    DF.gotoPage('/wxManage/materiaBase/MessageList', {type: param.type});
+                });
+                //失去焦点保存数据
+                $('#title').blur(function () {
+                    var itemid = $('#lymsgview .active').parent().attr('id');
+                    ValueBox[itemid].title = $(this).val();
+                });
+                //失去焦点保存数据
+                $('#author').blur(function () {
+                    var itemid = $('#lymsgview .active').parent().attr('id');
+                    ValueBox[itemid].author = $(this).val();
+                });
+                //checkbox变化赋值
+                $('#showContent').change(function () {
+                    var itemid = $('#lymsgview .active').parent().attr('id');
+                    ValueBox[itemid].show_cover_pic = $('#showContent:checked').length ? 1 : 0;
+                    ;
+                })
+                editor.addListener('selectionchange', function () {
+                    var itemid = $('#lymsgview .active').parent().attr('id');
+                    var $this = this;
+                    editor.ready(function () {
+                        setTimeout(function () {
+                            ValueBox[itemid].content = $this.getContent();
+                        }, 300);
+                    })
+                })
+
+                bindActiveTitle($('#lymsgitem'));
+            };
+            function createNewItem() {
+                //html模板
+                var el = '<div id="" data-id="1" class="">' +
+                        '<div class="lymsgitem_list_body">' +
+                        '<div class="lymsgitem_title2">标题</div>' +
+                        '<div class="lymsg_thumb">缩略图</div>' +
+                        '<img class="lymsg_thumb"/>' +
+                        '<div class="lymsgitem_mask">' +
+                        '<i class="linecons-pencil" style="left: 30%;"></i>' +
+                        '<i class="linecons-trash left60"></i>' +
+                        '</div>' +
+                        '</div>' +
+                        '</div>';
+                var dom = $(el);
+                //TODO 临时
+                if (messageId) {
+                    dom.find('.linecons-trash').remove();
+                    dom.find('.linecons-pencil').css('left', '140px');
+                }
+                //添加到dom
+                dom.fadeIn(300);
+                $('#lymsgcreate').before(dom);
+                //赋值ID
+                var id = 'lymsgitem_';
+                var prev = dom.prev();
+                if (prev.attr('id') !== 'lymsgitem') {
+                    var prid = prev.attr('id');
+                    var cuid = Number(prid.substr(prid.indexOf('_') + 1, prid.length));
+                    cuid += 1;
+                    id = id + cuid;
+                    dom.attr('id', id);
+                } else {
+                    id = id + '1';
+                    dom.attr('id', id);
+                }
+                //为数据模型添加ID
+                ValueBox[id] = {
+//                    mpnewsId:'',
+                    title: '',
+                    content: '',
+                    thumb_media_id: '',
+                    dataBase64: '',
+                    url: '',
+                    digest: '',
+                    author: '',
+                    content_source_url: '',
+                    downloadPath: '',
+                    show_cover_pic: 1
+                };
+                //浮动事件
+                setTimeout(function () {
+                    dom.hover(function () {
+                        dom.find('.lymsgitem_mask').fadeIn(250);
+                    }, function () {
+                        dom.find('.lymsgitem_mask').fadeOut(250);
+                    });
+                }, 200);
+                //删除
+                dom.find('.linecons-trash').click(function () {
+                    //样式效果处理
+                    dom.find('.lymsgitem_mask').hide();
+                    dom.fadeOut(250, function () {
+                        dom.remove();
+                        $('#lymsgitem .linecons-pencil').trigger('click');
+                    });
+//                    if(ValueBox[id].mpnewsId){
+//                        //数据处理
+//                        DF.ajax({
+//                            url:'weChatMpnewsMsgT/'+ValueBox[id].mpnewsId,
+//                            type:'DELETE',
+//                            success: function (data,status) {
+//                                DF.toast.success(data.message);
+//                            }
+//                        });
+//                    }
+                    delete ValueBox[id];
+                });
+                //编辑
+                dom.find('.linecons-pencil').click(function () {
+                    //样式效果处理
+                    $('#lymsgview').find('.lymsgitem_list_body').removeClass('active');
+                    $('#lymsgitem .lymsgitem_body').removeClass('active');
+                    dom.find('.lymsgitem_list_body').addClass('active');
+                    $("div[id^='lymsgitem']").each(function (index) {
+                        var $this = $(this);
+                        if ($this.attr('id') == dom.attr('id')) {
+                            $('#lymsgForm').animate({'marginTop': ((index - 1) * 120 + 160) + 'px'});
+                            $(document).scrollTop(0)
+                            return false;
+                        }
+                    });
+                    bindActiveTitle(dom);
+
+                    //数据处理
+                    var id = $('#lymsgview .active').parent().attr('id');
+                    var data = (ValueBox[id]);
+                    $('#title').val(data.title);
+                    editor.ready(function () {
+                        this.setContent(data.content);
+                    })
+                    $(document).scrollTop(0)
+                    if ($('#showContent:checked').length != data.show_cover_pic) {
+                        $('#showContent').trigger('click');
+                    }
+                    dealwidthImg(data);
+                });
+                return dom;
+            }
+
+            function getCurrentItems() {
+                return $("div[id^='lymsgitem']").length;
+            };
+            //param 图片mediaID 图片url
+            function setActiveThumbImgSrc(thumb_media_id, url) {
+                if (!url) {
+                    return
+                }
+                //当前选中的缩略图赋值 根据图片长款自动调用图片
+                //TOOD
+                //样式
+                //alert($('#lymsgview .active img').css('width')+$('#lymsgview .active img').css('height'))
+                $('#lymsgview .active img').attr('src', url).fadeIn(350).prev().hide();
+                //数据
+                var itemid = $('#lymsgview .active').parent().attr('id');
+                ValueBox[itemid].thumb_media_id = thumb_media_id;
+                ValueBox[itemid].downloadPath = url;
+            }
+
+            //当前选中的缩略图删除
+            function removeActiveThumbImgSrc() {
+                $('#lymsgview .active img').attr('src', '').hide().prev().show();
+                var itemid = $('#lymsgview .active').parent().attr('id');
+                ValueBox[itemid].thumb_media_id = '';
+            }
+
+            //当前选中的title联动
+            function bindActiveTitle(dom) {
+                $('#title').unbind('input propertychange');
+                $('#title').bind('input propertychange', function () {
+                    var v = $(this).val();
+                    $(this).parent().find('span.DF-placeHolder').addClass('pright');
+                    var title = '';
+                    dom.find('.lymsgitem_title2').length ? (title = dom.find('.lymsgitem_title2')) : (title = dom.find('.lymsgitem_title'));
+                    if (v) {
+                        title.text(v);
+                        $('#wordNum').text('(' + v.length + '/64)');
+                    } else {
+                        title.text('标题');
+                        $('#wordNum').text('(0/64)');
+                    }
+                });
+            }
+
+            //dropfile赋值
+            function setDropImg(selector) {
+                var dfDIV = '<div class="dz-preview dz-processing dz-success dz-image-preview">' +
+                        '<div class="dz-details">' +
+                        '<div class="dz-filename"><span data-dz-name=""></span></div>' +
+                        '<div class="dz-size" data-dz-size=""><strong>0.0</strong> KiB</div>' +
+                        '<img data-dz-thumbnail="" alt="" src="">' +
+                        '</div>' +
+                        '<div class="dz-progress"><span class="dz-upload" data-dz-uploadprogress="" style="width: 100%;"></span></div>' +
+                        '<div class="dz-success-mark"><span>✔</span></div>' +
+                        '<div class="dz-error-mark"><span>✘</span></div>' +
+                        '<div class="dz-error-message"><span data-dz-errormessage=""></span></div>' +
+                        '<a class="dz-remove" href="javascript:undefined;" data-dz-remove="">删除</a>' +
+                        '</div>';
+                var jqdf = $(dfDIV);
+                jqdf.find('.dz-remove').click(function () {
+                    jqdf.remove();
+                    removeActiveThumbImgSrc();
+
+                });
+                $(selector).append(jqdf);
+                return jqdf;
+            }
+
+            //dealwidthImg
+            function dealwidthImg(data) {
+                if (data.dataBase64) {
+                    if ($('#dropfile img').length) {
+                        $('#dropfile img').attr('src', data.dataBase64);
+                    } else {
+                        var img = setDropImg('#dropfile');
+                        img.find('img').attr('src', data.dataBase64);
+                    }
+                } else if (data.thumb_media_id) {
+                    if ($("#dropfile").find('.dz-preview').length == 1) {
+                        //图片缩略图 预览路径
+                        $('#dropfile').find('img').attr('src', data.downloadPath);
+                    } else {
+                        var img = setDropImg('#dropfile');
+                        img.find('img').attr('src', data.downloadPath);
+                    }
+                } else {
+                    if (File) {
+                        self.removeFile(File);
+                        File = null;
+                    }
+                    if ($("#dropfile").find('.dz-preview').length == 1) {
+                        $("#dropfile").find('.dz-preview').remove();
+                    }
+                }
+            }
+
+            $('#lymsgcreate').find('.lymsg_dash').click(function () {
+                if (getCurrentItems() && getCurrentItems() - 1 < 7) {
+                    createNewItem();
+                } else {
+                    alert('最多只能添加8行');
+                }
+            });
+            //验证表单
+            function validLymsgForm() {
+                var flag = true;
+                var key;
+                var attr;
+                for (var k in ValueBox) {
+                    if (!ValueBox[k].title) {
+                        flag = false;
+                        key = k;
+                        attr = 'title';
+                        break;
+                    }
+                    ;
+                    if (!ValueBox[k].thumb_media_id) {
+                        flag = false;
+                        key = k;
+                        attr = 'thumb_media_id';
+                        break;
+                    }
+                    ;
+                    if (!ValueBox[k].content) {
+                        flag = false;
+                        key = k;
+                        attr = 'content';
+                        break;
+                    }
+                    ;
+                }
+
+                return {valid: flag, key: key, attr: attr};
+            }
+
+            /**
+             * 根据未填写内容进行判断
+             */
+            function showInValidMsg(key, attr) {
+                if (key && attr) {
+                    $('#' + key).find('.lymsgitem_mask i').first().trigger('click');
+                    $(document).scrollTop(0);
+                    var messageMap = {
+                        title: '标题',
+                        content: '正文',
+                        thumb_media_id: '封面'
+                    }
+                    DF.toast.warning('【' + messageMap[attr] + '】' + '不能为空');
+
+                }
+            }
+
+            initLeftPanelEvent();
+        })(jQuery);
+
+    </script>
+    <script>
+        //初始化 tab
+        $(function () {
+            //图文
+            $('#pwmsg').click(function () {
+                var $this = $(this);
+                $('.lymsg_tab a').removeClass('active');
+                !$this.hasClass('active') && $this.addClass('active');
+                $('#save').show();
+            }).trigger('click');
+        });
+    </script>
+</div>

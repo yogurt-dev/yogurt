@@ -1,0 +1,456 @@
+<div class="page-title">
+
+    <div class="title-env">
+        <h1 class="title">Donkish</h1>
+        <p class="description">DonkishFramework 开发帮助文档</p>
+    </div>
+
+    <div class="breadcrumb-env">
+
+        <ol class="breadcrumb bc-1">
+            <li>
+                <a href="dashboard-1.html"><i class="fa-home"></i>Home</a>
+            </li>
+            <li class="active">
+
+                <strong>Document</strong>
+            </li>
+        </ol>
+
+    </div>
+
+</div>
+<div class="row">
+    <!--通讯录树-->
+    <div class="col-sm-4">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title" >
+                    <a href="javascript:;">文档树</a>
+                </h3>
+            </div>
+
+            <div class="DFTree" style="margin-top: 15px;padding: 0 20px;height: 500px;overflow-y: auto;">
+                <div class="input-group input-group-minimal">
+                    <input type="text" class="form-control" >
+                    <div class="input-group-addon">
+                        <a href="javascript:;"><i class="linecons-search"></i></a>
+                    </div>
+                </div>
+                <ul id="treeDemo" class="ztree"></ul>
+            </div>
+        </div>
+    </div>
+    <!--右侧内容展现区-->
+    <div class="col-sm-8">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title" >
+                    <a href="javascript:;">详细说明</a>
+                </h3>
+            </div>
+            <div>
+                <div id="methodDesc"></div>
+                <div id="">
+                    <table class="table table-hover" >
+                        <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>参数</th>
+                            <th>类型</th>
+                            <th>默认值</th>
+                        </tr>
+                        </thead>
+
+                        <tbody id="paramDesc">
+                        </tbody>
+                    </table>
+                </div>
+                <div id="returnDesc">
+
+                </div>
+            </div>
+        </div>
+    </div>
+<style type="text/css">
+    .ztree li span.button.linecons-truck_ico_open,.linecons-truck_ico_close,.linecons-truck_ico_docu{
+        font-family: linecons;
+        font-style: normal;
+        font-weight: 400;
+        speak: none;
+        display: inline-block !important;
+        text-decoration: inherit;
+        width: 1.2em !important;
+        margin-right: .2em !important;
+        text-align: center;
+        font-variant: normal;
+        text-transform: none;
+        line-height: 1em !important;
+        margin-left: .2em !important;
+        background-image: none !important;
+    }
+    .linecons-truck_ico_open:before,.linecons-truck_ico_close:before,.linecons-truck_ico_docu:before{
+        content: '\e829';
+    }
+    .doc_wrap{
+        margin-top: 15px;
+    }
+</style>
+<SCRIPT type="text/javascript">
+    (function($){
+        var contentMap = {
+            addValid:{
+                parentId:'biaodan',
+                name:'自定义验证',
+                desc:'自定义错误信息，基于jquery validate插件',
+                returns:'void',
+                paramType:['string','function','string'],
+                paramDefault:['null','null','验证不通过']
+            },
+            ajax:{
+                name:'ajax',
+                desc:'封装jquery的ajax',
+                returns:'object 返回一个promise对象,方便.done()的链式操作',
+                paramType:['object'],
+                paramDefault:['null']
+            },
+            alert:{
+                name:'提示框',
+                desc:'弹出提示框',
+                returns:'void',
+                paramType:['string','string'],
+                paramDefault:['null','提示']
+            },
+            analyticalUrlParams:{
+                name:'根据url获取参数',
+//                desc:'根据url获取参数',
+                returns:'object',
+                paramType:['object'],
+                paramDefault:['null']
+            },
+            callbackComponent:{
+                parentId:'zujian',
+                name:'组件回调函数',
+                desc:'编写组件时使用',
+                returns:'void',
+                paramType:['object'],
+                paramDefault:['null']
+            },
+            confirm:{
+                name:'确认框',
+                desc:'弹出确认框',
+                returns:'object 返回一个promise对象,方便.done()的链式操作',
+                paramType:['string','string','function'],
+                paramDefault:['null','提示','null']
+            },
+            create:{
+                parentId:'zujian',
+                name:'创建普通组件',
+                desc:'创建一个普通的组件',
+                returns:'void',
+                paramType:['string | object','string | object[jQuery]','function'],
+                paramDefault:['null','null','null']
+            },
+            createWindow:{
+                parentId:'zujian',
+                name:'创建窗体组件',
+                desc:'创建一个窗体的组件',
+                returns:'object',
+                paramType:['object','function'],
+                paramDefault:['null','null']
+            },
+            dataTable:{
+                name:'列表组件',
+                desc:'创建一个列表，基于dataTable',
+                returns:'object[jQuery]',
+                paramType:['object'],
+                paramDefault:['null']
+            },
+            getAuthorityData:{
+                name:'权限按钮',
+                desc:'获取权限按钮方法',
+                returns:'Array',
+                paramType:[''],
+                paramDefault:['']
+            },
+            getComponent:{
+                parentId:'zujian',
+                name:'获得组件',
+                desc:'获取权限按钮方法',
+                returns:'object',
+                paramType:['string'],
+                paramDefault:['null']
+            },
+            getCurrentPage:{
+                parentId:'yemian',
+                name:'获取当前页面',
+                desc:'获取当前页面',
+                returns:'string',
+                paramType:[''],
+                paramDefault:['']
+            },
+            getDevMode:{
+                name:'获取当前系统模式',
+                desc:'获取当前系统模式',
+                returns:'string',
+                paramType:[''],
+                paramDefault:['']
+            },
+            getPage:{
+                parentId:'yemian',
+                name:'获取一个页面',
+                desc:'获取一个页面',
+                returns:'void',
+                paramType:['string','function'],
+                paramDefault:['null','null']
+            },
+            getUrlParam:{
+                parentId:'yemian',
+                name:'获取当前页面URL参数',
+                desc:'获取当前页面URL参数',
+                returns:'object',
+                paramType:[''],
+                paramDefault:['']
+            },
+            getWebScoket:{
+                name:'获取websocket对象',
+                desc:'获取websocket对象',
+                returns:'object'
+            },
+            gotoPage:{
+                parentId:'yemian',
+                name:'页面跳转',
+                desc:'页面跳转',
+                returns:'void',
+                paramType:['string','object','function'],
+                paramDefault:['null','null','null']
+            },
+            hideModal:{
+                name:'隐藏模态窗口',
+                desc:'隐藏模态窗口',
+                returns:'void',
+                paramType:['object'],
+                paramDefault:['null']
+            },
+            initCustomFormComponent:{
+                parentId:'biaodan',
+                name:'初始化html元素',
+                desc:'初始化表单内的html元素',
+                returns:'void',
+                paramType:['object','function'],
+                paramDefault:['null','null']
+            },
+            initCustomFormPlaceHolder:{
+                parentId:'biaodan',
+                name:'初始化placeHolder',
+                desc:'初始化html元素的placeHolder',
+                returns:'void',
+                paramType:['object'],
+                paramDefault:['null']
+            },
+            leftSelectMenuPin:{
+                name:'选中菜单',
+                desc:'选中菜单',
+                returns:''
+            },
+            on:{
+                name:'Event事件',
+                desc:'表单on的事件',
+                returns:'object',
+                paramType:['string','object[jQuery]','function'],
+                paramDefault:['null','null','null']
+            },
+            pinMenu:{
+                name:'选中菜单',
+                desc:'选中菜单',
+                returns:'void',
+                paramType:['Number','Number'],
+                paramDefault:['null','null']
+            },
+            reloadPage:{
+                parentId:'yemian',
+                name:'重新加载页面',
+                desc:'重新加载页面',
+                returns:'void'
+            },
+            renderPage:{
+                parentId:'yemian',
+                name:'渲染页面',
+                desc:'渲染页面',
+                returns:''
+            },
+            setFormReadOnly:{
+                parentId:'biaodan',
+                name:'设置表单是否为只读',
+                desc:'设置表单是否为只读',
+                returns:'void',
+                paramType:['object[jQuery]','Boolean'],
+                paramDefault:['null','null']
+            },
+            setFormValues:{
+                parentId:'biaodan',
+                name:'为表单赋值',
+                desc:'为表单赋值',
+                returns:'void',
+                paramType:['object[jQuery]','object'],
+                paramDefault:['null','null']
+            },
+            showModal:{
+                name:'模态窗口',
+                desc:'模态窗口',
+                returns:'object',
+                paramType:['object','function','string'],
+                paramDefault:['null','null','_LYModal']
+            },
+            toast:{
+                name:'页面提示',
+                desc:'页面显示出一个提示',
+                returns:'object'
+            },
+            validate:{
+                parentId:'biaodan',
+                name:'表单验证',
+                desc:'表单验证',
+                returns:'Boolean',
+                paramType:['object[jQuery]'],
+                paramDefault:['null']
+            },
+            zTree:{
+                name:'树组件',
+                desc:'创建一个树，基于ztree',
+                returns:'object[jQuery]',
+                paramType:['object'],
+                paramDefault:['null']
+            },
+            zTree:{
+                name:'树组件',
+                desc:'创建一个树，基于ztree',
+                returns:'object[jQuery]',
+                paramType:['object'],
+                paramDefault:['null']
+            },
+            zTree:{
+                name:'树组件',
+                desc:'创建一个树，基于ztree',
+                returns:'object[jQuery]',
+                paramType:['object'],
+                paramDefault:['null']
+            }
+        };
+        var nodes = [];
+        var names = [];
+        var result = [];
+        var i = 0;
+        for(var k in DF){
+            i++;
+            var funStr = DF[k].toString();
+            var s = funStr.indexOf('\(');
+            var e = funStr.indexOf('\)');
+            var r = funStr.substring(s+1,e).split('\,');
+            var node = {
+                id:k,
+                name:k,
+                param:r,
+                desc:''
+            }
+            nodes.push(node);
+            names.push(k);
+        }
+        names.sort();
+        for(var j=0;j<names.length;j++){
+            var name = names[j];
+            for(var k=0;k<nodes.length;k++){
+                var node = nodes[k];
+                if(node['name']==name){
+                    node['text'] = contentMap[name] && contentMap[name].name;
+                    node['desc'] = contentMap[name] && contentMap[name].desc;
+                    node['returns'] = contentMap[name] && contentMap[name].returns;
+                    node['paramType'] = contentMap[name] && contentMap[name].paramType;
+                    node['paramDefault'] = contentMap[name] && contentMap[name].paramDefault;
+                    node['parentId'] = (contentMap[name] && contentMap[name].parentId)||0;
+                    node['desc'] && result.push(node);
+                    break;
+                }
+            }
+        }
+        console.log(result);
+        //分类 页面类、组件类、表单类
+        result.push({
+            id:'yemian',
+            "isParent":true,
+            text:'页面',
+            parentId:'0'
+        });
+        result.push({
+                    id:'zujian',
+                    "isParent":true,
+                    text:'组件',
+                    parentId:'0'
+        });
+        result.push({
+            id:'biaodan',
+            "isParent":true,
+            text:'表单',
+            parentId:'0'
+        });
+        tree = DF.zTree({
+            id:'treeDemo',
+            checkable:false,
+            dragable:false,
+//            url:'data/table/tree.json',
+            root:{
+                id:0,
+                text:'DonkishFramework',
+                iconSkin:'linecons-truck',
+                "isParent":true,
+                open:true
+            },
+            treeData:result,
+            textKey:'name',
+            pidKey:'parentId',
+            callback:{
+                onClick:function(event, treeId, treeNode){
+                    console.log(treeNode);
+                    if(!treeNode.isParent){
+                        createContent(treeNode);
+                    }
+                },
+                onDblClick:function(event, treeId, treeNode){
+//                    console.log(treeNode);
+                }
+                ,
+                onAsyncSuccess:function(event, treeId, treeNode, msg){
+                    console.log(treeNode,msg);
+                }
+                ,
+                beforeDrop:function(treeId, treeNodes, targetNode, moveType){
+                    console.log(treeId,targetNode);
+                }
+            },
+            onComplete:function(treeObject){
+            }
+        });
+        //创建内容
+        function createContent(node){
+            if(node.id==0)return
+            var source = '<div class="doc_wrap"><blockquote><p><strong>DF.{{name}}({{if param}}{{each param}}{{$value}},{{/each}}{{/if}})</strong><br>{{desc}}</p></blockquote></div>';
+            var html = DF.template(source,node);
+            //去掉参数的最后一个“，”
+            var lastIndex = html.lastIndexOf('\,');
+            html = html.substr(0,lastIndex)+ html.substr(html.lastIndexOf('\,')+1,html.length);
+            $('#methodDesc').children().remove();
+            $('#methodDesc').append(html);
+
+            var param = '{{each param}}<tr><td>{{$index+1}}</td><td>{{$value}}</td><td>{{if paramType}}{{paramType[$index]}}{{/if}}</td><td>{{if paramDefault}}{{paramDefault[$index]}}{{/if}}</td></tr>{{/each}}';
+            var html2 = DF.template(param,node);
+            $('#paramDesc').children().remove();
+            $('#paramDesc').append(html2);
+
+            var result = '<div class="doc_wrap"><blockquote><p><strong>返回值：{{returns}}</strong></p></blockquote></div>';
+            var html3 = DF.template(result,node);
+            $('#returnDesc').children().remove();
+            $('#returnDesc').append(html3);
+        }
+
+    })(jQuery);
+</SCRIPT>

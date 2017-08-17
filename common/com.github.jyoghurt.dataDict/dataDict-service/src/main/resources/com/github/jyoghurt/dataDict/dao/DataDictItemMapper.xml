@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC
+        "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.github.jyoghurt.dataDict.dao.DataDictItemMapper">
+
+    <select id="findSubDataDictItemByDictItemCode" resultType="com.github.jyoghurt.dataDict.domain.DataDictItem">
+		select * from DataDictItem t where t.deleteFlag=0 and t.uiConfigurable=1 and parentDictItemCode in
+		<foreach item="dictItemCode" index="index" collection="dictItemCodeList" open="(" separator="," close=")">
+			#{dictItemCode}
+		</foreach>
+	</select>
+
+	<update id="logicDeleteDictItem">
+		update DataDictItem t set t.deleteflag=1 where dictItemCode in
+		<foreach item="dictItemCode" index="index" collection="dictItemCodeList" open="(" separator="," close=")">
+			#{dictItemCode}
+		</foreach>
+	</update>
+
+</mapper>
