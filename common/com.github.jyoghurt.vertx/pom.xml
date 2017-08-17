@@ -13,7 +13,6 @@
     <version>COMMON-1.0-DEV-SNAPSHOT</version>
     <packaging>pom</packaging>
     <modules>
-        <module>vertx-web</module>
         <module>vertx-service</module>
     </modules>
 </project>

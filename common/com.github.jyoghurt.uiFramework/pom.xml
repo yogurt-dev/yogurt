@@ -14,6 +14,5 @@
     <packaging>pom</packaging>
     <modules>
         <module>uiFramework-service</module>
-        <module>uiFramework-web</module>
     </modules>
 </project>

@@ -12,7 +12,6 @@
     <version>COMMON-1.0-DEV-SNAPSHOT</version>
     <packaging>pom</packaging>
     <modules>
-        <module>serviceLog-web</module>
         <module>serviceLog-service</module>
     </modules>
 </project>

@@ -13,6 +13,5 @@
     <packaging>pom</packaging>
     <modules>
         <module>dataDict-service</module>
-        <module>dataDict-web</module>
     </modules>
 </project>

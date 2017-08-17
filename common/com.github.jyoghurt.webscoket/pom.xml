@@ -13,7 +13,6 @@
     <version>COMMON-1.0-DEV-SNAPSHOT</version>
     <packaging>pom</packaging>
     <modules>
-        <module>webscoket-web</module>
         <module>webscoket-service</module>
     </modules>
 </project>

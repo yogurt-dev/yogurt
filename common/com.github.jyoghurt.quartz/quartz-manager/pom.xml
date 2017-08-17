@@ -15,7 +15,6 @@
     <packaging>pom</packaging>
     <modules>
         <module>quartz-manager-service</module>
-        <module>quartz-manager-web</module>
     </modules>
 
 </project>
