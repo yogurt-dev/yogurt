@@ -56,14 +56,33 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
 
     private static final String COUNTSUFFIX = "Count";
 
-    @Override
-    public void save(T entity) {
+    private void processCreateColumns(T entity) {
         if (entity instanceof BaseEntity) {
-            ((BaseEntity) entity).setCreateDateTime(new Date());
-            ((BaseEntity) entity).setModifyDateTime(((BaseEntity) entity).getCreateDateTime());
+            BaseEntity baseEntity = ((BaseEntity) entity);
+            if (baseEntity.getCreateDateTime() == null) {
+                baseEntity.setCreateDateTime(new Date());
+            }
+            if (baseEntity.getModifyDateTime() == null) {
+                baseEntity.setModifyDateTime(baseEntity.getCreateDateTime());
+            }
             setFounder((BaseEntity) entity);
         }
+    }
 
+    private void processModifyColumns(T entity) {
+        if (entity instanceof BaseEntity) {
+            BaseEntity baseEntity = ((BaseEntity) entity);
+            if (baseEntity.getModifyDateTime() == null) {
+                baseEntity.setModifyDateTime(new Date());
+            }
+            //modify by limiao 20160811 处理修改的时候勿将创建人和创建时间更新成修改人和修改时间的问题
+            this.setModifyFounder((BaseEntity) entity);
+        }
+    }
+
+    @Override
+    public void save(T entity) {
+        this.processCreateColumns(entity);
         //modify by baoxiaobing@lvyushequ.com 增加历史版本处理
         if (entity instanceof BaseSnapshotEntity) {
             //设置版本
@@ -78,11 +97,7 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
 
     @Override
     public void save(T entity, String tableName) {
-        if (entity instanceof BaseEntity) {
-            ((BaseEntity) entity).setCreateDateTime(new Date());
-            ((BaseEntity) entity).setModifyDateTime(((BaseEntity) entity).getCreateDateTime());
-            setFounder((BaseEntity) entity);
-        }
+        this.processCreateColumns(entity);
         getMapper().saveByTableName(entity, tableName);
     }
 
@@ -153,7 +168,7 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
         //更新version字段
         Field field = JPAUtils.getIdField(entity.getClass());
         field.setAccessible(true);
-        int record =  getMapper().updateBySql((Class<T>) entity.getClass(), "t.version = t.version+1", new
+        int record = getMapper().updateBySql((Class<T>) entity.getClass(), "t.version = t.version+1", new
                 ChainMap<String, Object>().chainPut("version", version).chainPut(field.getName(), field.get(entity)));
         return record == 1;
     }
@@ -189,9 +204,7 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
         if (BaseEntity.class.isAssignableFrom(entities.get(0).getClass()) || BaseSnapshotEntity.class.isAssignableFrom
                 (entities.get(0).getClass())) {
             for (T entity : entities) {
-                ((BaseEntity) entity).setCreateDateTime(new Date());
-                ((BaseEntity) entity).setModifyDateTime(((BaseEntity) entity).getCreateDateTime());
-                setFounder((BaseEntity) entity);
+                this.processCreateColumns(entity);
                 if (entity instanceof BaseSnapshotEntity) {
                     //设置版本
                     ((BaseSnapshotEntity) entity).setVersion(VERSIONSTART);
@@ -208,11 +221,7 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
 
     @Override
     public void saveForSelective(T entity) {
-        if (entity instanceof BaseEntity) {
-            ((BaseEntity) entity).setCreateDateTime(new Date());
-            ((BaseEntity) entity).setModifyDateTime(((BaseEntity) entity).getCreateDateTime());
-            setFounder((BaseEntity) entity);
-        }
+        this.processCreateColumns(entity);
         getMapper().saveForSelective(entity);
     }
 
@@ -221,11 +230,7 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
         if (null == JPAUtils.gtIdValue(entity)) {
             return;
         }
-        if (entity instanceof BaseEntity) {
-            ((BaseEntity) entity).setModifyDateTime(new Date());
-            //modify by limiao 20160811 处理修改的时候勿将创建人和创建时间更新成修改人和修改时间的问题
-            this.setModifyFounder((BaseEntity) entity);
-        }
+        processModifyColumns(entity);
         if (entity instanceof BaseSnapshotEntity) {
             updateHis(entity);
             return;
@@ -269,7 +274,7 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
 
         qr.setRecordsTotal(getMapper().pageTotalRecord((Class<T>) entity.getClass(), getValueMap(queryHandle, entity)
                 .chainPutAll(queryHandle == null ? null : queryHandle.getExpandData())));
-        if(qr.getRecordsTotal() == 0){
+        if (qr.getRecordsTotal() == 0) {
             qr.setData(new ArrayList<T>());
             return qr;
         }
@@ -283,7 +288,7 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
         QueryResult<T> qr = newQueryResult();
         qr.setRecordsTotal(getMapper().findListTotalRecordBySql(customSql, getValueMap(queryHandle).chainPutAll
                 (queryHandle == null ? null : queryHandle.getExpandData())));
-        if(qr.getRecordsTotal() == 0){
+        if (qr.getRecordsTotal() == 0) {
             qr.setData(new ArrayList<T>());
             return qr;
         }
@@ -311,13 +316,7 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
         if (null == JPAUtils.gtIdValue(entity)) {
             return;
         }
-
-        if (entity instanceof BaseEntity) {
-            ((BaseEntity) entity).setModifyDateTime(new Date());
-            //add by limiao 20160811 处理修改的时候勿将创建人和创建时间更新成修改人和修改时间的问题
-            this.setModifyFounder((BaseEntity) entity);
-        }
-
+        this.processModifyColumns(entity);
         if (entity instanceof BaseSnapshotEntity) {
             //获取主键
             updateHis(entity);
@@ -381,10 +380,14 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
 
     private void setFounder(BaseEntity entity) {
         try {
-            entity.setFounderId(null == getSessionAttr(BaseEntity.OPERATOR_ID) ? BaseEntity.DEFAULT_OPERATOR :
-                    (String) getSessionAttr(BaseEntity.OPERATOR_ID));
-            entity.setFounderName(null == getSessionAttr(BaseEntity.OPERATOR_NAME) ? BaseEntity.DEFAULT_OPERATOR :
-                    (String) getSessionAttr(BaseEntity.OPERATOR_NAME));
+            if (StringUtils.isEmpty(entity.getFounderId())) {
+                entity.setFounderId(null == getSessionAttr(BaseEntity.OPERATOR_ID) ? BaseEntity.DEFAULT_OPERATOR :
+                        (String) getSessionAttr(BaseEntity.OPERATOR_ID));
+            }
+            if (StringUtils.isEmpty(entity.getFounderName())) {
+                entity.setFounderName(null == getSessionAttr(BaseEntity.OPERATOR_NAME) ? BaseEntity.DEFAULT_OPERATOR :
+                        (String) getSessionAttr(BaseEntity.OPERATOR_NAME));
+            }
         } catch (Exception e) {
             logger.debug("setFounder时session获取失败!");
             entity.setFounderId(BaseEntity.DEFAULT_OPERATOR);
@@ -395,8 +398,12 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
     //add by limiao 20160811 处理修改的时候勿将创建人和创建时间更新成修改人和修改时间的问题
     private void setModifyFounder(BaseEntity entity) {
         try {
-            entity.setModifierId((String) getSessionAttr(BaseEntity.OPERATOR_ID));
-            entity.setModifierName((String) getSessionAttr(BaseEntity.OPERATOR_NAME));
+            if (StringUtils.isEmpty(entity.getModifierId())) {
+                entity.setModifierId((String) getSessionAttr(BaseEntity.OPERATOR_ID));
+            }
+            if (StringUtils.isEmpty(entity.getModifierName())) {
+                entity.setModifierName((String) getSessionAttr(BaseEntity.OPERATOR_NAME));
+            }
         } catch (Exception e) {
             logger.info("update时session获取失败!");
             entity.setModifierId(BaseEntity.DEFAULT_OPERATOR);
@@ -431,7 +438,7 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
         } catch (NoSuchMethodException e) {
             throw new BaseErrorException("未定义方法：" + mapperQueryMethodName + "或" + countMethodName);
         } catch (IllegalAccessException | InvocationTargetException e) {
-            logger.error("异常",e);
+            logger.error("异常", e);
             throw new BaseErrorException("调用方法异常");
         }
         return queryResult;
