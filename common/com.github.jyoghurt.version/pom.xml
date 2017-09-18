@@ -7,10 +7,10 @@
     <parent>
         <groupId>com.github.jyoghurt</groupId>
         <artifactId>root</artifactId>
-        <version>1.0.3-SNAPSHOT</version>
+        <version>1.0.4-SNAPSHOT</version>
     </parent>
-    <artifactId>common-version</artifactId>
-    <version>COMMON-VERSION-1.0-DEV-SNAPSHOT</version>
+    <artifactId>version</artifactId>
+    <version>COMMON-1.0-DEV-SNAPSHOT</version>
     <packaging>pom</packaging>
     <properties>
         <spring.version>4.1.9.RELEASE</spring.version>
@@ -23,8 +23,8 @@
         <com.github.jyoghurt.uploadAnnex.version>COMMON-1.0-DEV-SNAPSHOT</com.github.jyoghurt.uploadAnnex.version>
         <com.github.jyoghurt.weChat.version>COMMON-1.0-DEV-SNAPSHOT</com.github.jyoghurt.weChat.version>
         <com.github.jyoghurt.quartz.version>COMMON-1.0-DEV-SNAPSHOT</com.github.jyoghurt.quartz.version>
-        <com.github.jyoghurt.wechatbasic>COMMON-1.0-DEV-SNAPSHOT</com.github.jyoghurt.wechatbasic>
-        <com.github.jyoghurt.msgcen>COMMON-1.0-DEV-SNAPSHOT</com.github.jyoghurt.msgcen>
+        <com.github.jyoghurt.wechatbasic.version>COMMON-1.0-DEV-SNAPSHOT</com.github.jyoghurt.wechatbasic.version>
+        <com.github.jyoghurt.msgcen.version>COMMON-1.0-DEV-SNAPSHOT</com.github.jyoghurt.msgcen.version>
         <com.github.jyoghurt.security.version>COMMON-1.0-DEV-SNAPSHOT</com.github.jyoghurt.security.version>
         <com.github.jyoghurt.applet.version>COMMON-1.0-DEV-SNAPSHOT</com.github.jyoghurt.applet.version>
         <com.github.jyoghurt.dataDict.version>COMMON-1.0-DEV-SNAPSHOT</com.github.jyoghurt.dataDict.version>
@@ -34,6 +34,9 @@
         <com.github.jyoghurt.excel.version>COMMON-1.0-DEV-SNAPSHOT</com.github.jyoghurt.excel.version>
         <com.github.jyoghurt.serviceLog>COMMON-1.0-DEV-SNAPSHOT</com.github.jyoghurt.serviceLog>
         <com.github.jyoghurt-switch.version>COMMON-1.0-DEV-SNAPSHOT</com.github.jyoghurt-switch.version>
+        <com.github.jyoghurt.http.version>COMMON-1.0-DEV-SNAPSHOT</com.github.jyoghurt.http.version>
+        <com.github.jyoghurt.payment.version>COMMON-1.0-DEV-SNAPSHOT</com.github.jyoghurt.payment.version>
+        <com.github.jyoghurt.serial.version>COMMON-1.0-DEV-SNAPSHOT</com.github.jyoghurt.serial.version>
     </properties>
 
 </project>

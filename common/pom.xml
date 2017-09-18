@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.github.jyoghurt.community</groupId>
+    <groupId>com.github.jyoghurt</groupId>
     <artifactId>common-modules</artifactId>
     <packaging>pom</packaging>
     <version>COMMUNITY-1.0-DEV-SNAPSHOT</version>
@@ -23,7 +23,6 @@
         <module>com.github.jyoghurt.security</module>
         <module>com.github.jyoghurt.serviceLog</module>
         <module>com.github.jyoghurt.sms</module>
-        <module>com.github.jyoghurt.uiFramework</module>
         <module>com.github.jyoghurt.uploadAnnex</module>
         <module>com.github.jyoghurt.webscoket</module>
 		<module>com.github.jyoghurt.vertx</module>
@@ -32,5 +31,8 @@
         <module>com.github.jyoghurt.activiti</module>
         <module>com.github.jyoghurt.applet</module>
         <module>com.github.jyoghurt.j2ee</module>
+        <module>com.github.jyoghurt.http</module>
+        <module>com.github.jyoghurt.payment</module>
+        <module>com.github.jyoghurt.serial</module>
     </modules>
 </project>

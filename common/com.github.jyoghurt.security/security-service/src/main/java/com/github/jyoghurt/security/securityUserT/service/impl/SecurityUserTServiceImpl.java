@@ -1,7 +1,7 @@
 package com.github.jyoghurt.security.securityUserT.service.impl;
 
-import com.github.jyoghurt.common.msgcen.common.utils.MsgSendUtil;
-import com.github.jyoghurt.common.msgcen.exception.MsgException;
+import com.github.jyoghurt.msgcen.common.utils.MsgSendUtil;
+import com.github.jyoghurt.msgcen.exception.MsgException;
 import com.github.jyoghurt.security.enums.Module;
 import com.github.jyoghurt.security.exception.SecurityException;
 import com.github.jyoghurt.security.securityMenuT.domain.SecurityMenuT;

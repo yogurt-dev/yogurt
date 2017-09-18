@@ -145,15 +145,15 @@ public class CustomMenusTServiceImpl extends ServiceSupport<WeChatCustomMenusT, 
     public CommonButton getCommonButton(WeChatCustomMenusTVo weChatCustomMenusTVo) {
         CommonButton bottomBtn = new CommonButton();
         switch (weChatCustomMenusTVo.getClickType()) {
-            case WeChatMenusTypeEnum.media_id: {
+            case media_id: {
                 bottomBtn.setMedia_id(weChatCustomMenusTVo.getContent());
                 break;
             }
-            case WeChatMenusTypeEnum.view: {
+            case view: {
                 bottomBtn.setUrl(weChatCustomMenusTVo.getContent());
                 break;
             }
-            case WeChatMenusTypeEnum.click: {
+            case click: {
                 bottomBtn.setUrl("");
                 break;
             }

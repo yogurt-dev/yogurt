@@ -13,8 +13,8 @@
   <!--</parent>-->
   <parent>
     <groupId>com.github.jyoghurt</groupId>
-    <artifactId>common-version</artifactId>
-    <version>COMMON-VERSION-1.0-DEV-SNAPSHOT</version>
+    <artifactId>version</artifactId>
+    <version>COMMON-1.0-DEV-SNAPSHOT</version>
   </parent>
   <version>5.19.0</version>
   <properties>

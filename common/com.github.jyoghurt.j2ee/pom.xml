@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.github.jyoghurt</groupId>
         <artifactId>root</artifactId>
-        <version>1.0.2-SNAPSHOT</version>
+        <version>1.0.4-SNAPSHOT</version>
     </parent>
     <artifactId>j2ee</artifactId>
     <version>2.0.4-SNAPSHOT</version>
@@ -60,17 +60,6 @@
             <artifactId>druid</artifactId>
             <version>1.0.13</version>
         </dependency>
-        <dependency>
-            <groupId>org.mybatis</groupId>
-            <artifactId>mybatis</artifactId>
-            <version>3.2.8</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mybatis</groupId>
-            <artifactId>mybatis-spring</artifactId>
-            <version>1.2.2</version>
-        </dependency>
-
         <!--事务-->
         <dependency>
             <groupId>org.aspectj</groupId>
