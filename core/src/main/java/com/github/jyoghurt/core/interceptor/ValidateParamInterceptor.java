@@ -28,7 +28,7 @@ public class ValidateParamInterceptor {
         } catch (ConstraintViolationException e) {
             String message = StringUtils.EMPTY;
             for (ConstraintViolation violation : e.getConstraintViolations()) {
-                message = StringUtils.join(message, violation.getMessage(), ",");
+                throw new BaseErrorException(violation.getMessage());
             }
             return new HttpResultEntity(HttpResultHandle.HttpResultEnum.ERROR.getErrorCode()
                     , StringUtils.stripEnd(message, ","));
