@@ -40,11 +40,10 @@ public class ValidateParamInterceptor {
         try {
             return pjp.proceed();
         } catch (ConstraintViolationException e) {
-            String message = StringUtils.EMPTY;
             for (ConstraintViolation violation : e.getConstraintViolations()) {
-                message = StringUtils.join(message, violation.getMessage(), ",");
+                throw new BaseErrorException(violation.getMessage());
             }
-            throw new BaseErrorException(message);
+            throw new BaseErrorException(e);
         }
     }
 }
