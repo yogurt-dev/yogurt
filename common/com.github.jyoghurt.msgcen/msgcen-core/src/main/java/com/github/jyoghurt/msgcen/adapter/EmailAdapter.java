@@ -1,6 +1,5 @@
 package com.github.jyoghurt.msgcen.adapter;
 
-import com.github.jyoghurt.msgcen.adapter.target.MsgTarget;
 import com.github.jyoghurt.msgcen.common.constants.EmailConstants;
 import com.github.jyoghurt.msgcen.common.email.EmailUpLoadSupport;
 import com.github.jyoghurt.msgcen.common.utils.MsgRegularUtil;

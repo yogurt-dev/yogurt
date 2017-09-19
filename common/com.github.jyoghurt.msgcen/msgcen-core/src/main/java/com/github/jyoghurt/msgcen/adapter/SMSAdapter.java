@@ -1,7 +1,6 @@
 package com.github.jyoghurt.msgcen.adapter;
 
 import com.alibaba.fastjson.JSON;
-import com.github.jyoghurt.msgcen.adapter.target.MsgTarget;
 import com.github.jyoghurt.msgcen.common.utils.MsgRegularUtil;
 import com.github.jyoghurt.msgcen.common.utils.MsgTmplRuleParseUtil;
 import com.github.jyoghurt.msgcen.domain.MsgTmplT;

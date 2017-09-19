@@ -23,6 +23,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Arrays;
 
 /**
@@ -59,7 +61,7 @@ public class UploadImgServiceImpl implements UploadImgService {
         try {
             return HttpResultHandle.getSuccessResult(ImgUploadHelper.upload(uploadPath, downloadPath, imageConfig, fileName, file.getInputStream()));
         } catch (IOException e) {
-            throw new ImgException(ImgException.ERROR_9002,e);
+            throw new ImgException(ImgException.ERROR_9002, e);
         }
     }
 
@@ -94,7 +96,7 @@ public class UploadImgServiceImpl implements UploadImgService {
         try {
             return ImgUploadHelper.upload(uploadPath, downloadPath, imageConfig, fileName, file.getInputStream());
         } catch (IOException e) {
-            throw new BaseErrorException(ImgExceptionEnums.ERROR_9002.getMessage(),e);
+            throw new BaseErrorException(ImgExceptionEnums.ERROR_9002.getMessage(), e);
         }
     }
 
@@ -125,7 +127,7 @@ public class UploadImgServiceImpl implements UploadImgService {
             out.println("</script>");
             return null;
         } catch (IOException e) {
-            throw new BaseErrorException(ImgExceptionEnums.ERROR_9002.getMessage(),e);
+            throw new BaseErrorException(ImgExceptionEnums.ERROR_9002.getMessage(), e);
         }
     }
 
@@ -164,10 +166,8 @@ public class UploadImgServiceImpl implements UploadImgService {
         try {
             path = ImgUploadHelper.upload(uploadPath, downloadPath, imageConfig, fileName, file.getInputStream());
         } catch (IOException e) {
-            throw new BaseErrorException(ImgException.ERROR_9002,e);
+            throw new BaseErrorException(ImgException.ERROR_9002, e);
         }
-
-
         ImgT imgT = new ImgT();
         imgT.setPath(path);
         imgT.setType(imageConfig.getModuleName());
@@ -176,6 +176,19 @@ public class UploadImgServiceImpl implements UploadImgService {
         result.put("imgId", imgT.getImgId());
         result.put("imgPath", path);
         return HttpResultHandle.getSuccessResult(result);
+    }
 
+
+    @Override
+    public String downLoad(String remoteFilePath, String moduleName, String fileName) {
+        try {
+            ImageConfig imageConfig = new ImageConfig();
+            URL urlfile = new URL(remoteFilePath);
+            HttpURLConnection httpUrl = (HttpURLConnection) urlfile.openConnection();
+            httpUrl.connect();
+            return ImgUploadHelper.upload(uploadPath, downloadPath, imageConfig, fileName, httpUrl.getInputStream());
+        } catch (Exception e) {
+            throw new BaseErrorException("下载微信图片失败", e);
+        }
     }
 }

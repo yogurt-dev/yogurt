@@ -17,7 +17,7 @@ public interface ImgService extends BaseService<ImgT> {
      * @param clothId
 
      */
-    void updateWashClothImg(String imgids,String affixids,String clothId) ;
+    void updateWashClothImg(String imgids, String affixids, String clothId) ;
 
     /**
      *
