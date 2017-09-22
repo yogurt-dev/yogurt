@@ -943,7 +943,7 @@ public class AdvancedUtil {
     }
 
     public static JSONObject sendTemple(String accessToken, ParentTpl parentTpl) throws WeChatException {
-        String requestUrl = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=ACCESS_TOKEN";
+        String requestUrl = "https://api.weixin.qq.com/cgi-bin/message/wxopen/template/send?access_token=ACCESS_TOKEN";
         requestUrl = requestUrl.replace("ACCESS_TOKEN", accessToken);
         return CommonUtil.httpsRequest(requestUrl, "POST", JSON.toJSONString(parentTpl));
     }

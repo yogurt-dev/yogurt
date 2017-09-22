@@ -1,8 +1,8 @@
 package com.github.jyoghurt.msgcen.common.email;
 
-import com.sun.tools.javac.util.List;
 
 import java.io.File;
+import java.util.List;
 
 /**
  * user:zjl

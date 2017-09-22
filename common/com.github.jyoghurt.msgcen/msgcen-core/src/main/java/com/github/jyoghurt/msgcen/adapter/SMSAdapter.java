@@ -43,8 +43,8 @@ public class SMSAdapter extends SmsUtils implements MsgAdapter, MsgTarget {
         }
         try {
             //发送email
-            if (SwitchHandler.switchIsOpenBySwitchGroupKey("msgcen")) {
 //                SmsUtils.send(targets, msgTmpl.getTmplCode(), values.size() == 0 ? null : values.toArray(new String[values.size()]));
+            if (SwitchHandler.switchIsOpenBySwitchGroupKey("msgcen")) {
                 AliyunSmsUtils.send(targets, msgTmpl.getSignName(), msgTmpl.getTmplCode(), values.size() == 0 ? null : values.toArray(new String[values.size()]));
             }
             recordMsg(targets, msgTmpl, JSON.toJSONString(param), null);

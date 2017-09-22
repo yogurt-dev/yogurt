@@ -6,6 +6,7 @@ package com.github.jyoghurt.msgcen.common.enums;
  */
 public enum MsgTypeEnum {
     WECHAT_TMPL("微信模板消息"),//微信模板消息
+    APPLET_TMPL("小程序模板消息"),
     EMAIL("EMAIL"),//
     SMS("短信消息");//
     private String typeValue;

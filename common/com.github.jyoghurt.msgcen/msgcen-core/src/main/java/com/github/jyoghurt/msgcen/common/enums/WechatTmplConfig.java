@@ -17,6 +17,7 @@ public enum WechatTmplConfig {
     RechargeAuthCodeTmpl,//充值验证码
     ActivityCancelTmpl,//活动取消通知
     ActivityOrderTmpl,//活动预约通知
-    RefundPaymentTmpl//退款取消通知
+    RefundPaymentTmpl,//退款取消通知
+    Xyorder//小野下单成功
 
 }

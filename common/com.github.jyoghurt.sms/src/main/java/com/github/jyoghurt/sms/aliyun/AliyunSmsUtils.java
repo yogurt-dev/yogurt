@@ -8,6 +8,7 @@ import com.aliyuncs.dysmsapi.model.v20170525.SendSmsResponse;
 import com.aliyuncs.exceptions.ClientException;
 import com.aliyuncs.profile.DefaultProfile;
 import com.aliyuncs.profile.IClientProfile;
+import com.github.jyoghurt.core.utils.SpringContextUtils;
 import com.github.jyoghurt.dataDict.service.DataDictUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,8 +31,8 @@ public class AliyunSmsUtils {
     private static final String accessKeyId;
     private static final String accessKeySecret;
     static {
-        accessKeyId = DataDictUtils.getDataDictValueName("aliyunConfig", "aliyunConfig_accessKeyId", false);
-        accessKeySecret = DataDictUtils.getDataDictValueName("aliyunConfig", "aliyunConfig_accessKeySecret", false);
+        accessKeyId = SpringContextUtils.getProperty("accessKeyId");
+        accessKeySecret = SpringContextUtils.getProperty("accessKeySecret");
     }
 
 
@@ -69,7 +70,6 @@ public class AliyunSmsUtils {
             IClientProfile profile = DefaultProfile.getProfile("cn-hangzhou", accessKeyId, accessKeySecret);
             DefaultProfile.addEndpoint("cn-hangzhou", "cn-hangzhou", product, domain);
             IAcsClient acsClient = new DefaultAcsClient(profile);
-
             //组装请求对象-具体描述见控制台-文档部分内容
             SendSmsRequest request = new SendSmsRequest();
             //必填:待发送手机号
@@ -80,7 +80,6 @@ public class AliyunSmsUtils {
             request.setTemplateCode(templateCode);
             //可选:模板中的变量替换JSON串
             request.setTemplateParam(JSON.toJSONString(paramMap));
-
             //选填-上行短信扩展码(无特殊需求用户请忽略此字段)
             //request.setSmsUpExtendCode("90997");
 

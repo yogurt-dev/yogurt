@@ -4,7 +4,6 @@ import com.github.jyoghurt.msgcen.exception.MsgException;
 import com.github.jyoghurt.msgcen.service.MsgSendService;
 import com.github.jyoghurt.core.utils.SpringContextUtils;
 import net.sf.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.List;
 

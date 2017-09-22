@@ -16,6 +16,10 @@ public class ParentTpl {
      */
     private String template_id;
     /**
+     * 表单id
+     */
+    private String form_id;
+    /**
      * 点击后跳转的url
      */
     private String url;
@@ -54,6 +58,14 @@ public class ParentTpl {
 
     public void setData(JSONObject data) {
         this.data = data;
+    }
+
+    public String getForm_id() {
+        return form_id;
+    }
+
+    public void setForm_id(String form_id) {
+        this.form_id = form_id;
     }
 
     @Override
