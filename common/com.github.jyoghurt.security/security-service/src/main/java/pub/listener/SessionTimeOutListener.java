@@ -10,7 +10,7 @@ import javax.servlet.http.HttpSessionListener;
 /**
  * Created by zhangjl on 2015/12/21.
  */
-@WebListener
+
 public class SessionTimeOutListener implements HttpSessionListener {
     public void sessionCreated(HttpSessionEvent se) {
         se.getSession();
