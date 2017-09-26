@@ -9,8 +9,8 @@
         <version>COMMON-1.0-DEV-SNAPSHOT</version>
     </parent>
     <artifactId>common-modules</artifactId>
-    <version>COMMUNITY-1.0-DEV-SNAPSHOT</version>
     <packaging>pom</packaging>
+    <version>COMMUNITY-1.0-DEV-SNAPSHOT</version>
 
     <modules>
         <module>com.github.jyoghurt.version</module>
@@ -37,6 +37,5 @@
         <module>com.github.jyoghurt.http</module>
         <module>com.github.jyoghurt.payment</module>
         <module>com.github.jyoghurt.serial</module>
-
     </modules>
 </project>
