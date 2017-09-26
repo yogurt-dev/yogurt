@@ -34,5 +34,6 @@
         <module>com.github.jyoghurt.http</module>
         <module>com.github.jyoghurt.payment</module>
         <module>com.github.jyoghurt.serial</module>
+        <module>com.github.jyoghurt.1</module>
     </modules>
 </project>
