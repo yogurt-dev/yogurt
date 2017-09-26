@@ -27,7 +27,7 @@ public class AliPayTransferUtil {
                 alipayTransferRequest.getPrivateKey(),
                 "json",
                 alipayTransferRequest.getCharset(),
-                alipayTransferRequest.getPublicKey());
+                alipayTransferRequest.getPublicKey(),"RSA2");
         return client;
     }
 

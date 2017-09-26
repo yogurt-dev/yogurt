@@ -3,12 +3,11 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>com.github.jyoghurt</groupId>
-        <artifactId>dataDict</artifactId>
+        <artifactId>version</artifactId>
         <version>COMMON-1.0-DEV-SNAPSHOT</version>
-        <relativePath>../</relativePath>
     </parent>
     <artifactId>dataDict-service</artifactId>
-    <version>${parent.version}</version>
+    <version>COMMON-1.0-DEV-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>dataDict-service</name>
     <dependencies>
