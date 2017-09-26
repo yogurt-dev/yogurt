@@ -26,7 +26,7 @@ public class AliPayTransferUtil {
                 alipayTransferRequest.getApp_id(),
                 alipayTransferRequest.getPrivateKey(),
                 "json",
-                alipayTransferRequest.getCharset(),
+                "UTF-8",
                 alipayTransferRequest.getPublicKey(),"RSA2");
         return client;
     }
@@ -55,7 +55,7 @@ public class AliPayTransferUtil {
         try {
             AlipayFundTransToaccountTransferResponse response = alipayClient.execute(request);
            if(!response.isSuccess()){
-               throw new BaseErrorException();
+               throw new BaseErrorException("支付宝接口调用异常,code:{0},msg:{1}",response.getSubCode(),response.getSubMsg());
            }
         } catch (AlipayApiException e) {
             throw new BaseErrorException(e);
