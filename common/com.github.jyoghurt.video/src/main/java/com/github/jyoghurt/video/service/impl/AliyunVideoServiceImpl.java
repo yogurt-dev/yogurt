@@ -46,10 +46,24 @@ public class AliyunVideoServiceImpl implements AliyunVideoService {
 
     @Override
     public PlayInfoDTO getPlayInfo(PublicRequest publicRequest) {
-        return getInfo(publicRequest, 0);
+        for(int i=0;i<10;i++){
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            try {
+                return getInfo(publicRequest);
+            }catch (Exception e){
+                if(i==9){
+                    throw new BaseErrorException(e);
+                }
+            }
+        }
+        throw new BaseErrorException("阿里云视频上传异常");
     }
 
-    private PlayInfoDTO getInfo(PublicRequest publicRequest, int count) {
+    private PlayInfoDTO getInfo(PublicRequest publicRequest) {
         String url = "http://vod.cn-shanghai.aliyuncs.com?Action=GetPlayInfo&VideoId=" + publicRequest.getVideoId() + "&Format=JSON";
         url = url + AliyunUtils.buildPublicParam(publicRequest.getAccessKeyId());
         HttpResponse response1 = HttpClientUtils.post(Signature.newBuilder()
@@ -62,16 +76,7 @@ public class AliyunVideoServiceImpl implements AliyunVideoService {
             String xmlStr = EntityUtils.toString(response1.getEntity(), "UTF-8");
             PlayInfoDTO playInfoDTO = JSON.parseObject(xmlStr, PlayInfoDTO.class);
             if (StringUtils.isNotEmpty(playInfoDTO.getMessage())) {
-                if (count > 10) {
-                    throw new BaseErrorException("阿里云视频上传异常:" + playInfoDTO.getMessage());
-                }
-                count++;
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    throw new BaseErrorException(e);
-                }
-                getInfo(publicRequest, count);
+                throw new BaseErrorException("阿里云视频上传异常:" + playInfoDTO.getMessage());
             }
             return playInfoDTO;
         } catch (IOException e) {
