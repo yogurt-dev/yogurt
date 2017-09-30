@@ -37,6 +37,7 @@
         <com.github.jyoghurt.http.version>COMMON-1.0-DEV-SNAPSHOT</com.github.jyoghurt.http.version>
         <com.github.jyoghurt.payment.version>COMMON-1.0-DEV-SNAPSHOT</com.github.jyoghurt.payment.version>
         <com.github.jyoghurt.serial.version>COMMON-1.0-DEV-SNAPSHOT</com.github.jyoghurt.serial.version>
+        <com.github.jyoghurt.video.version>COMMON-1.0-DEV-SNAPSHOT</com.github.jyoghurt.video.version>
     </properties>
 
 </project>

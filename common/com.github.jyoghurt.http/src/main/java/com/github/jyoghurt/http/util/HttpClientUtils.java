@@ -9,6 +9,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
+import java.util.Map;
 
 /**
  * user:zjl
@@ -72,6 +73,15 @@ public class HttpClientUtils {
         HttpEntity entity = response.getEntity();
         try {
             return EntityUtils.toString(entity, "UTF-8");
+        } catch (IOException e) {
+            throw new BaseErrorException("解析responseIO异常", e);
+        }
+    }
+
+    public static Map<String, Object> parseResponseToMap(HttpResponse response) {
+        HttpEntity entity = response.getEntity();
+        try {
+            return XMLParserUtil.getMapFromXML(EntityUtils.toString(entity, "UTF-8"));
         } catch (IOException e) {
             throw new BaseErrorException("解析responseIO异常", e);
         }
