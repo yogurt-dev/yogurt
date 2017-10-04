@@ -10,18 +10,14 @@ import com.github.jyoghurt.http.util.HttpClientUtils;
 import com.github.jyoghurt.video.dto.PlayInfoDTO;
 import com.github.jyoghurt.video.dto.PublicRequest;
 import com.github.jyoghurt.video.service.AliyunVideoService;
-import com.github.jyoghurt.video.service.UploadVideoService;
 import com.github.jyoghurt.video.util.AliyunUtils;
+import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.util.EntityUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  * Created with IntelliJ IDEA.
@@ -61,6 +57,27 @@ public class AliyunVideoServiceImpl implements AliyunVideoService {
             }
         }
         throw new BaseErrorException("阿里云视频上传异常");
+    }
+
+    @Override
+    public void deleteVideo(PublicRequest publicRequest) {
+        String url = "http://vod.cn-shanghai.aliyuncs.com?Action=DeleteVideo&VideoIds=" + publicRequest.getVideoId() + "&Format=JSON";
+        url = url + AliyunUtils.buildPublicParam(publicRequest.getAccessKeyId());
+        HttpResponse response1 = HttpClientUtils.post(Signature.newBuilder()
+                .method("POST")
+                .url(url)
+                .secret(publicRequest.getAccessKeySecret())
+                .build()
+                .compose(), null);
+        try {
+            String xmlStr = EntityUtils.toString(response1.getEntity(), "UTF-8");
+            System.out.println(xmlStr);
+            JSONObject json = JSONObject.fromObject(xmlStr);
+            String code = (String) json.get("Code");
+            System.out.println(code);
+        } catch (IOException e) {
+            throw new BaseErrorException("获取阿里云视频信息IO异常", e);
+        }
     }
 
     private PlayInfoDTO getInfo(PublicRequest publicRequest) {

@@ -12,6 +12,7 @@ import com.github.jyoghurt.core.exception.BaseErrorException;
 import com.github.jyoghurt.core.result.HttpResultEntity;
 import com.github.jyoghurt.core.result.HttpResultHandle;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,15 +43,22 @@ public class UploadImgServiceImpl implements UploadImgService {
     @Autowired
     private ImgService imgService;
 
-    //图片大小限制为2M
-    private static final long MAXSIZE = 1000000;
+    //图片大小限制为1M
+    private static final long DEFAULT_MAXSIZE = 1000000;
+    @Value("${maxSize}")
+    private String maxSize;
     protected Logger logger = LoggerFactory.getLogger(this.getClass());
-
+    private Long getMaxSize(){
+        if(StringUtils.isNotEmpty(maxSize)){
+            return Long.valueOf(maxSize);
+        }
+        return DEFAULT_MAXSIZE;
+    }
     @Override
     public HttpResultEntity uploadImg(MultipartFile file, ImageConfig imageConfig) throws ImgException {
         String suffix = "gif,jpg,jpeg,png,bmp";
         String fileName = file.getOriginalFilename();
-        if (file.getSize() > MAXSIZE) {
+        if (file.getSize() > getMaxSize()) {
             throw new ImgException(ImgException.ERROR_9001);
         }
 
@@ -107,7 +115,7 @@ public class UploadImgServiceImpl implements UploadImgService {
         try {
             String suffix = "gif,jpg,jpeg,png,bmp";
             String fileName = file.getOriginalFilename();
-            if (file.getSize() > MAXSIZE) {
+            if (file.getSize() > getMaxSize()) {
                 return "文件过大";
             }
             String fileExt = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
@@ -133,7 +141,7 @@ public class UploadImgServiceImpl implements UploadImgService {
 
     public HttpResultEntity uploadImgDb(String file, ImageConfig imageConfig) throws ImgException {
         String suffix = "gif,jpg,jpeg,png,bmp";
-        if (file.length() > MAXSIZE) {
+        if (file.length() > getMaxSize()) {
             throw new ImgException(ImgException.ERROR_9001);
         }
 
@@ -152,7 +160,7 @@ public class UploadImgServiceImpl implements UploadImgService {
 
         String suffix = "gif,jpg,jpeg,png,bmp";
         String fileName = file.getOriginalFilename();
-        if (file.getSize() > MAXSIZE) {
+        if (file.getSize() > getMaxSize()) {
             throw new BaseErrorException("上传图片不能超过1M");
         }
 
@@ -183,6 +191,7 @@ public class UploadImgServiceImpl implements UploadImgService {
     public String downLoad(String remoteFilePath, String moduleName, String fileName) {
         try {
             ImageConfig imageConfig = new ImageConfig();
+            imageConfig.setModuleName(moduleName);
             URL urlfile = new URL(remoteFilePath);
             HttpURLConnection httpUrl = (HttpURLConnection) urlfile.openConnection();
             httpUrl.connect();

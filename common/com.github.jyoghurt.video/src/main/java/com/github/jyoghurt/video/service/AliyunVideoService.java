@@ -27,4 +27,6 @@ public interface AliyunVideoService {
      * @return 视频资料
      */
     PlayInfoDTO getPlayInfo(PublicRequest publicRequest);
+
+    void deleteVideo(PublicRequest publicRequest);
 }
