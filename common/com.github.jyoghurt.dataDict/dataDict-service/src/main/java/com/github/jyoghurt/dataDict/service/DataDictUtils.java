@@ -3,8 +3,12 @@ package com.github.jyoghurt.dataDict.service;
 
 import com.github.jyoghurt.dataDict.domain.DataDictValue;
 import com.github.jyoghurt.core.utils.SpringContextUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -65,7 +69,17 @@ public class DataDictUtils {
     public static List<DataDictValue> getDataDictValues(String dictItemCode)  {
         return getDataDictService().getDataDictValues(dictItemCode);
     }
-
+    public static Map<String ,DataDictValue> getDataDictValueMap(String dictItemCode)  {
+            List<DataDictValue> dataDictValues = getDataDictService().getDataDictValues(dictItemCode);
+            if(CollectionUtils.isEmpty(dataDictValues)){
+                return Collections.EMPTY_MAP;
+            }
+            Map<String,DataDictValue> map = new HashMap();
+            for(DataDictValue value : dataDictValues){
+                map.put(value.getDictValueCode(),value);
+            }
+            return map;
+    }
     /**
      * 把类名当做枚举项code，查询旗下所有枚举值，并根据枚举值的code与类属性的对应关系，自动填充对象
      * eg：SmsConfig
