@@ -1,12 +1,14 @@
-package com.github.jyoghurt.quartz.service.impl;
+package com.df.quartz.service.impl;
 
 
-import com.github.jyoghurt.quartz.dao.ScheduleJobMapper;
-import com.github.jyoghurt.quartz.domain.ScheduleJob;
-import com.github.jyoghurt.quartz.exception.QuartzException;
-import com.github.jyoghurt.quartz.service.ScheduleJobService;
+import com.df.quartz.dao.ScheduleJobMapper;
+import com.df.quartz.domain.ScheduleJob;
+import com.df.quartz.exception.QuartzException;
+import com.df.quartz.service.ScheduleJobService;
 import com.github.jyoghurt.core.service.impl.ServiceSupport;
+import org.apache.commons.collections.map.HashedMap;
 import org.quartz.*;
+import org.quartz.impl.matchers.GroupMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,8 @@ import org.springframework.stereotype.Service;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Service("scheduleJobService")
 public class ScheduleJobServiceImpl extends ServiceSupport<ScheduleJob, ScheduleJobMapper> implements ScheduleJobService {
@@ -48,10 +52,12 @@ public class ScheduleJobServiceImpl extends ServiceSupport<ScheduleJob, Schedule
 
     public void syncScheduleJobs() throws QuartzException {
         //找到所有需要同步的任务
-        List<ScheduleJob> scheduleJobs = this.findAll(new ScheduleJob());
+        List<ScheduleJob> scheduleJobs = this.findAll(new ScheduleJob().setDeleteFlag(false));
         for (ScheduleJob scheduleJob : scheduleJobs) {
             syncScheduleJob(scheduleJob);
         }
+        //匹配应该删除的周期任务
+        matchRemoveJob(scheduleJobs);
     }
 
     /**
@@ -196,6 +202,25 @@ public class ScheduleJobServiceImpl extends ServiceSupport<ScheduleJob, Schedule
         logger.info("========================================");
         logger.info("更新<失败回滚>任务类型成功,jobName:{}", triggerKey.getName());
         logger.info("========================================");
+    }
+
+    private void matchRemoveJob(List<ScheduleJob> scheduleJobs) {
+        Scheduler scheduler = schedulerFactoryBean.getScheduler();
+        Map<String, Boolean> scheduleJobsMap = new HashedMap();
+        for (ScheduleJob scheduleJob : scheduleJobs) {
+            scheduleJobsMap.put(scheduleJob.getJobName(), true);
+        }
+        try {
+            Set<JobKey> jobKeys = scheduler.getJobKeys(GroupMatcher.anyGroup());
+            for (JobKey jobKey : jobKeys) {
+                if (null!=scheduleJobsMap.get(jobKey.getName())) {
+                    continue;
+                }
+                removeScheduleJob(jobKey.getGroup(), jobKey.getName());
+            }
+        } catch (SchedulerException e) {
+            logger.error("获取周期任务全部触发器异常");
+        }
     }
 
     private void removeScheduleJob(ScheduleJob scheduleJob) throws QuartzException {
