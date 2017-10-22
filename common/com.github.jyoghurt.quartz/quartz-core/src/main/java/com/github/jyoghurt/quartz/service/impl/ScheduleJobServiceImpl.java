@@ -1,11 +1,12 @@
-package com.df.quartz.service.impl;
+package com.github.jyoghurt.quartz.service.impl;
 
 
-import com.df.quartz.dao.ScheduleJobMapper;
-import com.df.quartz.domain.ScheduleJob;
-import com.df.quartz.exception.QuartzException;
-import com.df.quartz.service.ScheduleJobService;
+
 import com.github.jyoghurt.core.service.impl.ServiceSupport;
+import com.github.jyoghurt.quartz.dao.ScheduleJobMapper;
+import com.github.jyoghurt.quartz.domain.ScheduleJob;
+import com.github.jyoghurt.quartz.exception.QuartzException;
+import com.github.jyoghurt.quartz.service.ScheduleJobService;
 import org.apache.commons.collections.map.HashedMap;
 import org.quartz.*;
 import org.quartz.impl.matchers.GroupMatcher;
