@@ -38,5 +38,6 @@
         <module>com.github.jyoghurt.payment</module>
         <module>com.github.jyoghurt.serial</module>
         <module>com.github.jyoghurt.video</module>
+        <module>com.github.jyoghurt.drools</module>
     </modules>
 </project>

@@ -27,11 +27,11 @@ public class VertxRegisterController extends BaseController {
     @RequestMapping(value = "/init", method = RequestMethod.GET)
     public HttpResultEntity<?> register() throws Exception {
         Map<String, VertxSocketSupport> map = SpringContextUtils.getBeans(VertxSocketSupport.class);
-        map.forEach((s, vertxSocketSupport) ->
-                VertxHandler.getInstance().eventBus()
-                        .consumer(vertxSocketSupport.initAddress() + "_Server").handler(
-                        message -> vertxSocketSupport.handleMessage(message.body())
-                ));
+//        map.forEach((s, vertxSocketSupport) ->
+//                VertxHandler.getInstance().eventBus()
+//                        .consumer(vertxSocketSupport.initAddress() + "_Server").handler(
+//                        message -> vertxSocketSupport.handleMessage(message.body())
+//                ));
         JSONObject obj = new JSONObject();
         obj.put("MANAGER", SpringContextUtils.getProperty("socketManagerAddress"));
         obj.put("SERVER", SpringContextUtils.getProperty("socketServerAddress"));
