@@ -1,5 +1,6 @@
 package com.github.jyoghurt.wechatbasic.common.pojo;
 
+
 import com.github.jyoghurt.wechatbasic.enums.WeChatMenusTypeEnum;
 
 /**
@@ -8,11 +9,13 @@ import com.github.jyoghurt.wechatbasic.enums.WeChatMenusTypeEnum;
  * @author chihang
  * @date 2015-10-14
  */  
-public class CommonButton extends Button {  
+public class CommonButton extends ComplexButton {
     private WeChatMenusTypeEnum type;
     private String key;
     private String url;
     private String media_id;
+    private String appid;
+    private String pagepath;
 
     public WeChatMenusTypeEnum getType() {
         return type;
@@ -44,5 +47,21 @@ public class CommonButton extends Button {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getAppid() {
+        return appid;
+    }
+
+    public void setAppid(String appid) {
+        this.appid = appid;
+    }
+
+    public String getPagepath() {
+        return pagepath;
+    }
+
+    public void setPagepath(String pagepath) {
+        this.pagepath = pagepath;
     }
 }

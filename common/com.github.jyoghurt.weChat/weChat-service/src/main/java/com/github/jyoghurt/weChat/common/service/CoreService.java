@@ -138,7 +138,7 @@ public class CoreService {
     /*校验关注自动回复*/
     public static String checkAndReplyFocus(String appId, String fromUserName, String toUserName) throws WeChatException {
         try {
-            for (WeChatAutoResponseT weChatAutoResponseT : weChatAutoResponseTService.findAutoResponseList(appId, WeChatAutoResponseType.FOCUS)) {
+            for (WeChatAutoResponseT weChatAutoResponseT : weChatAutoResponseTService.findAutoResponseList(appId, WeChatAutoResponseType.subscribe)) {
                 for (WeChatAutoResponseMsgT weChatAutoResponseMsgT : weChatAutoResponseMsgTService.findAutoResponseMsgByParent(weChatAutoResponseT.getAutoResponseId())) {
                     return analysisAutoResponseMsgT(fromUserName, toUserName, weChatAutoResponseMsgT);
                 }

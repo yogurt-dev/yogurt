@@ -133,11 +133,11 @@ public class CustomMenusTServiceImpl extends ServiceSupport<WeChatCustomMenusT, 
                     CommonButton subBtn = getCommonButton(subVo);
                     subButtonList.add(subBtn);
                 }
-                bottomBtn.setSub_button((CommonButton[]) subButtonList.toArray(new CommonButton[subButtonList.size()]));
+                //bottomBtn.setSub_button((CommonButton[]) subButtonList.toArray(new CommonButton[subButtonList.size()]));
                 buttonList.add(bottomBtn);
             }
         }
-        menu.setButton((Button[]) buttonList.toArray(new Button[buttonList.size()]));
+       // menu.setButton((Button[]) buttonList.toArray(new Button[buttonList.size()]));
         return menu;
     }
 
