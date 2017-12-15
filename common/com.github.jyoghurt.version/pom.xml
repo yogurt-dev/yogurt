@@ -14,6 +14,7 @@
     <packaging>pom</packaging>
     <properties>
         <spring.version>4.1.9.RELEASE</spring.version>
+
         <com.github.jyoghurt.j2ee>2.0.4-SNAPSHOT</com.github.jyoghurt.j2ee>
         <com.github.jyoghurt.activiti.version>COMMON-1.0-DEV-SNAPSHOT</com.github.jyoghurt.activiti.version>
         <com.github.jyoghurt.webscoket.version>COMMON-1.0-DEV-SNAPSHOT</com.github.jyoghurt.webscoket.version>

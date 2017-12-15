@@ -96,6 +96,5 @@ public class TencentCallBackServiceImpl implements TencentCallBackService {
         } catch (PaymentRepeatException e) {
             logger.info("支付已完成,支付记录Id:{}", hisPaymentRecords.getPaymentId());
         }
-
     }
 }
