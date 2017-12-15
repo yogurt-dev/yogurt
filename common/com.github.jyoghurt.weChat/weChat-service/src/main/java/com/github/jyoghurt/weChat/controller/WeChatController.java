@@ -110,4 +110,12 @@ public class WeChatController extends BaseController {
         return getSuccessResult(materialNewsMapList);
     }
 
+    @LogContent("获取用户信息")
+    @RequestMapping(value = "/getUserInfo/{openId}", method = RequestMethod.GET)
+    public HttpResultEntity<?> getUserInfo(@PathVariable String openId) {
+        //获取媒体下载路径;
+        WeixinUserInfo weixinUserInfo = AdvancedUtil.getUserInfo(WeixinUtil.getAccessToken().getToken(),
+                openId);
+        return getSuccessResult(weixinUserInfo);
+    }
 }
