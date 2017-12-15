@@ -5,10 +5,7 @@ import com.github.jyoghurt.core.annotations.LogContent;
 import com.github.jyoghurt.core.controller.BaseController;
 import com.github.jyoghurt.core.result.HttpResultEntity;
 import com.github.jyoghurt.security.annotations.IgnoreAuthentication;
-import com.github.jyoghurt.wechatbasic.common.pojo.BathgetMaterialParam;
-import com.github.jyoghurt.wechatbasic.common.pojo.Button;
-import com.github.jyoghurt.wechatbasic.common.pojo.CommonButton;
-import com.github.jyoghurt.wechatbasic.common.pojo.Menu;
+import com.github.jyoghurt.wechatbasic.common.pojo.*;
 import com.github.jyoghurt.wechatbasic.common.util.AdvancedUtil;
 import com.github.jyoghurt.wechatbasic.common.util.SignUtil;
 import com.github.jyoghurt.wechatbasic.common.util.WeixinUtil;
@@ -63,75 +60,28 @@ public class WeChatController extends BaseController {
      * 列出配货单
      */
     @LogContent("自定义菜单")
-    @RequestMapping(value = "/createMenu", method = RequestMethod.GET)
-    public HttpResultEntity<?> createMenu() {
-        BathgetMaterialParam bathgetMaterialParam = new BathgetMaterialParam();
-        bathgetMaterialParam.setCount(100);
-        bathgetMaterialParam.setOffset(0);
-        String appletAppId = "wx5b9be6b77c4b201c";
+    @RequestMapping(value = "/createMenu/{mediaId}", method = RequestMethod.GET)
+    public HttpResultEntity<?> createMenu(@PathVariable String mediaId) {
+        String appletAppId = "wx6d3b59eec2a43a48";
+        // TODO: 2017/12/13  按照自定义菜单配的路径修改
         String pagePath = "pages/school/index";
+        // TODO: 2017/12/13  按照自定义菜单配的路径修改
         String url = "http://appleterror.lvyushequ.com/";
         List<Button> levelOneMenu = new ArrayList<>();
-        //校园生活
-        CommonButton schoolButton = new CommonButton();
-        schoolButton.setName("校园生活");
-        List<CommonButton> subSchoolBtns = new ArrayList<>();
-        //sub1
-        CommonButton schoolSub1Button = new CommonButton();
-        schoolSub1Button.setName("快递代取");
-        schoolSub1Button.setAppid(appletAppId);
-        schoolSub1Button.setPagepath(pagePath);
-        schoolSub1Button.setUrl(url);
-        schoolSub1Button.setType(WeChatMenusTypeEnum.miniprogram);
-        //sub2
-        CommonButton schoolSub2Button = new CommonButton();
-        schoolSub2Button.setName("校园超市");
-        schoolSub2Button.setAppid(appletAppId);
-        schoolSub2Button.setPagepath(pagePath);
-        schoolSub2Button.setUrl(url);
-        schoolSub2Button.setType(WeChatMenusTypeEnum.miniprogram);
-        //sub3
-        CommonButton schoolSub3Button = new CommonButton();
-        schoolSub3Button.setName("耐克定制");
-        schoolSub3Button.setMedia_id("oBXUQxDVKs4CxNHk-CPlRUzGuyC8pH70aDDqpFXvO3U");
-        schoolSub3Button.setType(WeChatMenusTypeEnum.media_id);
-        subSchoolBtns.add(schoolSub1Button);
-        subSchoolBtns.add(schoolSub2Button);
-        subSchoolBtns.add(schoolSub3Button);
-        schoolButton.setSub_button(subSchoolBtns);
-        levelOneMenu.add(schoolButton);
         //我的校园
         CommonButton mySchoolButton = new CommonButton();
-        mySchoolButton.setName("我的校园");
+        mySchoolButton.setName("进入小野");
         mySchoolButton.setAppid(appletAppId);
         mySchoolButton.setPagepath(pagePath);
         mySchoolButton.setUrl(url);
         mySchoolButton.setType(WeChatMenusTypeEnum.miniprogram);
         levelOneMenu.add(mySchoolButton);
-        //驴鱼圈子
-        CommonButton lyButton = new CommonButton();
-        lyButton.setName("驴鱼圈子");
-        List<CommonButton> lyBtns = new ArrayList<>();
-        //sub1
-        CommonButton lySub1Button = new CommonButton();
-        lySub1Button.setName("联系我们");
-        lySub1Button.setKey("callUs");
-        lySub1Button.setType(WeChatMenusTypeEnum.click);
-        //sub2
-        CommonButton lySub2Button = new CommonButton();
-        lySub2Button.setName("招募代理人");
-        lySub2Button.setKey("findProxy");
-        lySub2Button.setType(WeChatMenusTypeEnum.click);
-        //sub3
-        CommonButton lySub3Button = new CommonButton();
-        lySub3Button.setName("移动端后台");
-        lySub3Button.setUrl("https://open.weixin.qq.com/connect/oauth2/authorize?appid=wxc98d1fe9ec478c8a&redirect_uri=http%3A%2F%2F836341fadc484cd889b753f81612d0b4.lvyushequ.com%2Fm_login.html&response_type=code&scope=snsapi_base&state=123#wechat_redirect");
-        lySub3Button.setType(WeChatMenusTypeEnum.view);
-        lyBtns.add(lySub1Button);
-        lyBtns.add(lySub2Button);
-        lyBtns.add(lySub3Button);
-        lyButton.setSub_button(lyBtns);
-        levelOneMenu.add(lyButton);
+        //活动季
+        CommonButton activitiBtn = new CommonButton();
+        activitiBtn.setName("活动季");
+        activitiBtn.setMedia_id(mediaId);
+        activitiBtn.setType(WeChatMenusTypeEnum.media_id);
+        levelOneMenu.add(activitiBtn);
         Menu menu = new Menu();
         menu.setButton(levelOneMenu);
         WeixinUtil.createMenu(menu, WeixinUtil.getAccessToken().getToken());
@@ -139,12 +89,25 @@ public class WeChatController extends BaseController {
     }
 
     /**
-     * 列出配货单
+     * 生成带编号场景的二维码
      */
-    @LogContent("自定义菜单")
+    @LogContent("生成带编号场景的二维码")
     @RequestMapping(value = "/getQRCode/{code}", method = RequestMethod.GET)
     public HttpResultEntity<?> getQRCode(@PathVariable Integer code) {
         String codeUrl = AdvancedUtil.getQRCode(AdvancedUtil.createPermanentQRCode(WeixinUtil.getAccessToken().getToken(), code), "D:/upload/qrCode");
         return getSuccessResult(codeUrl);
     }
+
+    @LogContent("获取素材列表")
+    @RequestMapping(value = "/getMaterialList", method = RequestMethod.GET)
+    public HttpResultEntity<?> getMaterialList() {
+        BathgetMaterialParam bathgetMaterialParam = new BathgetMaterialParam();
+        bathgetMaterialParam.setCount(100);
+        bathgetMaterialParam.setOffset(0);
+        //获取媒体下载路径;
+        MaterialNewsMapList materialNewsMapList = AdvancedUtil.batchgetMaterialNews(WeixinUtil.getAccessToken().getToken(),
+                bathgetMaterialParam);
+        return getSuccessResult(materialNewsMapList);
+    }
+
 }
