@@ -39,11 +39,8 @@ public class WeixinUtil {
      * @return token
      */
     public static AccessToken getAccessToken() {
-        String env = SpringContextUtils.getProperty(WechatConstants.ENV);
-        String appId = DataDictUtils.getDataDictValue(WeChatAppMsgConfig.class.getSimpleName(), env
-                + "_" + WeChatAppMsgConfig.APPID.name()).getDictValueName();
-        String appsecret = DataDictUtils.getDataDictValue(WeChatAppMsgConfig.class.getSimpleName(), env
-                + "_" + WeChatAppMsgConfig.APPSECRET.name()).getDictValueName();
+        String appId =SpringContextUtils.getProperty("wechatAppId");
+        String appsecret =SpringContextUtils.getProperty("wechatAppSecret");
         return getAccessToken(appId, appsecret);
     }
 
@@ -62,11 +59,8 @@ public class WeixinUtil {
     }
 
     public static AccessToken reGetAccessToken() {
-        String env = SpringContextUtils.getProperty(WechatConstants.ENV);
-        String appId = DataDictUtils.getDataDictValue(WeChatAppMsgConfig.class.getSimpleName(), env
-                + "_" + WeChatAppMsgConfig.APPID.name()).getDictValueName();
-        String appsecret = DataDictUtils.getDataDictValue(WeChatAppMsgConfig.class.getSimpleName(), env
-                + "_" + WeChatAppMsgConfig.APPSECRET.name()).getDictValueName();
+        String appId =SpringContextUtils.getProperty("wechatAppId");
+        String appsecret =SpringContextUtils.getProperty("wechatAppSecret");
         return reGetToken(appId, appsecret);
     }
 
