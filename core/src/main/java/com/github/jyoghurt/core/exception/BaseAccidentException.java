@@ -58,7 +58,6 @@ public class BaseAccidentException extends Exception {
             logFlag = true;
         }
     }
-
     public BaseAccidentException(String message, Throwable cause) {
         super(message, cause);
         if (!(cause instanceof BaseAccidentException)) {
@@ -66,6 +65,9 @@ public class BaseAccidentException extends Exception {
         }
     }
 
+    public BaseAccidentException(BaseAccidentException exception){
+        this.exceptionBody = exception.getExceptionBody();
+    }
     public String getErrorCode() {
         return errorCode;
     }
