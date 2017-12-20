@@ -13,6 +13,7 @@ import com.google.gson.Gson;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +21,11 @@ import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.net.URLEncoder;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -155,18 +160,18 @@ public class AdvancedUtil {
      * @param appId
      * @param redirectUri
      */
-    public static void getOauth2(String appId, String redirectUri) {
+    public static String getOauth2URL(String appId, String redirectUri) {
+        // 拼接请求地址
+        String requestUrl = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=APPID&redirect_uri=REDIRECT_URI&response_type=code&scope=snsapi_userinfo&state=1#wechat_redirect";
+        requestUrl = requestUrl.replace("APPID", appId);
         try {
-            // 拼接请求地址
-            String requestUrl = "https://open.weixin.qq.com/connect/oauth2/authorize?appid=APPID&redirect_uri=REDIRECT_URI&response_type=code&scope=SCOPE&state=STATE#wechat_redirect";
-            requestUrl = requestUrl.replace("APPID", appId);
-            requestUrl = requestUrl.replace("REDIRECT_URI", redirectUri);
-            // 获取网页授权凭证
-            JSONObject jsonObject = CommonUtil.httpsRequest(requestUrl, "GET", null);
-        } catch (WeChatException e) {
-            log.error("微信获取网页授权凭证异常", e);
-            e.printStackTrace();
+            requestUrl = requestUrl.replace("REDIRECT_URI", URLEncoder.encode(redirectUri, "utf-8"));
+        } catch (UnsupportedEncodingException e) {
+            log.error("转换异常", e);
+            return StringUtils.EMPTY;
         }
+        return requestUrl;
+
     }
 
     /**
@@ -177,7 +182,7 @@ public class AdvancedUtil {
      * @param code
      * @return WeixinAouth2Token
      */
-    public static WeixinOauth2Token getOauth2AccessToken(String appId, String appSecret, String code) {
+    private static WeixinOauth2Token getOauth2AccessToken(String appId, String appSecret, String code) {
         WeixinOauth2Token wat = null;
         JSONObject jsonObject = new JSONObject();
         try {
@@ -211,7 +216,7 @@ public class AdvancedUtil {
      * @param code
      * @return openId
      */
-    public static String getOauth2OpenId(String appId, String appSecret, String code) {
+    public static WeixinOauth2Token getOauth2OpenId(String appId, String appSecret, String code) {
         log.info("========================================");
         log.info("从redis缓存中读取code,查看是否存在重复跳转现象" + code);
         log.info("========================================");
@@ -226,7 +231,7 @@ public class AdvancedUtil {
         }
         if (null != token) {
             log.error("确定微信端存在同一code重复跳转获取token现象，现从redis读取token,不再进行请求" + code);
-            return token.toString();
+            return (WeixinOauth2Token)token;
         }
         WeixinOauth2Token weixinOauth2Token = getOauth2AccessToken(appId, appSecret, code);
         if (null == weixinOauth2Token) {
@@ -237,10 +242,10 @@ public class AdvancedUtil {
         log.info("============================================");
         log.info("将token置于redis缓存");
         log.info("============================================");
-        redisHandler.getRedisTemplate().opsForValue().set(appId + "_" + code, openId);
-        redisHandler.getRedisTemplate().expire(appId + "_" + code, 60, TimeUnit.SECONDS);
+        redisHandler.getRedisTemplate().opsForValue().set(appId + "_" + code, weixinOauth2Token);
+        redisHandler.getRedisTemplate().expire(appId + "_" + code, 3600, TimeUnit.SECONDS);
         log.info("============================================");
-        return openId;
+        return weixinOauth2Token;
     }
 
     /**
@@ -309,8 +314,11 @@ public class AdvancedUtil {
                 snsUserInfo.setCity(jsonObject.getString("city"));
                 // 用户头像
                 snsUserInfo.setHeadImgUrl(jsonObject.getString("headimgurl"));
+//                snsUserInfo.setUnionid(jsonObject.getString("unionid"));
                 // 用户特权信息
                 snsUserInfo.setPrivilegeList(JSONArray.toList(jsonObject.getJSONArray("privilege"), List.class));
+
+
             }
             return snsUserInfo;
         } catch (WeChatException e) {
@@ -320,21 +328,40 @@ public class AdvancedUtil {
     }
 
     /**
-     * 通过AccessToken
+     * 获取AccessToken
      *
      * @return SNSUserInfo
      */
     @SuppressWarnings({"deprecation", "unchecked"})
-    public static String getAccessToken() {
-        SNSUserInfo snsUserInfo = null;
-        JSONObject jsonObject = new JSONObject();
+    public static String getAccessToken(String appId, String appSecret) {
+        Object token = null;
+        RedisHandler redisHandler = (RedisHandler) SpringContextUtils.getBean("redisHandler");
         try {
+            token = redisHandler.getRedisTemplate().opsForValue().get("appId_token");
+        } catch (Exception e) {
+            log.info("========================================");
+            log.info("从redis获取缓存序列化失败");
+            log.info("========================================");
+        }
+        if (null != token) {
+//            return token.toString();
+        }
+
+        try {
+            JSONObject jsonObject = null;
             // 拼接请求地址
             String requestUrl = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=APPID&secret=APPSECRET";
-            requestUrl = requestUrl.replace("APPID", "wx66776eafa3939846").replace("APPSECRET", "6146de557f4773639569f1c277f1a56a");
+            requestUrl = requestUrl.replace("APPID", appId).replace("APPSECRET", appSecret);
             // 通过网页授权获取用户信息
             jsonObject = CommonUtil.httpsRequest(requestUrl, "GET", null);
             if (null != jsonObject) {
+                //将token置于redis缓存
+                log.info("============================================");
+                log.info("将ticket置于redis缓存");
+                log.info("============================================");
+                redisHandler.getRedisTemplate().opsForValue().set("appId_token", jsonObject.getString("access_token"));
+                redisHandler.getRedisTemplate().expire("appId_token", 7000, TimeUnit.SECONDS);
+                log.info("============================================");
                 return jsonObject.getString("access_token");
             }
             return null;
@@ -355,18 +382,39 @@ public class AdvancedUtil {
     public static String getJsapiTicket(String accessToken) {
         SNSUserInfo snsUserInfo = null;
         JSONObject jsonObject = new JSONObject();
+        Object ticket = null;
+        RedisHandler redisHandler = (RedisHandler) SpringContextUtils.getBean("redisHandler");
+        try {
+            ticket = redisHandler.getRedisTemplate().opsForValue().get(accessToken + "_ticket");
+        } catch (Exception e) {
+            log.info("========================================");
+            log.info("从redis获取缓存序列化失败");
+            log.info("========================================");
+        }
+        if (null != ticket) {
+//            return ticket.toString();
+        }
         try {
             // 拼接请求地址
             String requestUrl = "https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=ACCESS_TOKEN&type=jsapi";
             requestUrl = requestUrl.replace("ACCESS_TOKEN", accessToken);
             // 通过网页授权获取用户信息
             jsonObject = CommonUtil.httpsRequest(requestUrl, "GET", null);
-            System.out.println(jsonObject);
-            if (null != jsonObject) {
-                // 用户的标识
-                return jsonObject.getString("ticket");
+
+            if (null == jsonObject) {
+                return null;
             }
-            return null;
+
+
+            //将token置于redis缓存
+            log.info("============================================");
+            log.info("将ticket置于redis缓存");
+            log.info("============================================");
+            redisHandler.getRedisTemplate().opsForValue().set(accessToken + "_ticket", jsonObject.getString("ticket"));
+            redisHandler.getRedisTemplate().expire(accessToken + "_ticket", 7000, TimeUnit.SECONDS);
+            log.info("============================================");
+            // 用户的标识
+            return jsonObject.getString("ticket");
         } catch (WeChatException e) {
             log.error("微信获取jsapi_ticket异常", e);
         }
@@ -955,9 +1003,9 @@ public class AdvancedUtil {
     }
 
     public static void main(String args[]) {
-        createPermanentQRCode(getAccessToken(), "驴鱼登录");
+//        createPermanentQRCode(getAccessToken(), "驴鱼登录");
         //"media_id" -> "IMEkemtKyIY4OZstSo00qQw48zhqGiHCf9ZamV8EQPY"
-        getOauth2("wx66776eafa3939846", "http://zjl19881215.6655.la/PaymentWechatJsApi.html");
+        getOauth2URL("wx38b815a2f9a34133", "http://wuxiaoye.iok.la/activity.html");
 /*        Date d = new Date(1395658920);
         d.getTime();
         String accessToken = getAccessToken();
@@ -1135,5 +1183,28 @@ public class AdvancedUtil {
         //{"touser":"o9MbCvptRpUhT81EyJB1H0YsLAW0","msgtype":"news",
         // "news":{"articles":[{"author":"","content":"<p>21<\/p>\n","content_source_url":"","digest":"","show_cover_pic":"1","thumb_media_id":"1108501790125","title":"55","url":"http://mp.weixin.qq.com/s?__biz=MzIwMDQzNTk1Ng==&mid=400227776&idx=1&sn=74a6515c5f093375532d68697e86c5dc#rd"}]}}
         System.out.println(123);
+    }
+
+    public static String SHA1(String decript) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-1");
+            digest.update(decript.getBytes());
+            byte messageDigest[] = digest.digest();
+            // Create Hex String
+            StringBuffer hexString = new StringBuffer();
+            // 字节数组转换为 十六进制 数
+            for (int i = 0; i < messageDigest.length; i++) {
+                String shaHex = Integer.toHexString(messageDigest[i] & 0xFF);
+                if (shaHex.length() < 2) {
+                    hexString.append(0);
+                }
+                hexString.append(shaHex);
+            }
+            return hexString.toString();
+
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return "";
     }
 }

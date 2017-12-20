@@ -25,6 +25,8 @@ public class SNSUserInfo {
     private String headImgUrl;
     // 用户特权信息
     private List<String> privilegeList;
+//    unionid
+    private String unionid;
 
     public String getOpenId() {
         return openId;
@@ -88,5 +90,13 @@ public class SNSUserInfo {
 
     public void setPrivilegeList(List<String> privilegeList) {
         this.privilegeList = privilegeList;
+    }
+
+    public String getUnionid() {
+        return unionid;
+    }
+
+    public void setUnionid(String unionid) {
+        this.unionid = unionid;
     }
 }

@@ -28,7 +28,8 @@ public class WeixinUtil {
     private static Map<String, TokenEntity> tokenMap = new HashMap<>();
 
     public static void cleanToken() {
-        tokenMap = new HashMap<>();
+        RedisHandler redisHandler = (RedisHandler) SpringContextUtils.getBean("redisHandler");
+        redisHandler.getRedisTemplate().opsForValue().set(REDIS_HASH_KEY + "_" + SpringContextUtils.getProperty("wechatAppId"),null);
     }
 
     private static String REDIS_HASH_KEY = "wechatToken";

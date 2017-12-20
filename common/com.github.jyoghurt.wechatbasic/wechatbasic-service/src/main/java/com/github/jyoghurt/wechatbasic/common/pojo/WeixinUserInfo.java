@@ -1,32 +1,22 @@
 package com.github.jyoghurt.wechatbasic.common.pojo;
 
 /**
- * ΢���û��Ļ�����Ϣ
- * 
+ *
  * @author yutao
  * @date 2013-11-09
  */
 public class WeixinUserInfo {
-	// �û��ı�ʶ
 	private String openId;
-	// ��ע״̬��1�ǹ�ע��0��δ��ע����δ��עʱ��ȡ����������Ϣ
 	private int subscribe;
-	// �û���עʱ�䣬Ϊʱ���������û�����ι�ע����ȡ����עʱ��
 	private String subscribeTime;
-	// �ǳ�
 	private String nickname;
-	// �û����Ա�1�����ԣ�2��Ů�ԣ�0��δ֪��
 	private int sex;
-	// �û����ڹ���
 	private String country;
-	// �û�����ʡ��
 	private String province;
-	// �û����ڳ���
 	private String city;
-	// �û������ԣ���������Ϊzh_CN
 	private String language;
-	// �û�ͷ��
 	private String headImgUrl;
+	private String unionid;
 
 	public String getOpenId() {
 		return openId;
@@ -106,5 +96,13 @@ public class WeixinUserInfo {
 
 	public void setHeadImgUrl(String headImgUrl) {
 		this.headImgUrl = headImgUrl;
+	}
+
+	public String getUnionid() {
+		return unionid;
+	}
+
+	public void setUnionid(String unionid) {
+		this.unionid = unionid;
 	}
 }
