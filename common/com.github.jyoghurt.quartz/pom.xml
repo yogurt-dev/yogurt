@@ -10,7 +10,7 @@
         <version>COMMON-1.0-DEV-SNAPSHOT</version>
     </parent>
     <artifactId>quartz</artifactId>
-    <version>COMMON-1.0-DEV-SNAPSHOT</version>
+    <version>COMMON-2.0-DEV-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <modules>

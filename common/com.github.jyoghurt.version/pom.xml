@@ -23,7 +23,7 @@
         <com.github.jyoghurt.emailPlugin.version>COMMON-1.0-DEV-SNAPSHOT</com.github.jyoghurt.emailPlugin.version>
         <com.github.jyoghurt.uploadAnnex.version>COMMON-1.0-DEV-SNAPSHOT</com.github.jyoghurt.uploadAnnex.version>
         <com.github.jyoghurt.weChat.version>COMMON-1.0-DEV-SNAPSHOT</com.github.jyoghurt.weChat.version>
-        <com.github.jyoghurt.quartz.version>COMMON-1.0-DEV-SNAPSHOT</com.github.jyoghurt.quartz.version>
+        <com.github.jyoghurt.quartz.version>COMMON-2.0-DEV-SNAPSHOT</com.github.jyoghurt.quartz.version>
         <com.github.jyoghurt.wechatbasic.version>COMMON-1.0-DEV-SNAPSHOT</com.github.jyoghurt.wechatbasic.version>
         <com.github.jyoghurt.msgcen.version>COMMON-1.0-DEV-SNAPSHOT</com.github.jyoghurt.msgcen.version>
         <com.github.jyoghurt.security.version>COMMON-1.0-DEV-SNAPSHOT</com.github.jyoghurt.security.version>

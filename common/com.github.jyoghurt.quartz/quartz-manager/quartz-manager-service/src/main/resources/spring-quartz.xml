@@ -16,6 +16,6 @@
         <property name="jobFactory">
             <bean class="com.github.jyoghurt.quartz.factory.JobFactory"/>
         </property>
-        <property name="configLocation" value="classpath:${MANAGER_ENV}-config.properties"/>
+        <property name="configLocation" value="classpath:manager-config.properties"/>
     </bean>
 </beans>

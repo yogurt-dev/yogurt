@@ -6,6 +6,7 @@ package com.github.jyoghurt.common.payment.common.enums;
  */
 public enum PaymentBusinessTypeEnum {
     ORDER("orderClientService"), //订单模块 ;
+    ACTIVITY("activityClientService"),//活动模块
     RECHARGE("memberRechargeService");//账户充值
 
 
