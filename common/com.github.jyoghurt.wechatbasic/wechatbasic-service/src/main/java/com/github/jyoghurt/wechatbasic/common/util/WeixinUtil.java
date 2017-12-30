@@ -29,7 +29,7 @@ public class WeixinUtil {
 
     public static void cleanToken() {
         RedisHandler redisHandler = (RedisHandler) SpringContextUtils.getBean("redisHandler");
-        redisHandler.getRedisTemplate().opsForValue().set(REDIS_HASH_KEY + "_" + SpringContextUtils.getProperty("wechatAppId"),null);
+        redisHandler.getRedisTemplate().opsForValue().set(REDIS_HASH_KEY + "_" + SpringContextUtils.getProperty("wechatAppId"), null);
     }
 
     private static String REDIS_HASH_KEY = "wechatToken";
@@ -40,8 +40,8 @@ public class WeixinUtil {
      * @return token
      */
     public static AccessToken getAccessToken() {
-        String appId =SpringContextUtils.getProperty("wechatAppId");
-        String appsecret =SpringContextUtils.getProperty("wechatAppSecret");
+        String appId = SpringContextUtils.getProperty("wechatAppId");
+        String appsecret = SpringContextUtils.getProperty("wechatAppSecret");
         return getAccessToken(appId, appsecret);
     }
 
@@ -60,8 +60,8 @@ public class WeixinUtil {
     }
 
     public static AccessToken reGetAccessToken() {
-        String appId =SpringContextUtils.getProperty("wechatAppId");
-        String appsecret =SpringContextUtils.getProperty("wechatAppSecret");
+        String appId = SpringContextUtils.getProperty("wechatAppId");
+        String appsecret = SpringContextUtils.getProperty("wechatAppSecret");
         return reGetToken(appId, appsecret);
     }
 

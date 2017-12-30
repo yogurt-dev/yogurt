@@ -8,18 +8,19 @@ import com.github.jyoghurt.core.utils.SpringContextUtils;
 import com.github.jyoghurt.security.annotations.IgnoreAuthentication;
 import com.github.jyoghurt.wechatbasic.common.pojo.*;
 import com.github.jyoghurt.wechatbasic.common.util.AdvancedUtil;
+import com.github.jyoghurt.wechatbasic.common.util.AppletUtil;
 import com.github.jyoghurt.wechatbasic.common.util.SignUtil;
 import com.github.jyoghurt.wechatbasic.common.util.WeixinUtil;
 import com.github.jyoghurt.wechatbasic.enums.WeChatMenusTypeEnum;
 import com.github.jyoghurt.wechatbasic.service.WechatNoticeCoreService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -58,7 +59,8 @@ public class WeChatController extends BaseController {
         }
     }
 
-    /**nRHhvrmciPzCO3dQ-fodDk4AKxfY33-aoSls57udve4
+    /**
+     * nRHhvrmciPzCO3dQ-fodDk4AKxfY33-aoSls57udve4
      * 列出配货单
      */
     @LogContent("自定义菜单")
@@ -116,8 +118,8 @@ public class WeChatController extends BaseController {
     @RequestMapping(value = "/getUserInfo/{code}", method = RequestMethod.GET)
     public HttpResultEntity<?> getUserInfo(@PathVariable String code) {
         String appId = SpringContextUtils.getProperty("wechatAppId");
-        String appsecret =SpringContextUtils.getProperty("wechatAppSecret");
-        WeixinOauth2Token weixinOauth2Token = AdvancedUtil.getOauth2OpenId(appId,appsecret,code);
+        String appsecret = SpringContextUtils.getProperty("wechatAppSecret");
+        WeixinOauth2Token weixinOauth2Token = AdvancedUtil.getOauth2OpenId(appId, appsecret, code);
         WeixinUserInfo weixinUserInfo = AdvancedUtil.getUserInfo(weixinOauth2Token.getAccessToken(), weixinOauth2Token.getOpenId());
         return getSuccessResult(weixinUserInfo);
     }
@@ -126,8 +128,8 @@ public class WeChatController extends BaseController {
     @RequestMapping(value = "/getSNSUserInfo/{code}", method = RequestMethod.GET)
     public HttpResultEntity<?> getSNSUserInfo(@PathVariable String code) {
         String appId = SpringContextUtils.getProperty("wechatAppId");
-        String appsecret =SpringContextUtils.getProperty("wechatAppSecret");
-        WeixinOauth2Token weixinOauth2Token = AdvancedUtil.getOauth2OpenId(appId,appsecret,code);
+        String appsecret = SpringContextUtils.getProperty("wechatAppSecret");
+        WeixinOauth2Token weixinOauth2Token = AdvancedUtil.getOauth2OpenId(appId, appsecret, code);
         SNSUserInfo userInfo = AdvancedUtil.getSNSUserInfo(weixinOauth2Token.getAccessToken(),
                 weixinOauth2Token.getOpenId());
         return getSuccessResult(userInfo);
@@ -140,6 +142,12 @@ public class WeChatController extends BaseController {
         return getSuccessResult();
     }
 
+    @LogContent("createPermanentQRCode")
+    @RequestMapping(value = "/createPermanentQRCode", method = RequestMethod.POST)
+    public HttpResultEntity<?> createPermanentQRCode(@RequestBody CreatePermanentQRCodeParam createPermanentQRCodeParam) throws UnsupportedEncodingException {
+        AccessToken token = WeixinUtil.getAccessToken(SpringContextUtils.getProperty("appletAppId"), SpringContextUtils.getProperty("appletSecret"));
+        return getSuccessResult(AppletUtil.createPermanentQRCode(token.getToken(), createPermanentQRCodeParam.getScene(), createPermanentQRCodeParam.getPath(), createPermanentQRCodeParam.getWidth()));
+    }
 
     @LogContent("getJsapiTicket")
     @RequestMapping(value = "/getJsapiTicket", method = RequestMethod.GET)
@@ -150,20 +158,20 @@ public class WeChatController extends BaseController {
 
     public static void main(String[] args) {
 
-            //1、获取AccessToken
-            String accessToken = "4_lS5sL9PWdkzq_WXZd0TbxkaDzJ2qFKV0ut-5lobR6t7lzJWF7xsI7G0aQhR6g3zzhRnKfE7T-RseGrG0Ff9A3159dPy3lGzw0l9ghNgkFANSQl_JyQvZWoftiBzINivvA4a4AG_1RbU3s9SHYEJcACAFLQ";
+        //1、获取AccessToken
+        String accessToken = "4_lS5sL9PWdkzq_WXZd0TbxkaDzJ2qFKV0ut-5lobR6t7lzJWF7xsI7G0aQhR6g3zzhRnKfE7T-RseGrG0Ff9A3159dPy3lGzw0l9ghNgkFANSQl_JyQvZWoftiBzINivvA4a4AG_1RbU3s9SHYEJcACAFLQ";
 
-            //2、获取Ticket
-            String jsapi_ticket =  AdvancedUtil.getJsapiTicket("4_lS5sL9PWdkzq_WXZd0TbxkaDzJ2qFKV0ut-5lobR6t7lzJWF7xsI7G0aQhR6g3zzhRnKfE7T-RseGrG0Ff9A3159dPy3lGzw0l9ghNgkFANSQl_JyQvZWoftiBzINivvA4a4AG_1RbU3s9SHYEJcACAFLQ");
+        //2、获取Ticket
+        String jsapi_ticket = AdvancedUtil.getJsapiTicket("4_lS5sL9PWdkzq_WXZd0TbxkaDzJ2qFKV0ut-5lobR6t7lzJWF7xsI7G0aQhR6g3zzhRnKfE7T-RseGrG0Ff9A3159dPy3lGzw0l9ghNgkFANSQl_JyQvZWoftiBzINivvA4a4AG_1RbU3s9SHYEJcACAFLQ");
 
-            //3、时间戳和随机字符串
-            String noncestr = UUID.randomUUID().toString().replace("-", "").substring(0, 16);//随机字符串
-            String timestamp = String.valueOf(System.currentTimeMillis() / 1000);//时间戳
+        //3、时间戳和随机字符串
+        String noncestr = UUID.randomUUID().toString().replace("-", "").substring(0, 16);//随机字符串
+        String timestamp = String.valueOf(System.currentTimeMillis() / 1000);//时间戳
 
-            System.out.println("accessToken:"+accessToken+"\njsapi_ticket:"+jsapi_ticket+"\n时间戳："+timestamp+"\n随机字符串："+noncestr);
+        System.out.println("accessToken:" + accessToken + "\njsapi_ticket:" + jsapi_ticket + "\n时间戳：" + timestamp + "\n随机字符串：" + noncestr);
 
-            //4、获取url
-            String url="http://www.luiyang.com/add.html";
+        //4、获取url
+        String url = "http://www.luiyang.com/add.html";
             /*根据JSSDK上面的规则进行计算，这里比较简单，我就手动写啦
             String[] ArrTmp = {"jsapi_ticket","timestamp","nonce","url"};
             Arrays.sort(ArrTmp);
@@ -173,12 +181,12 @@ public class WeChatController extends BaseController {
             }
             */
 
-            //5、将参数排序并拼接字符串
-            String str = "jsapi_ticket="+jsapi_ticket+"&noncestr="+noncestr+"&timestamp="+timestamp+"&url="+url;
+        //5、将参数排序并拼接字符串
+        String str = "jsapi_ticket=" + jsapi_ticket + "&noncestr=" + noncestr + "&timestamp=" + timestamp + "&url=" + url;
 
-            //6、将字符串进行sha1加密
-            String signature = AdvancedUtil.SHA1(str);
-            System.out.println("参数："+str+"\n签名："+signature);
+        //6、将字符串进行sha1加密
+        String signature = AdvancedUtil.SHA1(str);
+        System.out.println("参数：" + str + "\n签名：" + signature);
 
     }
 

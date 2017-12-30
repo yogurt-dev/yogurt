@@ -6,6 +6,7 @@ package com.github.jyoghurt.http.enums;
  */
 public enum HttpRequestType {
     POST,
+    POST_AND_OPEN,
     GET,
     PUT,
     DELETE

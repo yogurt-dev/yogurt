@@ -5,8 +5,10 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.thoughtworks.xstream.io.xml.XmlFriendlyNameCoder;
 import com.github.jyoghurt.http.constants.FrameConstants;
+import net.sf.json.JSONObject;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
@@ -131,6 +133,29 @@ public class HttpClientHandler {
         return getResponse(httpClient, httpPost);
     }
 
+
+    public CloseableHttpResponse sendPost(String url, String jsonStr) {
+        init();
+        HttpPost httpPost = new HttpPost(url);
+        //得指明使用编码，否则到API服务器XML的中文不能被成功识别
+        StringEntity postEntity = new StringEntity(jsonStr, FrameConstants.CHARSET);
+        httpPost.setEntity(postEntity);
+        //设置请求器的配置
+        httpPost.setConfig(requestConfig);
+        return getResponse(httpClient, httpPost);
+    }
+
+    public CloseableHttpResponse sendPostAndOpen(String url, String jsonStr) {
+        init();
+        HttpPost httpPost = new HttpPost(url);
+        //得指明使用编码，否则到API服务器XML的中文不能被成功识别
+        StringEntity postEntity = new StringEntity(jsonStr, FrameConstants.CHARSET);
+        httpPost.setEntity(postEntity);
+        //设置请求器的配置
+        httpPost.setConfig(requestConfig);
+        return getResponseAndOpen(httpClient, httpPost);
+    }
+
     /**
      * 通过Http post xml数据
      *
@@ -170,13 +195,19 @@ public class HttpClientHandler {
      * @param httpGet    httpGet参数
      * @return response
      */
-    private HttpResponse getResponse(CloseableHttpClient httpClient, HttpGet httpGet) {
+    private CloseableHttpResponse getResponse(CloseableHttpClient httpClient, HttpGet httpGet) {
+        CloseableHttpResponse response = null;
         try {
-            return httpClient.execute(httpGet);
+            response = httpClient.execute(httpGet);
+            return response;
         } catch (Exception e) {
             throw new BaseErrorException("请求微信支付Http异常", e);
         } finally {
-            httpGet.abort();
+            if (null != response) {
+                if (!"image/jpeg".equals(response.getFirstHeader("Content-Type").getValue())) {
+                    httpGet.abort();
+                }
+            }
         }
     }
 
@@ -188,13 +219,29 @@ public class HttpClientHandler {
      * @param httpPost   httpPost参数
      * @return response
      */
-    private HttpResponse getResponse(CloseableHttpClient httpClient, HttpPost httpPost) {
+    private CloseableHttpResponse getResponse(CloseableHttpClient httpClient, HttpPost httpPost) {
+        CloseableHttpResponse response = null;
         try {
-            return httpClient.execute(httpPost);
+            response = httpClient.execute(httpPost);
+            return response;
         } catch (Exception e) {
             throw new BaseErrorException("请求微信支付Http异常", e);
         } finally {
-            httpPost.abort();
+            if (null != response) {
+                if (!"image/jpeg".equals(response.getFirstHeader("Content-Type").getValue())) {
+                    httpPost.abort();
+                }
+            }
+        }
+    }
+
+    private CloseableHttpResponse getResponseAndOpen(CloseableHttpClient httpClient, HttpPost httpPost) {
+        CloseableHttpResponse response = null;
+        try {
+            response = httpClient.execute(httpPost);
+            return response;
+        } catch (Exception e) {
+            throw new BaseErrorException("请求微信支付Http异常", e);
         }
     }
 
