@@ -54,7 +54,7 @@ public class AppletUtil {
      * @param scene_str   场景ID
      * @return ticket
      */
-    public static String createPermanentQRCode(String accessToken, String scene_str, String page, int width) {
+    public static String createPermanentQRCode(String accessToken, String scene_str, String page, int width ) {
         try {
             // 拼接请求地址
             String requestUrl = "https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=ACCESS_TOKEN";
@@ -62,18 +62,16 @@ public class AppletUtil {
             // 创建永久带参二维码
             Map<String, Object> map = new HashedMap();
             map.put("scene", scene_str);
-            map.put("path", page);
+            map.put("page", page);
             map.put("width", width);
             CloseableHttpResponse httpResponse = new HttpClientHandler().sendPostAndOpen(requestUrl, JSON.toJSONString(map));
+            System.out.println("***************"+httpResponse);
             try {
                 ImageConfig imageConfig = new ImageConfig();
                 imageConfig.setModuleName("appletQR");
                 InputStream str = httpResponse.getEntity().getContent();
                 return ImgUploadHelper.upload(SpringContextUtils.getProperty("uploadPath"),
-                        SpringContextUtils.getProperty("downloadPath"),
-                        imageConfig,
-                        UUID.randomUUID() + ".png",
-                        str);
+                        SpringContextUtils.getProperty("downloadPath"), imageConfig, UUID.randomUUID() + ".png", str);
             } catch (Exception e) {
                 e.printStackTrace();
                 log.error("小程序生成带参数的二维码异常", e);
