@@ -65,6 +65,7 @@ public class AppletUtil {
             map.put("page", page);
             map.put("width", width);
             CloseableHttpResponse httpResponse = new HttpClientHandler().sendPostAndOpen(requestUrl, JSON.toJSONString(map));
+            System.out.println("***************"+httpResponse);
             try {
                 ImageConfig imageConfig = new ImageConfig();
                 imageConfig.setModuleName("appletQR");
