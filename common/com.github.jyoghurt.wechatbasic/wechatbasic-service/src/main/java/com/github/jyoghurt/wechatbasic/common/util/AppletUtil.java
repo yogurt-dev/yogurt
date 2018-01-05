@@ -62,7 +62,7 @@ public class AppletUtil {
             // 创建永久带参二维码
             Map<String, Object> map = new HashedMap();
             map.put("scene", scene_str);
-            map.put("path", page);
+            map.put("page", page);
             map.put("width", width);
             CloseableHttpResponse httpResponse = new HttpClientHandler().sendPostAndOpen(requestUrl, JSON.toJSONString(map));
             try {
@@ -70,10 +70,7 @@ public class AppletUtil {
                 imageConfig.setModuleName("appletQR");
                 InputStream str = httpResponse.getEntity().getContent();
                 return ImgUploadHelper.upload(SpringContextUtils.getProperty("uploadPath"),
-                        SpringContextUtils.getProperty("downloadPath"),
-                        imageConfig,
-                        UUID.randomUUID() + ".png",
-                        str);
+                        SpringContextUtils.getProperty("downloadPath"), imageConfig, UUID.randomUUID() + ".png", str);
             } catch (Exception e) {
                 e.printStackTrace();
                 log.error("小程序生成带参数的二维码异常", e);
