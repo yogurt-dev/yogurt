@@ -151,7 +151,7 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
                 throw new DaoException(StringUtils.join("当前提交数据已过期，请重新编辑 entityClass =", entity.getClass().getName()));
             }
             ((BaseSnapshotEntity) entity).setVersion(version + 1);
-            getMapper().updateForSelective(entity);
+            getMapper().update(entity);
             saveHis(entity);
         } catch (IllegalAccessException e) {
             throw new DaoException(StringUtils.join("检测并发失败 entityClass =", entity.getClass().getName()));
