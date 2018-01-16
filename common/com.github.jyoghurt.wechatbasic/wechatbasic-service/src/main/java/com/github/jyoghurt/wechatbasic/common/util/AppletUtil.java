@@ -54,7 +54,7 @@ public class AppletUtil {
      * @param scene_str   场景ID
      * @return ticket
      */
-    public static String createPermanentQRCode(String accessToken, String scene_str, String page, int width) {
+    public static String createPermanentQRCode(String accessToken, String scene_str, String page, int width ) {
         try {
             // 拼接请求地址
             String requestUrl = "https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=ACCESS_TOKEN";
