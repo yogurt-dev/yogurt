@@ -19,7 +19,6 @@ import java.util.Random;
 
 public class ImgUploadHelper {
     public static final Logger logger = LoggerFactory.getLogger(ImgUploadHelper.class);
-
     /**
      * 上传图片
      *
@@ -29,6 +28,17 @@ public class ImgUploadHelper {
      */
     public static String upload(String uploadPath, String downloadPath,
                                 ImageConfig imageConfig, String fileName, InputStream inputStream) {
+        return upload(uploadPath, downloadPath, imageConfig, fileName, inputStream,null);
+    }
+    /**
+     * 上传图片
+     *
+     * @param imageConfig
+     * @return 上传图片路径
+     * @throws IOException
+     */
+    public static String upload(String uploadPath, String downloadPath,
+                                ImageConfig imageConfig, String fileName, InputStream inputStream,String newFileName) {
         try {
             String imageUrl = "";
             logger.info("上传图片名称==>>" + fileName);
@@ -37,16 +47,23 @@ public class ImgUploadHelper {
             }
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
             String dirPath = dateFormat.format(new Date());
-            String path = StringUtils.join(uploadPath, "/", imageConfig.getModuleName(), "/", dirPath);
+            String path = StringUtils.join(uploadPath, "/", imageConfig.getModuleName(), "/", StringUtils.isEmpty(newFileName)?dirPath:null);
 
             File gallerySaveDir = new File(path);
             if (!gallerySaveDir.exists()) {
                 gallerySaveDir.mkdirs();// 如果目录不存在就创建
             }
             SimpleDateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
-            String newFileName = df.format(new Date()) + "_" + new Random().nextInt(100);
+            File uploadedFile =null;
             String ext = fileName.substring(fileName.lastIndexOf('.'));
-            File uploadedFile = new File(gallerySaveDir, newFileName + "_original" + ext);
+            if(StringUtils.isNotEmpty(newFileName)){
+                uploadedFile = new File(gallerySaveDir, newFileName + "_original");
+            }else{
+                newFileName = df.format(new Date()) + "_" + new Random().nextInt(100);
+
+                uploadedFile = new File(gallerySaveDir, newFileName + "_original" + ext);
+            }
+
 
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             byte[] buffer = new byte[1024];
@@ -59,7 +76,7 @@ public class ImgUploadHelper {
             byteArrayOutputStream.flush();
             //保存原图
             FileCopyUtils.copy(new ByteArrayInputStream(byteArrayOutputStream.toByteArray()), new FileOutputStream(uploadedFile));
-            logger.info("上传图片路径==>>" + imageUrl);
+            logger.info("上传图片路径==>>" + path);
             if (null == imageConfig || imageConfig.getWidth() == null) {
                 ext = StringUtils.isEmpty(imageConfig.getExtension()) ? ext : imageConfig.getExtension();
                 FileCopyUtils.copy(new ByteArrayInputStream(byteArrayOutputStream.toByteArray()), new FileOutputStream

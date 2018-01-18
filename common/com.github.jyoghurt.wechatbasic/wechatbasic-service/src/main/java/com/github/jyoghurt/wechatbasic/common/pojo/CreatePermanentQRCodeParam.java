@@ -1,5 +1,7 @@
 package com.github.jyoghurt.wechatbasic.common.pojo;
 
+import java.util.Map;
+
 /**
  * Created with IntelliJ IDEA.
  * User: DELL
@@ -11,51 +13,56 @@ public class CreatePermanentQRCodeParam {
 
     private String scene;
 
-    private String path;
+    private String page;
 
     private Integer width;
 
     private Boolean auto_color;
 
-    private Object line_color;
+    private Map line_color;
 
     public String getScene() {
         return scene;
     }
 
-    public void setScene(String scene) {
+    public CreatePermanentQRCodeParam setScene(String scene) {
         this.scene = scene;
+        return this;
     }
 
-    public String getPath() {
-        return path;
+    public String getPage() {
+        return page;
     }
 
-    public void setPath(String path) {
-        this.path = path;
+    public CreatePermanentQRCodeParam setPage(String page) {
+        this.page = page;
+        return this;
     }
 
     public Integer getWidth() {
         return width;
     }
 
-    public void setWidth(Integer width) {
+    public CreatePermanentQRCodeParam setWidth(Integer width) {
         this.width = width;
+        return this;
     }
 
     public Boolean getAuto_color() {
         return auto_color;
     }
 
-    public void setAuto_color(Boolean auto_color) {
+    public CreatePermanentQRCodeParam setAuto_color(Boolean auto_color) {
         this.auto_color = auto_color;
+        return this;
     }
 
-    public Object getLine_color() {
+    public Map getLine_color() {
         return line_color;
     }
 
-    public void setLine_color(Object line_color) {
+    public CreatePermanentQRCodeParam setLine_color(Map line_color) {
         this.line_color = line_color;
+        return this;
     }
 }

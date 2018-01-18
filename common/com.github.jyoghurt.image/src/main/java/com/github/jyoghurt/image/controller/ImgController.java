@@ -26,7 +26,6 @@ import java.util.List;
 @RequestMapping("/img")
 public class ImgController extends BaseController {
 
-
 	/**
 	 * 图片服务类
 	 */
@@ -64,55 +63,4 @@ public class ImgController extends BaseController {
 		result.put("imgInfo",jsonArray);
 		return getSuccessResult(result);
 	}
-
-//	/**
-//	 * 列出图片
-//	 */
-//	@LogContent("查询图片")
-//	@RequestMapping(value = "/list",method=RequestMethod.GET)
-//	public HttpResultEntity<?> list(ImgT imgT ,QueryHandle queryHandle)   {
-//        return getSuccessResult(imgService.getData(imgT.setDeleteFlag(false),queryHandle.configPage().addOrderBy("createDateTime",
-//				"desc")));
-//
-//	}
-//
-//
-//	/**
-//	 * 添加图片
-//	 */
-//	@LogContent("添加图片")
-//	@RequestMapping(method=RequestMethod.POST)
-//	public HttpResultEntity<?> add(@RequestBody ImgT imgT)   {
-//		imgService.save(imgT);
-//        return getSuccessResult();
-//	}
-//
-//	/**
-//	 * 编辑图片
-//	 */
-//	@LogContent("编辑图片")
-//	@RequestMapping(method=RequestMethod.PUT)
-//	public HttpResultEntity<?> edit(@RequestBody ImgT imgT)   {
-//		imgService.updateForSelective(imgT);
-//        return getSuccessResult();
-//	}
-//
-//	/**
-//	 * 删除单个图片
-//	 */
-//	@LogContent("删除图片")
-//	@RequestMapping(value = "/{imgId}",method=RequestMethod.DELETE)
-//	public HttpResultEntity<?> logicDelete(@PathVariable String imgId)   {
-//		imgService.logicDelete(imgId);
-//		return getSuccessResult();
-//	}
-//
-//    /**
-//     * 查询单个图片
-//	 */
-//	 @LogContent("查询单个图片")
-//	 @RequestMapping(value = "/{imgId}",method=RequestMethod.GET)
-//	 public HttpResultEntity<?> get(@PathVariable String imgId)   {
-//		 return getSuccessResult(imgService.find(imgId));
-//	 }
 }

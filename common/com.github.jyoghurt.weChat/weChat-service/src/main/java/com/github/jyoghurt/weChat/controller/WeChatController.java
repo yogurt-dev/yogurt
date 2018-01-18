@@ -145,9 +145,7 @@ public class WeChatController extends BaseController {
     @LogContent("createPermanentQRCode")
     @RequestMapping(value = "/createPermanentQRCode", method = RequestMethod.POST)
     public HttpResultEntity<?> createPermanentQRCode(@RequestBody CreatePermanentQRCodeParam createPermanentQRCodeParam) throws UnsupportedEncodingException {
-        AccessToken token = WeixinUtil.getAccessToken(SpringContextUtils.getProperty("appletAppId"), SpringContextUtils.getProperty("appletSecret"));
-        System.out.println("***********token="+token.getToken());
-        return getSuccessResult(AppletUtil.createPermanentQRCode(token.getToken(), createPermanentQRCodeParam.getScene(), createPermanentQRCodeParam.getPath(), createPermanentQRCodeParam.getWidth()));
+        return getSuccessResult(AppletUtil.createPermanentQRCode(createPermanentQRCodeParam));
     }
 
     @LogContent("getJsapiTicket")
