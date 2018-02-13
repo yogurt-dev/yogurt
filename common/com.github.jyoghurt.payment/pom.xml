@@ -72,5 +72,10 @@
             <artifactId>xstream</artifactId>
             <version>1.4.7</version>
         </dependency>
+        <dependency>
+            <groupId>com.github.jyoghurt</groupId>
+            <artifactId>dataDict-service</artifactId>
+            <version>${com.github.jyoghurt.dataDict.version}</version>
+        </dependency>
     </dependencies>
 </project>

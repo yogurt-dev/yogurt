@@ -5,6 +5,8 @@ import com.github.jyoghurt.common.payment.common.domain.PaymentRecordsT;
 import com.github.jyoghurt.common.payment.common.enums.PaymentGatewayEnum;
 import com.github.jyoghurt.core.exception.BaseErrorException;
 import com.github.jyoghurt.core.utils.SpringContextUtils;
+import com.github.jyoghurt.dataDict.domain.DataDictValue;
+import com.github.jyoghurt.dataDict.service.DataDictUtils;
 
 import java.util.Map;
 
@@ -59,8 +61,10 @@ public class TencentPayCommonUtil {
         String uploadPath = SpringContextUtils.getProperty("certPath");
         String env = SpringContextUtils.getProperty("environmentName");
         String split = System.getProperty("file.separator");
-        String certName = "lvyukeji_cert";
-        String downloadPath = uploadPath + split + "certificate" + split + env + split + (PaymentGatewayEnum.TENCENT_APPLET == paymentRecordsT.getPaymentMethod()?"applet_"+certName:certName);
+        //证书下载路径
+        String downloadPath = getCert(PaymentGatewayEnum.TENCENT_APPLET == paymentRecordsT.getPaymentMethod()
+                ? vars.get("appletMchId").toString()
+                : vars.get("tencentMchId").toString());
         //初始化配置
         TencentConfigure tencentConfigure = initSDKConfiguration(
                 vars.get("tencentKey").toString(),
@@ -75,5 +79,15 @@ public class TencentPayCommonUtil {
                         : vars.get("tencentSubMchId").toString(),
                 downloadPath);
         return tencentConfigure;
+    }
+
+    public static String getCert(String tencentMchId) {
+        String uploadPath = SpringContextUtils.getProperty("certPath");
+        String env = SpringContextUtils.getProperty("environmentName");
+        DataDictValue dataDictValue = DataDictUtils.getDataDictValue("CertificatePathEnum", tencentMchId);
+        String split = System.getProperty("file.separator");
+        String certName = dataDictValue.getDictValueName();
+        String downloadPath = uploadPath + split + "certificate" + split + env + split + certName;
+        return downloadPath;
     }
 }
