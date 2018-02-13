@@ -42,10 +42,10 @@ public class TencentPayCommonUtil {
         if (null == vars.get("tencentKey")) {
             throw new BaseErrorException(Error_Msg_Tmpl, "相关数据区中缺少参数tencentKey", paymentRecordsT.toString());
         }
-        if (null == vars.get("tencentAppId")&&PaymentGatewayEnum.TENCENT_APPLET != paymentRecordsT.getPaymentMethod()) {
+        if (null == vars.get("tencentAppId") && PaymentGatewayEnum.TENCENT_APPLET != paymentRecordsT.getPaymentMethod()) {
             throw new BaseErrorException(Error_Msg_Tmpl, "相关数据区中缺少参数tencentAppId", paymentRecordsT.toString());
         }
-        if (null == vars.get("tencentMchId")&&PaymentGatewayEnum.TENCENT_APPLET != paymentRecordsT.getPaymentMethod()) {
+        if (null == vars.get("tencentMchId") && PaymentGatewayEnum.TENCENT_APPLET != paymentRecordsT.getPaymentMethod()) {
             throw new BaseErrorException(Error_Msg_Tmpl, "相关数据区中缺少参数tencentMchId", paymentRecordsT.toString());
         }
         //小程序
@@ -83,11 +83,10 @@ public class TencentPayCommonUtil {
 
     public static String getCert(String tencentMchId) {
         String uploadPath = SpringContextUtils.getProperty("certPath");
-        String env = SpringContextUtils.getProperty("environmentName");
         DataDictValue dataDictValue = DataDictUtils.getDataDictValue("CertificatePathEnum", tencentMchId);
         String split = System.getProperty("file.separator");
         String certName = dataDictValue.getDictValueName();
-        String downloadPath = uploadPath + split + "certificate" + split + env + split + certName;
+        String downloadPath = uploadPath + split + "certificate" + split + certName;
         return downloadPath;
     }
 }
