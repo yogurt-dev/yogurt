@@ -27,45 +27,63 @@ public class ParentTpl {
      * 模板内容
      */
     private JSONObject data;
+    /**
+     * 模板需要放大的关键词
+     */
+    private String emphasis_keyword;
 
     public String getTouser() {
         return touser;
     }
 
-    public void setTouser(String touser) {
+    public ParentTpl setTouser(String touser) {
         this.touser = touser;
+        return this;
     }
 
     public String getTemplate_id() {
         return template_id;
     }
 
-    public void setTemplate_id(String template_id) {
+    public ParentTpl setTemplate_id(String template_id) {
         this.template_id = template_id;
+        return this;
     }
 
     public String getUrl() {
         return url;
     }
 
-    public void setUrl(String url) {
+    public ParentTpl setUrl(String url) {
         this.url = url;
+        return this;
     }
 
     public JSONObject getData() {
         return data;
     }
 
-    public void setData(JSONObject data) {
+    public ParentTpl setData(JSONObject data) {
         this.data = data;
+        return this;
     }
 
     public String getForm_id() {
         return form_id;
     }
 
-    public void setForm_id(String form_id) {
+    public ParentTpl setForm_id(String form_id) {
         this.form_id = form_id;
+        return this;
+    }
+
+    public String getEmphasis_keyword() {
+        return emphasis_keyword;
+    }
+
+    public ParentTpl setEmphasis_keyword(String emphasis_keyword) {
+        this.emphasis_keyword = emphasis_keyword;
+        return  this;
     }
 
     @Override
