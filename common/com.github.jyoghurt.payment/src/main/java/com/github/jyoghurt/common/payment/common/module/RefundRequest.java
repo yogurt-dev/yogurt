@@ -40,48 +40,54 @@ public class RefundRequest {
         return outRequestNo;
     }
 
-    public void setOutRequestNo(String outRequestNo) {
+    public RefundRequest setOutRequestNo(String outRequestNo) {
         this.outRequestNo = outRequestNo;
+        return this;
     }
 
     public String getBusinessId() {
         return businessId;
     }
 
-    public void setBusinessId(String businessId) {
+    public RefundRequest setBusinessId(String businessId) {
         this.businessId = businessId;
+        return this;
     }
 
     public PaymentBusinessTypeEnum getPaymentBusinessType() {
         return paymentBusinessType;
     }
 
-    public void setPaymentBusinessType(PaymentBusinessTypeEnum paymentBusinessType) {
+    public RefundRequest setPaymentBusinessType(PaymentBusinessTypeEnum paymentBusinessType) {
         this.paymentBusinessType = paymentBusinessType;
+        return this;
     }
 
     public String getRefundPaymentReason() {
         return refundPaymentReason;
     }
 
-    public void setRefundPaymentReason(String refundPaymentReason) {
+    public RefundRequest setRefundPaymentReason(String refundPaymentReason) {
         this.refundPaymentReason = refundPaymentReason;
+        return this;
     }
 
     public BigDecimal getRefundAmount() {
         return RefundAmount;
     }
 
-    public void setRefundAmount(BigDecimal refundAmount) {
+    public RefundRequest setRefundAmount(BigDecimal refundAmount) {
         RefundAmount = refundAmount.setScale(2, RoundingMode.DOWN);
+        return this;
     }
 
     public String getOperatorId() {
         return operatorId;
     }
 
-    public void setOperatorId(String operatorId) {
+    public RefundRequest setOperatorId(String operatorId) {
         this.operatorId = operatorId;
+        return this;
     }
 
     @Override
