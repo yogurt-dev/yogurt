@@ -22,7 +22,7 @@ public class ParentTpl {
     /**
      * 点击后跳转的url
      */
-    private String url;
+    private String page;
     /**
      * 模板内容
      */
@@ -50,12 +50,12 @@ public class ParentTpl {
         return this;
     }
 
-    public String getUrl() {
-        return url;
+    public String getPage() {
+        return page;
     }
 
-    public ParentTpl setUrl(String url) {
-        this.url = url;
+    public ParentTpl setPage(String page) {
+        this.page = page;
         return this;
     }
 
@@ -91,7 +91,7 @@ public class ParentTpl {
         return "ParentTpl{" +
                 "touser='" + touser + '\'' +
                 ", template_id='" + template_id + '\'' +
-                ", url='" + url + '\'' +
+                ", url='" + page + '\'' +
                 ", data=" + data +
                 '}';
     }

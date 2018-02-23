@@ -54,7 +54,7 @@ public class WechatTmplAdapter implements MsgAdapter, MsgTarget {
                     } else {
                         weChatUrl += "?openId=" + target;
                     }
-                    parentTpl.setUrl(weChatUrl);
+                    parentTpl.setPage(weChatUrl);
                 }
                 //发送email
                 if (SwitchHandler.switchIsOpenBySwitchGroupKey("msgcen")) {
