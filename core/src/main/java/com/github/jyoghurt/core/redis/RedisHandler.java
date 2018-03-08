@@ -11,13 +11,13 @@ import org.springframework.stereotype.Service;
 public class RedisHandler {
 
     @Autowired
-    public RedisTemplate<String, Object> redisTemplate;
+    public RedisTemplate redisTemplate;
 
-    public RedisTemplate<String, Object> getRedisTemplate() {
+    public RedisTemplate getRedisTemplate() {
         return redisTemplate;
     }
 
-    public void setRedisTemplate(RedisTemplate<String, Object> redisTemplate) {
+    public void setRedisTemplate(RedisTemplate redisTemplate) {
         this.redisTemplate = redisTemplate;
     }
 
