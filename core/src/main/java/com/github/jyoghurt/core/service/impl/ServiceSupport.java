@@ -159,6 +159,28 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
     }
 
     /**
+     * 更新历史数据
+     * add by baoxiaobing@lvyushequ.com
+     *
+     * @param entity
+     * @Date 2016-12-20
+     */
+    private void updateForSelectiveHis(T entity) {
+        Integer version = getEntityVersion(entity);
+        try {
+            if (!checkConcurrency(entity, version)) {
+                throw new DaoException(StringUtils.join("当前提交数据已过期，请重新编辑 entityClass =", entity.getClass().getName()));
+            }
+            ((BaseSnapshotEntity) entity).setVersion(version + 1);
+            getMapper().updateForSelective(entity);
+            saveHis(entity);
+        } catch (IllegalAccessException e) {
+            throw new DaoException(StringUtils.join("检测并发失败 entityClass =", entity.getClass().getName()));
+        }
+    }
+
+
+    /**
      * 检测是否存在并发
      *
      * @param entity
@@ -319,7 +341,7 @@ public abstract class ServiceSupport<T, M extends BaseMapper<T>> implements Base
         this.processModifyColumns(entity);
         if (entity instanceof BaseSnapshotEntity) {
             //获取主键
-            updateHis(entity);
+            updateForSelectiveHis(entity);
             return;
         }
         getMapper().updateForSelective(entity);
