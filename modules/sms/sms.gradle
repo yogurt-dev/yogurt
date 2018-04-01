@@ -1,0 +1,7 @@
+dependencies {
+    compile project(":datadict"),
+            libraries.aliyun_java_sdk_core,
+            libraries.aliyun_java_sdk_dysmsapi,
+            libraries.sendMessage,
+            libraries.slf4j_log4j12
+}

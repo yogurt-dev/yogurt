@@ -1,0 +1,10 @@
+dependencies {
+    compile project(":core"),
+            project(":datadict"),
+            project(":http"),
+            project(":image"),
+            libraries.dom4j,
+            libraries.freemarker,
+            libraries.httpclient,
+            libraries.xstream
+}

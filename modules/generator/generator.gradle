@@ -1,0 +1,8 @@
+dependencies {
+    compile libraries.commons_logging,
+            libraries.commons_lang3,
+            libraries.poi,
+            libraries.poi_ooxml,
+            libraries.testng,
+            libraries.velocity
+}

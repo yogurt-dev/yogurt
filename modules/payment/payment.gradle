@@ -1,0 +1,17 @@
+dependencies {
+    compile project(":core"),
+            project(":datadict"),
+            project(":image"),
+            project(":http"),
+            libraries.alipay,
+            libraries.commons_configuration,
+            libraries.commons_codec,
+            libraries.commons_httpclient,
+            libraries.google_zxing_core,
+            libraries.guava,
+            libraries.httpclient,
+            libraries.sendMessage,
+            libraries.xpp3,
+            libraries.xmlpull,
+            libraries.xstream
+}

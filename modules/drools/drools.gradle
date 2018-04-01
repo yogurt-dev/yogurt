@@ -1,0 +1,6 @@
+dependencies {
+    compile libraries.drools_core,
+            libraries.drools_compiler,
+            libraries.ecj,
+            project(":core")
+}

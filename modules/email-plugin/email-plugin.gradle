@@ -1,0 +1,4 @@
+dependencies {
+    compile project(":email"),
+            project(":datadict")
+}

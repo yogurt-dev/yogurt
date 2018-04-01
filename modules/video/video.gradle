@@ -1,0 +1,10 @@
+dependencies {
+    compile project(":core"),
+            project(":http"),
+            libraries.jdom,
+            libraries.sdk_core,
+            libraries.sdk_vod,
+            libraries.oss,
+            libraries.vod_upload,
+            libraries.signature
+}

@@ -1,0 +1,7 @@
+dependencies {
+    compile project(":email-plugin"),
+            project(":sms"),
+            project(":switch"),
+            project(":wechatbasic")
+
+}

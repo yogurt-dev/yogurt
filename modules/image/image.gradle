@@ -1,0 +1,5 @@
+dependencies {
+    compile project(":core"),
+            libraries.json_lib,
+            libraries.im4java
+}
