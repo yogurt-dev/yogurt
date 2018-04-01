@@ -1,42 +1,24 @@
 rootProject.name = 'jyoghurt'
-def rootDir = rootProject.projectDir
+file("${rootProject.projectDir}/modules").eachDir { project ->
+    includeProject(project)
+}
 
-//分两层动态引入project
-file("$rootDir/modules").eachDir { module ->
-    def buildFile = new File(rootDir, "modules/${module.name}/${module.name}.gradle")
+private void includeProject(File project) {
+    File buildFile = new File(settingsDir, separatorConvert("${project.path}${File.separator}${project.name}.gradle"))
     if (buildFile.isFile()) {
-        include module.name
+        include project.name
+        this.findProject(":${project.name}").projectDir = new File(settingsDir, separatorConvert("${project.path}"))
         return
     }
-    file("$rootDir/modules/${module.name}").eachDir { project ->
-        if (new File(rootDir, "modules/${module.name}/${project.name}/${project.name}.gradle").isFile()) {
-            include project.name
-        }
+    file(project.path).eachDir { childProject ->
+        includeProject(childProject)
     }
 }
 
-/**
- * 遍历所有被引入的project
- * 固定用法设置多层树依赖
- * project.projectDir = pd
- * project.buildFileName = "${fileBaseName}.gradle"
- */
-rootProject.children.each { subProject ->
-    String subProjectName = subProject.name
-    def pd = new File(settingsDir, "modules/${subProjectName}")
-    def bf = new File(settingsDir, "modules/${subProjectName}/${subProjectName}.gradle")
-    if (pd.isDirectory() && bf.isFile()) {
-        subProject.projectDir = pd
-        subProject.buildFileName = "${subProjectName}.gradle"
-    } else {
-        def moduleName = subProject.name.split('-')[0]
-        pd = new File(settingsDir, "modules/$moduleName/${subProjectName}")
-        bf = new File(settingsDir, "modules/$moduleName/${subProjectName}/${subProjectName}.gradle")
-        if (pd.isDirectory() && bf.isFile()) {
-            subProject.projectDir = pd
-            subProject.buildFileName = "${subProjectName}.gradle"
-        }
-    }
+private String separatorConvert(String path) {
+    path = path.replace("${rootProject.projectDir}", "")
+    path = path.replaceAll("\\${File.separator}", "/")
+    return path.substring(1, path.length())
 }
 
 
