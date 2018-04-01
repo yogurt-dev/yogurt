@@ -1,0 +1,78 @@
+
+//配置的是gradle 自身需要的资源
+buildscript {
+    repositories {
+        maven {
+            url "${nexusUrl}/repository/maven-public"
+            credentials(PasswordCredentials) {
+                username = nexusUsername
+                password = nexusPassword
+            }
+        }
+    }
+}
+
+allprojects {
+    repositories {
+        maven {
+            url "${nexusUrl}/repository/maven-public"
+            credentials(PasswordCredentials) {
+                username = nexusUsername
+                password = nexusPassword
+            }
+        }
+    }
+
+    tasks.withType(JavaCompile) {
+        options.encoding = 'utf-8'
+        options.compilerArgs = ['-Xlint:-options']
+    }
+
+    tasks.withType(GroovyCompile) {
+        options.encoding = 'utf-8'
+        options.compilerArgs = ['-Xlint:-options']
+        groovyOptions.encoding = 'utf-8'
+    }
+}
+apply plugin: 'idea'
+ext {
+    jyConfRoot = "$rootDir/root"
+}
+//包含jyohurt下所有子工程
+subprojects {
+    apply plugin: 'idea'
+    apply plugin: 'java'
+    apply plugin: 'groovy'
+    apply plugin: 'maven'
+    apply from:"$jyConfRoot/dependencies.gradle"
+    //todo 准备加入代码走查  apply from:
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+    group = 'com.github.jyoghurt'
+    //避免混淆从3.0.0开始  先发布SNAPSHOT 等稳定以后打包RELASE
+    version = '3.0.0-SNAPSHOT'
+    //编译出源码包
+    task sourcesJar(type: Jar, dependsOn: classes) {
+        classifier = 'sources'
+        from sourceSets.main.allSource
+    }
+    //定制化的使用task
+    //associating the task that produces the artifact with the configuration
+    artifacts {
+        archives sourcesJar
+    }
+    //设置上传
+    uploadArchives {
+        repositories {
+            mavenDeployer {
+                repository(url: "${nexusUrl}/repository/maven-releases") {
+                    authentication(userName: nexusUsername, password: nexusPassword)
+                }
+                snapshotRepository(url: "${nexusUrl}/repository/maven-snapshots") {
+                    authentication(userName: nexusUsername, password: nexusPassword)
+                }
+            }
+        }
+    }
+}
+

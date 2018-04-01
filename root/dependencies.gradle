@@ -1,0 +1,90 @@
+//提供公共变量[:]理解为map
+ext {
+    versions = [:]
+    libraries = [:]
+}
+versions.spring = "4.1.9.RELEASE"
+
+//aliyun
+libraries.aliyun_java_sdk_core = "aliyun:aliyun-java-sdk-core:RELEASE"
+libraries.aliyun_java_sdk_dysmsapi = "aliyun:aliyun-java-sdk-dysmsapi:RELEASE"
+libraries.alipay = "com.alipay.api:alipay:2.0"
+libraries.oss = "com.aliyun:oss:2.6.0"
+libraries.signature = "com.aliyun:signature:1.0"
+libraries.sdk_core = "com.aliyun:sdk-core:3.2.2"
+libraries.sdk_vod = "com.aliyun:sdk-vod:2.1.0"
+libraries.vod_upload = "com.aliyun:vod-upload:1.0"
+
+libraries.aspectjweaver = "org.aspectj:aspectjweaver:1.7.4"
+
+libraries.commons_configuration = "com.github.testdriven.guice:commons-configuration:1.0"
+libraries.commons_collections4 = "org.apache.commons:commons-collections4:4.0"
+libraries.commons_codec = "commons-codec:commons-codec:1.6"
+libraries.commons_lang3 = "org.apache.commons:commons-lang3:3.1"
+libraries.commons_logging = "commons-logging:commons-logging:1.2"
+libraries.commons_fileupload = "commons-fileupload:commons-fileupload:1.3.1"
+libraries.commons_httpclient = "commons-httpclient:commons-httpclient:3.0.1"
+
+libraries.dom4j = "org.dom4j:dom4j:2.0.0-RC1"
+//连接池
+libraries.druid = "com.alibaba:druid:1.0.13"
+
+libraries.drools_core = "org.drools:drools-core:5.6.0.Final"
+libraries.drools_compiler = "org.drools:drools-compiler:5.6.0.Final"
+libraries.ecj = "org.eclipse.jdt.core.compiler:ecj:4.4.2"
+
+libraries.freemarker = "org.freemarker:freemarker:2.3.23"
+libraries.guava = "com.google.guava:guava:22.0"
+libraries.google_zxing_core = "com.google.zxing:core:3.2.1"
+//http
+libraries.httpclient = "org.apache.httpcomponents:httpclient:4.3.5"
+
+libraries.im4java = "org.im4java:im4java:1.4.0"
+
+libraries.jdom = "org.jdom:jdom:1.1"
+//json
+libraries.fastjson = "com.alibaba:fastjson:1.2.6"
+libraries.flyway_core = "org.flywaydb:flyway-core:4.0"
+libraries.gson = "com.google.code.gson:gson:2.3"
+libraries.jackson_annotations = "com.fasterxml.jackson.core:jackson-annotations:2.4.4"
+libraries.jackson_core = "com.fasterxml.jackson.core:jackson-core:2.4.4"
+libraries.jackson_databind = "com.fasterxml.jackson.core:jackson-databind:2.4.4"
+libraries.jackson_mapper_asl = "org.codehaus.jackson:jackson-mapper-asl:1.9.13"
+libraries.json_lib = "net.sf.json-lib:json-lib:2.4:jdk15"
+libraries.jtds = "net.sourceforge.jtds:jtds:1.3.1"
+//java
+libraries.javaee_api = "javax:javaee-api:7.0"
+
+//log
+libraries.slf4j_log4j12 = "org.slf4j:slf4j-log4j12:1.7.12"
+libraries.log4j = "log4j:log4j:1.2.17"
+//mybatis
+libraries.mybatis = "org.mybatis:mybatis:3.4.5"
+libraries.mybatis_spring = "org.mybatis:mybatis-spring:1.3.1"
+
+libraries.persistence_api = "javax.persistence:persistence-api:1.0.2"
+libraries.poi = "org.apache.poi:poi:3.11"
+libraries.poi_ooxml = "org.apache.poi:poi-ooxml:3.11"
+libraries.quartz = "org.quartz-scheduler:quartz:2.2.3"
+
+libraries.sendMessage = "com.ccp.sms:sendMessage:1.0"
+//spring
+libraries.spring_webmvc = "org.springframework:spring-webmvc:${versions.spring}"
+libraries.spring_jdbc = "org.springframework:spring-jdbc:${versions.spring}"
+libraries.spring_context_support = "org.springframework:spring-context-support:${versions.spring}"
+//cache
+libraries.spring_data_redis = "org.springframework.data:spring-data-redis:1.6.2.RELEASE"
+libraries.jedis = "redis.clients:jedis:2.8.0"
+//test
+libraries.testng = "org.testng:testng:6.8"
+
+libraries.velocity = "org.apache.velocity:velocity:1.7"
+//数据校验
+libraries.validation_api = "javax.validation:validation-api:1.1.0.Final"
+libraries.hibernate_validator = "org.hibernate:hibernate-validator:5.1.3.Final"
+
+libraries.xmlpull = "xmlpull:xmlpull:1.1.3.1"
+libraries.xpp3 = "xpp3:xpp3:1.1.4c"
+libraries.xstream = "com.thoughtworks.xstream:xstream:1.4.7"
+
+

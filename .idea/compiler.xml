@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <bytecodeTargetLevel>
+      <module name="core_main" target="1.8" />
+      <module name="core_test" target="1.8" />
+      <module name="datadict_main" target="1.8" />
+      <module name="datadict_test" target="1.8" />
+      <module name="drools_main" target="1.8" />
+      <module name="drools_test" target="1.8" />
+      <module name="email-plugin_main" target="1.8" />
+      <module name="email-plugin_test" target="1.8" />
+      <module name="email_main" target="1.8" />
+      <module name="email_test" target="1.8" />
+      <module name="generator_main" target="1.8" />
+      <module name="generator_test" target="1.8" />
+      <module name="http_main" target="1.8" />
+      <module name="http_test" target="1.8" />
+      <module name="image_main" target="1.8" />
+      <module name="image_test" target="1.8" />
+      <module name="msgcen_main" target="1.8" />
+      <module name="msgcen_test" target="1.8" />
+      <module name="payment_main" target="1.8" />
+      <module name="payment_test" target="1.8" />
+      <module name="quartz_main" target="1.8" />
+      <module name="quartz_test" target="1.8" />
+      <module name="sms_main" target="1.8" />
+      <module name="sms_test" target="1.8" />
+      <module name="switch_main" target="1.8" />
+      <module name="switch_test" target="1.8" />
+      <module name="video_main" target="1.8" />
+      <module name="video_test" target="1.8" />
+      <module name="wechatbasic_main" target="1.8" />
+      <module name="wechatbasic_test" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

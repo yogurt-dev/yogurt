@@ -1,0 +1,43 @@
+rootProject.name = 'jyoghurt'
+def rootDir = rootProject.projectDir
+
+//分两层动态引入project
+file("$rootDir/modules").eachDir { module ->
+    def buildFile = new File(rootDir, "modules/${module.name}/${module.name}.gradle")
+    if (buildFile.isFile()) {
+        include module.name
+        return
+    }
+    file("$rootDir/modules/${module.name}").eachDir { project ->
+        if (new File(rootDir, "modules/${module.name}/${project.name}/${project.name}.gradle").isFile()) {
+            include project.name
+        }
+    }
+}
+
+/**
+ * 遍历所有被引入的project
+ * 固定用法设置多层树依赖
+ * project.projectDir = pd
+ * project.buildFileName = "${fileBaseName}.gradle"
+ */
+rootProject.children.each { subProject ->
+    String subProjectName = subProject.name
+    def pd = new File(settingsDir, "modules/${subProjectName}")
+    def bf = new File(settingsDir, "modules/${subProjectName}/${subProjectName}.gradle")
+    if (pd.isDirectory() && bf.isFile()) {
+        subProject.projectDir = pd
+        subProject.buildFileName = "${subProjectName}.gradle"
+    } else {
+        def moduleName = subProject.name.split('-')[0]
+        pd = new File(settingsDir, "modules/$moduleName/${subProjectName}")
+        bf = new File(settingsDir, "modules/$moduleName/${subProjectName}/${subProjectName}.gradle")
+        if (pd.isDirectory() && bf.isFile()) {
+            subProject.projectDir = pd
+            subProject.buildFileName = "${subProjectName}.gradle"
+        }
+    }
+}
+
+
+

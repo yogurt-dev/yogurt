@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: org.antlr:antlr:3.3">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.antlr/antlr/3.3/8d5646c16b508272e02a064a1479056b72f3c887/antlr-3.3.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.antlr/antlr/3.3/91f7c99d857563f1b0c8d11bca3df1d040dbd03a/antlr-3.3-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
