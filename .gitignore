@@ -1,0 +1,4 @@
+/.idea
+/modules/**/build
+/modules/**/out
+
