@@ -1,0 +1,4 @@
+dependencies {
+    compile project(":wechat-api"),
+            libraries.security_service
+}

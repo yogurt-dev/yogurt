@@ -68,6 +68,7 @@ libraries.poi_ooxml = "org.apache.poi:poi-ooxml:3.11"
 libraries.quartz = "org.quartz-scheduler:quartz:2.2.3"
 
 libraries.sendMessage = "com.ccp.sms:sendMessage:1.0"
+libraries.security_service = "com.github.jyoghurt:security-service:COMMON-1.0-DEV-SNAPSHOT"
 //spring
 libraries.spring_webmvc = "org.springframework:spring-webmvc:${versions.spring}"
 libraries.spring_jdbc = "org.springframework:spring-jdbc:${versions.spring}"
