@@ -8,6 +8,7 @@ private void includeProject(File project) {
     if (buildFile.isFile()) {
         include project.name
         this.findProject(":${project.name}").projectDir = new File(settingsDir, separatorConvert("${project.path}"))
+        this.findProject(":${project.name}").buildFileName = "${project.name}.gradle"
         return
     }
     file(project.path).eachDir { childProject ->
