@@ -1,0 +1,33 @@
+dependencies {
+    compile libraries.aspectjweaver,
+            libraries.commons_lang3,
+            libraries.commons_collections4,
+            libraries.druid,
+            libraries.httpclient,
+            libraries.guava,
+            libraries.fastjson,
+            libraries.gson,
+            libraries.jackson_annotations,
+            libraries.jackson_core,
+            libraries.jackson_databind,
+            libraries.jackson_mapper_asl,
+            libraries.json_lib,
+            libraries.jtds,
+            libraries.javaee_api,
+            libraries.slf4j_log4j12,
+            libraries.log4j,
+            libraries.mybatis,
+            libraries.mybatis_spring,
+            libraries.persistence_api,
+            libraries.spring_jdbc,
+            libraries.validation_api,
+            libraries.hibernate_validator,
+//todo 要从core里面慢慢拆出去
+            libraries.jedis,
+            libraries.spring_webmvc,
+            libraries.spring_data_redis,
+            libraries.commons_fileupload,
+            libraries.jedis,
+            libraries.flyway_core
+    compile project(":generator")
+}

@@ -1,2 +1,0 @@
---alter table SecurityUserT drop column portrait1;
---alter table SecurityUserT add portrait varchar(100) COMMENT '头像';

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GradleSettings">
+    <option name="linkedExternalProjectsSettings">
+      <GradleProjectSettings>
+        <option name="distributionType" value="LOCAL" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="gradleHome" value="E:/gradle-3.3" />
+        <option name="modules">
+          <set>
+            <option value="$PROJECT_DIR$" />
+            <option value="$PROJECT_DIR$/modules/core" />
+            <option value="$PROJECT_DIR$/modules/datadict" />
+            <option value="$PROJECT_DIR$/modules/drools" />
+            <option value="$PROJECT_DIR$/modules/email" />
+            <option value="$PROJECT_DIR$/modules/email-plugin" />
+            <option value="$PROJECT_DIR$/modules/generator" />
+            <option value="$PROJECT_DIR$/modules/http" />
+            <option value="$PROJECT_DIR$/modules/image" />
+            <option value="$PROJECT_DIR$/modules/msgcen" />
+            <option value="$PROJECT_DIR$/modules/payment" />
+            <option value="$PROJECT_DIR$/modules/quartz" />
+            <option value="$PROJECT_DIR$/modules/sms" />
+            <option value="$PROJECT_DIR$/modules/switch" />
+            <option value="$PROJECT_DIR$/modules/video" />
+            <option value="$PROJECT_DIR$/modules/wechatbasic" />
+          </set>
+        </option>
+      </GradleProjectSettings>
+    </option>
+  </component>
+</project>
