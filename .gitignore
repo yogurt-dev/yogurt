@@ -3,3 +3,5 @@
 /modules/**/out
 
 .idea
+/.gradle
+.gradle
