@@ -32,7 +32,7 @@ public class DataDictUtils {
      * @param dictItemCode 字典项编码
      * @return
      */
-    public static List<DataDictValue> geDataDictValuesByItemCode(String dictItemCode)  {
+    public static List<DataDictValue> getDataDictValuesByItemCode(String dictItemCode)  {
         return getDataDictService().geDataDictValuesByItemCode(dictItemCode);
     }
 

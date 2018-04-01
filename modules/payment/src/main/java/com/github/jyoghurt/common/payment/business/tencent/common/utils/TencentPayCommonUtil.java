@@ -86,7 +86,6 @@ public class TencentPayCommonUtil {
         DataDictValue dataDictValue = DataDictUtils.getDataDictValue("CertificatePathEnum", tencentMchId);
         String split = System.getProperty("file.separator");
         String certName = dataDictValue.getDictValueName();
-        String downloadPath = uploadPath + split + "certificate" + split + certName;
-        return downloadPath;
+        return uploadPath  + split + certName;
     }
 }

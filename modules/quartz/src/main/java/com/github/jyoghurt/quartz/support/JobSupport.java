@@ -14,7 +14,7 @@ import java.util.Date;
  * date: 2016/7/29.
  */
 public abstract class JobSupport implements Job {
-    private static Logger logger = LoggerFactory.getLogger(JobSupport.class);
+    public  Logger logger = LoggerFactory.getLogger(JobSupport.class);
 
     public void startExecuteLog(JobExecutionContext context) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

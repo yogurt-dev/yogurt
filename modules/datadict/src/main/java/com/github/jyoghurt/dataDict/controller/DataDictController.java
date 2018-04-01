@@ -47,7 +47,7 @@ public class DataDictController extends BaseController {
     @LogContent("根据字典项查询字典值列表")
     @RequestMapping(value = "/getDataDictValuesByItemCode/{dictItemCode}", method = RequestMethod.GET)
     public HttpResultEntity<?> getDataDictValuesByItemCode(@PathVariable String dictItemCode) {
-        return getSuccessResult(DataDictUtils.geDataDictValuesByItemCode(dictItemCode));
+        return getSuccessResult(DataDictUtils.getDataDictValuesByItemCode(dictItemCode));
     }
 
     @LogContent("根据字典项查询字典值列表")

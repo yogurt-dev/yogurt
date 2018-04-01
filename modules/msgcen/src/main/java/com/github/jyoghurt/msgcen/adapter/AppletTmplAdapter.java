@@ -6,7 +6,6 @@ import com.github.jyoghurt.msgcen.common.utils.MsgTmplRuleParseUtil;
 import com.github.jyoghurt.msgcen.domain.MsgTmplT;
 import com.github.jyoghurt.msgcen.exception.MsgException;
 import com.github.jyoghurt.msgcen.factory.MsgAdapter;
-import com.github.jyoghurt.sw.handler.SwitchHandler;
 import com.github.jyoghurt.wechatbasic.common.templet.ParentTpl;
 import com.github.jyoghurt.wechatbasic.common.util.AdvancedUtil;
 import com.github.jyoghurt.wechatbasic.common.util.WeixinUtil;
@@ -51,12 +50,12 @@ public class AppletTmplAdapter implements MsgAdapter, MsgTarget {
                     } else {
                         weChatUrl += "?openId=" + target;
                     }
-                    parentTpl.setUrl(weChatUrl);
+                    parentTpl.setPage(weChatUrl);
                 }
                 //发送email
-                if (SwitchHandler.switchIsOpenBySwitchGroupKey("msgcen")) {
+//                if (SwitchHandler.switchIsOpenBySwitchGroupKey("msgcen")) {
                     AdvancedUtil.sendTemple(WeixinUtil.getAccessToken().getToken(), parentTpl);
-                }
+//                }
                 recordMsg(target, msgTmpl, JSON.toJSONString(param), null);
             } catch (Exception e) {
                 recordMsg(target, msgTmpl, JSON.toJSONString(param), e);
