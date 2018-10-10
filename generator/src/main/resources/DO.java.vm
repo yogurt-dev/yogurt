@@ -1,7 +1,7 @@
-package ${modulePackage}.domain;
+package ${modulePackage}.po;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.github.jyoghurt.core.domain.BaseEntity;
+import com.github.jyoghurt.core.po.BaseEntity;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.hibernate.validator.constraints.Length;
 

@@ -1,6 +1,6 @@
 package ${modulePackage}.dao;
 
-import ${modulePackage}.domain.${className};
+import ${modulePackage}.po.${className};
 import com.github.jyoghurt.core.dao.BaseMapper;
 import com.github.jyoghurt.core.dao.BaseMapperProvider;
 import org.apache.ibatis.annotations.Param;
@@ -11,10 +11,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * ${replaceSuffixClassName} Mapper
+ * ${lowerName} Mapper
  *
  */
-public interface ${replaceSuffixClassName}Mapper extends BaseMapper<${className}> {
+public interface ${lowerName}Mapper extends BaseMapper<${className}> {
 
     @Override
     @SelectProvider(type = BaseMapperProvider.class, method = "selectById")

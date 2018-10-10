@@ -1,4 +1,4 @@
-package com.github.jyoghurt.core.domain;
+package com.github.jyoghurt.core.po;
 
 import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonFormat;

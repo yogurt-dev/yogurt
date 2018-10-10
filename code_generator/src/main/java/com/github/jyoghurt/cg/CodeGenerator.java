@@ -1,17 +1,24 @@
 package com.github.jyoghurt.cg;
 
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugin.BuildPluginManager;
+import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.MavenProject;
 import org.apache.velocity.VelocityContext;
 
+import static org.twdata.maven.mojoexecutor.MojoExecutor.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 @Mojo(name="generate",defaultPhase= LifecyclePhase.PACKAGE)
+
 public class CodeGenerator extends AbstractMojo {
 
     @Parameter
@@ -49,7 +56,62 @@ public class CodeGenerator extends AbstractMojo {
     @Parameter
     private GenerateBean generate;
 
+
+    /**
+     * The project currently being build.
+     *
+     * @parameter expression="${project}"
+     * @required
+     * @readonly
+     */
+    @Parameter(defaultValue = "${project}")
+    private MavenProject project;
+
+    /**
+     * The current Maven session.
+     *
+     * @parameter expression="${session}"
+     * @required
+     * @readonly
+     */
+    @Parameter(defaultValue = "${session}")
+    private MavenSession session;
+
+    /**
+     * The Maven BuildPluginManager component.
+     *
+     * @component
+     * @required
+     */
+    @Component
+    private BuildPluginManager pluginManager;
+
     public void execute()  {
+        try {
+//          调用jooq代码生成器
+            executeMojo(
+                    plugin(
+                            groupId("org.jooq"),
+                            artifactId("jooq-codegen-maven"),
+                            version("3.10.8"),
+                            dependencies(dependency(
+                                    groupId("mysql"),
+                                    artifactId("mysql-connector-java"),
+                                    version("5.1.47")))
+                    ),
+                    goal("generate"),
+                    configuration(
+                            element(name("configurationFile"), "src/main/resources/jooqConfig.xml")
+                    ),
+                    executionEnvironment(
+                            project,
+                            session,
+                            pluginManager
+                    )
+            );
+        } catch (MojoExecutionException e) {
+            e.printStackTrace();
+        }
         CreateBean createBean = new CreateBean();
         createBean.setMysqlInfo(jdbcUrl, jdbcUser, jdbcPassword, schema);
         /** 此处修改成你的 表名 和 中文注释 ***/

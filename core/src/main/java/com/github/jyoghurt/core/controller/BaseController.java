@@ -2,7 +2,7 @@ package com.github.jyoghurt.core.controller;
 
 
 import com.github.jyoghurt.core.constant.Constant;
-import com.github.jyoghurt.core.domain.BaseEntity;
+import com.github.jyoghurt.core.po.BaseEntity;
 import com.github.jyoghurt.core.exception.BaseAccidentException;
 import com.github.jyoghurt.core.exception.BaseErrorException;
 import com.github.jyoghurt.core.result.HttpResultEntity;

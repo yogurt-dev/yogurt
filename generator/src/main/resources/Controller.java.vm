@@ -9,8 +9,8 @@ import com.github.jyoghurt.core.excetpion.BaseException;
 import com.github.jyoghurt.core.handle.QueryHandle;
 import com.github.jyoghurt.core.result.HttpResultEntity;
 import com.github.jyoghurt.core.result.QueryResult;
-import ${importPackage}.domain.${className};
-import ${importPackage}.service.${replaceSuffixClassName}Service;
+import ${importPackage}.po.${className};
+import ${importPackage}.service.${lowerName}Service;
 import org.springframework.web.bind.annotation.RequestMethod;
 import com.github.jyoghurt.core.annotations.LogContent;
 
@@ -22,16 +22,15 @@ import com.github.jyoghurt.core.annotations.LogContent;
  *
  */
 @RestController
-@LogContent(module = "${moduleName}")
-@RequestMapping("/${replaceSuffixLowerName}")
-public class ${replaceSuffixClassName}Controller extends BaseController {
+@RequestMapping("/${lowerName}")
+public class ${lowerName}Controller extends BaseController {
 
 
 	/**
 	 * ${codeName}服务类
 	 */
 	@Resource
-	private ${replaceSuffixClassName}Service ${replaceSuffixLowerName}Service;
+	private ${lowerName}Service ${lowerName}Service;
 
 //	/**
 //	 * 列出${codeName}
@@ -39,7 +38,7 @@ public class ${replaceSuffixClassName}Controller extends BaseController {
 //	@LogContent("查询${codeName}")
 //	@RequestMapping(value = "/list",method=RequestMethod.GET)
 //	public HttpResultEntity<?> list(${className} ${lowerName} ,QueryHandle queryHandle) {
-//        return getSuccessResult(${replaceSuffixLowerName}Service.getData(${lowerName}.setDeleteFlag(false),queryHandle.configPage().addOrderBy("createDateTime",
+//        return getSuccessResult(${lowerName}Service.getData(${lowerName}.setDeleteFlag(false),queryHandle.configPage().addOrderBy("createDateTime",
 //				"desc")));
 //
 //	}
@@ -51,7 +50,7 @@ public class ${replaceSuffixClassName}Controller extends BaseController {
 //	@LogContent("添加${codeName}")
 //	@RequestMapping(method=RequestMethod.POST)
 //	public HttpResultEntity<?> add(@RequestBody ${className} ${lowerName}) {
-//		${replaceSuffixLowerName}Service.save(${lowerName});
+//		${lowerName}Service.save(${lowerName});
 //        return getSuccessResult();
 //	}
 //
@@ -61,7 +60,7 @@ public class ${replaceSuffixClassName}Controller extends BaseController {
 //	@LogContent("编辑${codeName}")
 //	@RequestMapping(method=RequestMethod.PUT)
 //	public HttpResultEntity<?> edit(@RequestBody ${className} ${lowerName}) {
-//		${replaceSuffixLowerName}Service.updateForSelective(${lowerName});
+//		${lowerName}Service.updateForSelective(${lowerName});
 //        return getSuccessResult();
 //	}
 //
@@ -71,7 +70,7 @@ public class ${replaceSuffixClassName}Controller extends BaseController {
 //	@LogContent("删除${codeName}")
 //	@RequestMapping(value = "/{${prikey}}",method=RequestMethod.DELETE)
 //	public HttpResultEntity<?> logicDelete(@PathVariable String ${prikey}) {
-//		${replaceSuffixLowerName}Service.logicDelete(${prikey});
+//		${lowerName}Service.logicDelete(${prikey});
 //		return getSuccessResult();
 //	}
 //
@@ -81,6 +80,6 @@ public class ${replaceSuffixClassName}Controller extends BaseController {
 //	 @LogContent("查询单个${codeName}")
 //	 @RequestMapping(value = "/{${prikey}}",method=RequestMethod.GET)
 //	 public HttpResultEntity<?> get(@PathVariable String $prikey) {
-//		 return getSuccessResult(${replaceSuffixLowerName}Service.find($prikey));
+//		 return getSuccessResult(${lowerName}Service.find($prikey));
 //	 }
 }

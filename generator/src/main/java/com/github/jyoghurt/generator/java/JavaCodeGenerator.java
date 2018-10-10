@@ -41,7 +41,7 @@ public class JavaCodeGenerator {
      * @param className className如"MemberT"
      * @return String 如"Member"
      */
-    public static String getReplaceSuffixClassName(String className) {
+    public static String getlowerName(String className) {
         if (className == null || className.length() < 1) {
             return className;
         }
@@ -80,11 +80,11 @@ public class JavaCodeGenerator {
 
         String className = createBean.getTablesNameToClassName(tableName);
         //add by limiao 去掉结尾的ClassName
-        String replaceSuffixClassName = getReplaceSuffixClassName(className);
+        String lowerName = getlowerName(className);
 
         String lowerName = className.substring(0, 1).toLowerCase() + className.substring(1, className.length());
         //add by limiao 去掉结尾的LowerName
-        String replaceSuffixLowerName = replaceSuffixClassName.substring(0, 1).toLowerCase() + replaceSuffixClassName.substring(1, replaceSuffixClassName.length());
+        String lowerName = lowerName.substring(0, 1).toLowerCase() + lowerName.substring(1, lowerName.length());
 
         // 项目跟路径路径，此处修改为你的项目路径
         String rootPath = CommonPageParser.getRootPath();// "F:\\openwork\\open\\";
@@ -109,38 +109,38 @@ public class JavaCodeGenerator {
         //
         // File file=new File(pckPath);
         // java,xml文件名称
-        String modelPath = File.separator + "domain" + File.separator + className + ".java";
+        String modelPath = File.separator + "po" + File.separator + className + ".java";
         String searchFormPath = File.separator + "controller" + File.separator + "form" + File.separator + className
                 + "SearchForm.java";
 
-        //modify by limiao 20160307 以下className都修改成replaceSuffixClassName
+        //modify by limiao 20160307 以下className都修改成lowerName
         //String mapperPath = File.separator + "dao" + File.separator + className + "Mapper.java";
-        String mapperPath = File.separator + "dao" + File.separator + replaceSuffixClassName + "Mapper.java";
+        String mapperPath = File.separator + "dao" + File.separator + lowerName + "Mapper.java";
 
         //String mapperXmlPath = File.separator + "dao" + File.separator + className + "Mapper.xml";
-        String mapperXmlPath = File.separator + "dao" + File.separator + replaceSuffixClassName + "Mapper.xml";
+        String mapperXmlPath = File.separator + "dao" + File.separator + lowerName + "Mapper.xml";
 
         //String servicePath = File.separator + "service" + File.separator + className + "Service.java";
-        String servicePath = File.separator + "service" + File.separator + replaceSuffixClassName + "Service.java";
+        String servicePath = File.separator + "service" + File.separator + lowerName + "Service.java";
 
         //String serviceImplPath = File.separator + "service" + File.separator + "impl" + File.separator + className
         // + "ServiceImpl.java";
-        String serviceImplPath = File.separator + "service" + File.separator + "impl" + File.separator + replaceSuffixClassName
+        String serviceImplPath = File.separator + "service" + File.separator + "impl" + File.separator + lowerName
                 + "ServiceImpl.java";
         //String controllerPath = File.separator + "controller" + File.separator + className + "Controller.java";
-        String controllerPath = File.separator + "controller" + File.separator + replaceSuffixClassName + "Controller.java";
+        String controllerPath = File.separator + "controller" + File.separator + lowerName + "Controller.java";
 
         //String sqlMapperPath = File.separator + "dao" + File.separator + className + "Mapper.xml";
-        String sqlMapperPath = File.separator + "dao" + File.separator + replaceSuffixClassName + "Mapper.xml";
+        String sqlMapperPath = File.separator + "dao" + File.separator + lowerName + "Mapper.xml";
 
         //String htmlPath = File.separator + className + ".html";
-        String htmlPath = File.separator + replaceSuffixLowerName + ".html";
+        String htmlPath = File.separator + lowerName + ".html";
 
         //String listJSPPath = lowerName + File.separator + className + "List.jsp";
-        String listJSPPath = lowerName + File.separator + replaceSuffixLowerName + "List.jsp";
+        String listJSPPath = lowerName + File.separator + lowerName + "List.jsp";
 
         // String editJSPPath = lowerName + File.separator + "edit" + className + ".jsp";
-        String editJSPPath = lowerName + File.separator + "edit" + replaceSuffixLowerName + ".jsp";
+        String editJSPPath = lowerName + File.separator + "edit" + lowerName + ".jsp";
 
         // String springPath="conf" + File.separator + "spring" + File.separator ;
         // String sqlMapPath="conf" + File.separator + "mybatis" + File.separator ;
@@ -156,8 +156,8 @@ public class JavaCodeGenerator {
         context.put("moduleSimplePackage", moduleSimplePackage);
 
         //add by limiao 20160307 增加两个变量到context
-        context.put("replaceSuffixClassName", replaceSuffixClassName);
-        context.put("replaceSuffixLowerName", replaceSuffixLowerName);
+        context.put("lowerName", lowerName);
+        context.put("lowerName", lowerName);
         /****************************** 生成bean字段 *********************************/
         try {
             context.put("feilds", createBean.getBeanFeilds(tableName)); // 生成bean
@@ -193,7 +193,7 @@ public class JavaCodeGenerator {
         String modulePakPath = modulePackage.replaceAll("\\.", "/");
         // 生成Model
         if (ArrayUtils.isNotEmpty(templates) && ArrayUtils.contains(templates, BEAN)) {
-            CommonPageParser.WriterPage(context, "Bean.java.vm", realPath + javaPath + modulePakPath, modelPath); //
+            CommonPageParser.WriterPage(context, "DO.java.vm", realPath + javaPath + modulePakPath, modelPath); //
         }
 
         if (ArrayUtils.isNotEmpty(templates) && ArrayUtils.contains(templates, MAPPER)) {

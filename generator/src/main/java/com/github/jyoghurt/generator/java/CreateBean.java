@@ -143,7 +143,7 @@ public class CreateBean {
     }
 
     public String getType(String type) {
-        switch (type = type.toLowerCase()) {
+        switch ( type.toLowerCase()) {
             case "char":
             case "varchar":
             case "text":

@@ -1,12 +1,12 @@
 package ${modulePackage}.service;
 
 import com.github.jyoghurt.core.service.BaseService;
-import ${modulePackage}.domain.${className};
+import ${modulePackage}.po.${className};
 
 /**
  * ${codeName}服务层
  *
  */
-public interface ${replaceSuffixClassName}Service extends BaseService<${className}> {
+public interface ${lowerName}Service extends BaseService<${className}> {
 
 }

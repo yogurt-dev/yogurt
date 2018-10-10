@@ -1,7 +1,7 @@
 package com.github.jyoghurt.core.dao;
 
 
-import com.github.jyoghurt.core.domain.BaseEntity;
+import com.github.jyoghurt.core.po.BaseEntity;
 import com.github.jyoghurt.core.enums.LogSystemType;
 import com.github.jyoghurt.core.exception.DaoException;
 import com.github.jyoghurt.core.exception.UtilException;

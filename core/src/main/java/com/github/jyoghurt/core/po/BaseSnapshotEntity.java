@@ -1,4 +1,4 @@
-package com.github.jyoghurt.core.domain;
+package com.github.jyoghurt.core.po;
 
 import java.io.Serializable;
 
