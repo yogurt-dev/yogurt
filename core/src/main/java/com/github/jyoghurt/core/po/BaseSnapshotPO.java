@@ -9,7 +9,7 @@ import java.io.Serializable;
  * @author: baoxiaobing@lvyushequ.com
  * @date: 2016-12-19 14:30
  */
-public class BaseSnapshotEntity<T extends BaseSnapshotEntity<T>> extends BaseEntity<T> implements Serializable {
+public class BaseSnapshotPO<T extends BaseSnapshotPO<T>> extends BasePO<T> implements Serializable {
 
     private Integer version;
 

@@ -1,20 +1,27 @@
 package com.github.jyoghurt.core.service.impl;
 
 import com.github.jyoghurt.core.dao.BaseDAO;
-import com.github.jyoghurt.core.po.BaseEntity;
+import com.github.jyoghurt.core.exception.DaoException;
+import com.github.jyoghurt.core.exception.ServiceException;
+import com.github.jyoghurt.core.po.BasePO;
 import com.github.jyoghurt.core.service.BaseService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.Serializable;
 
-public class BaseServiceImpl<T extends BaseEntity> implements BaseService<T> {
+
+public class BaseServiceImpl<T extends BasePO> implements BaseService<T> {
 
     @Autowired
     protected BaseDAO<T> baseDAO;
 
     @Override
-    public void save(T entity) {
-        baseDAO.save(entity);
+    public void save(T entity) throws ServiceException {
+        try {
+            baseDAO.save(entity);
+        } catch (DaoException e) {
+            throw new ServiceException(e);
+        }
     }
 
     @Override
@@ -28,7 +35,17 @@ public class BaseServiceImpl<T extends BaseEntity> implements BaseService<T> {
     }
 
     @Override
-    public  <F extends Serializable> T findById(F id) {
+    public void logicDelete(Serializable id) throws ServiceException {
+        try {
+            baseDAO.logicDelete(id);
+        } catch (DaoException e) {
+            throw new ServiceException(e);
+        }
+    }
+
+
+    @Override
+    public <F extends Serializable> T findById(F id) {
         return baseDAO.findById(id);
     }
 

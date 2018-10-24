@@ -16,9 +16,7 @@ import javax.validation.ConstraintViolationException;
 /**
  * Created by jietianwu on 14-5-8. 用于记录操作日志及错误日志
  */
-@Component
-@Aspect
-@Order(10)
+
 public class ValidateParamInterceptor {
     @Around(value = "@within(org.springframework.web.bind.annotation.RestController)||" +
             "@within(org.springframework.stereotype.Controller)")

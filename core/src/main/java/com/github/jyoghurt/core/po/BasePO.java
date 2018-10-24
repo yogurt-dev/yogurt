@@ -1,20 +1,18 @@
 package com.github.jyoghurt.core.po;
 
-import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import javax.persistence.Column;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 
 /**
  * Created by jtwu on 2015/4/21.
  */
-@Table
-public class BaseEntity<T extends BaseEntity<T>> implements Serializable {
+public class BasePO<T extends BasePO<T>> implements Serializable {
 
     @Transient
     public static final String DEFAULT_OPERATOR = "system";
@@ -23,13 +21,13 @@ public class BaseEntity<T extends BaseEntity<T>> implements Serializable {
     @Transient
     public static final String OPERATOR_NAME = "operatorName";
     @Transient
-    public static final String DELETE_FLAG = "deleteFlag";
+    public static final String DELETE_FLAG = "delete_flag";
 
     private static final long serialVersionUID = 6468926052770326495L;
     // 创建时间
-    private Date createDateTime;
+    private LocalDateTime createDateTime;
     // 修改时间
-    private Date modifyDateTime;
+    private LocalDateTime modifiedDateTime;
     // 创建人ID
     private String founderId;
     // 创建人姓名
@@ -38,28 +36,26 @@ public class BaseEntity<T extends BaseEntity<T>> implements Serializable {
     private String modifierId;
     // 修改人姓名
     private String modifierName;
-    // 删除标示
-    @Column(nullable = false)
-    private Boolean deleteFlag;
+    // 逻辑删除标示
+    @Column(name = "is_deleted")
+    private Boolean deleted;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    @JSONField(format= "yyyy-MM-dd HH:mm:ss")
-    public Date getModifyDateTime() {
-        return modifyDateTime;
+    public LocalDateTime getModifiedDateTime() {
+        return modifiedDateTime;
     }
 
-    public T setModifyDateTime(Date modifyDateTime) {
-        this.modifyDateTime = modifyDateTime;
+    public T setModifiedDateTime(LocalDateTime modifiedDateTime) {
+        this.modifiedDateTime = modifiedDateTime;
         return (T) this;
     }
 
-    @JSONField(format= "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
-    public Date getCreateDateTime() {
+    public LocalDateTime getCreateDateTime() {
         return createDateTime;
     }
 
-    public T setCreateDateTime(Date createDateTime) {
+    public T setCreateDateTime(LocalDateTime createDateTime) {
         this.createDateTime = createDateTime;
         return (T) this;
     }
@@ -101,12 +97,12 @@ public class BaseEntity<T extends BaseEntity<T>> implements Serializable {
         return (T) this;
     }
 
-    public Boolean getDeleteFlag() {
-        return deleteFlag;
+    public Boolean getDeleted() {
+        return deleted;
     }
 
-    public T setDeleteFlag(Boolean deleteFlag) {
-        this.deleteFlag = deleteFlag;
-        return (T) this;
+    public T setDeleted(Boolean deleted) {
+        this.deleted = deleted;
+        return (T)this;
     }
 }
