@@ -1,84 +1,65 @@
 package com.github.jyoghurt.cg;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-import org.apache.velocity.Template;
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.Velocity;
-import org.apache.velocity.app.VelocityEngine;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
-import java.util.Properties;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+import freemarker.template.TemplateExceptionHandler;
+import lombok.extern.slf4j.Slf4j;
 
+import java.io.*;
+import java.util.Map;
 
+@Slf4j
 public class CommonPageParser {
 
-	private static VelocityEngine ve;// = VelocityEngineUtil.getVelocityEngine();
 
-	private final static String CONTENT_ENCODING = "UTF-8";
+    private final static String CONTENT_ENCODING = "UTF-8";
+    private static Configuration cfg = new Configuration(Configuration.VERSION_2_3_28);
 
-	private static final Log log = LogFactory.getLog(CommonPageParser.class);
+    private static boolean isReplace = true; // 是否可以替换文件 true =可以替换，false =不可以替换
 
-	private static boolean isReplace = true; // 是否可以替换文件 true =可以替换，false =不可以替换
+    static {
 
 
-	static {
-		try {
-			// 获取文件模板根路径
-			String templateBasePath = CommonPageParser.class.getProtectionDomain().getCodeSource().getLocation().getPath();
-			Properties properties = new Properties();
-			if (templateBasePath.endsWith(".jar")) {
-				properties.setProperty(Velocity.RESOURCE_LOADER, "jar");
-				properties.setProperty("jar.resource.loader.class", "org.apache.velocity.runtime.resource.loader.JarResourceLoader");
-				properties.setProperty("jar.resource.loader.path", "jar:file:" + templateBasePath);
-			} else {
-				properties.setProperty(Velocity.RESOURCE_LOADER, "file");
-				properties.setProperty("file.resource.loader.description", "Velocity File Resource Loader");
-				properties.setProperty(Velocity.FILE_RESOURCE_LOADER_PATH, templateBasePath);
-				properties.setProperty(Velocity.FILE_RESOURCE_LOADER_CACHE, "true");
-			}
-			properties.setProperty("file.resource.loader.modificationCheckInterval", "30");
-			properties.setProperty(Velocity.RUNTIME_LOG_LOGSYSTEM_CLASS,
-					"org.apache.velocity.runtime.log.Log4JLogChute");
-			properties.setProperty("runtime.log.logsystem.log4j.logger", "org.apache.velocity");
-			properties.setProperty("directive.set.null.allowed", "true");
-			VelocityEngine velocityEngine = new VelocityEngine();
-			velocityEngine.init(properties);
-			ve = velocityEngine;
-		} catch (Exception e) {
-			log.error(e);
-		}
-	}
+// Specify the source where the template files come from. Here I set a
+// plain directory for it, but non-file-system sources are possible too:
 
-	public static void WriterPage(VelocityContext context, String templateName, String fileDirPath, String targetFile) {
-		try {
-			File file = new File(fileDirPath + targetFile);
-			if (!file.exists()) {
-				new File(file.getParent()).mkdirs();
-			} else {
-				if (isReplace) {
-					System.out.println("替换文件" + file.getAbsolutePath());
-				} else {
-					System.out.println("页面生成失败" + file.getAbsolutePath() + "文件已存在");
-					return;
-				}
-			}
+        cfg.setClassForTemplateLoading(CommonPageParser.class, "/");
 
-			Template template = ve.getTemplate(templateName, CONTENT_ENCODING);
-			FileOutputStream fos = new FileOutputStream(file);
-			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(fos, CONTENT_ENCODING));
-			template.merge(context, writer);
-			writer.flush();
-			writer.close();
-			fos.close();
-			System.out.println("页面生成成功" + file.getAbsolutePath());
-		} catch (Exception e) {
-			e.printStackTrace();
-			log.error("", e);
-		}
-	}
+// Set the preferred charset template files are stored in. UTF-8 is
+// a good choice in most applications:
+        cfg.setDefaultEncoding(CONTENT_ENCODING);
+
+// Sets how errors will appear.
+// During web page *development* TemplateExceptionHandler.HTML_DEBUG_HANDLER is better.
+        cfg.setTemplateExceptionHandler(TemplateExceptionHandler.RETHROW_HANDLER);
+//        cfg.setClassicCompatible(true);
+
+    }
+
+    public static void writerPage(Map map, String templateName, String fileDirPath, String targetFile) throws Exception {
+            File file = new File(fileDirPath + targetFile);
+            if (!file.exists()) {
+                new File(file.getParent()).mkdirs();
+            } else {
+                if (isReplace) {
+                    log.info("替换文件 " + file.getAbsolutePath());
+                } else {
+                    log.info("生成失败 " + file.getAbsolutePath() + "文件已存在");
+                    return;
+                }
+            }
+
+            Template temp = cfg.getTemplate(templateName);
+            FileOutputStream fos = new FileOutputStream(file);
+            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(fos, CONTENT_ENCODING));
+            temp.process(map,writer);
+//            template.merge(context, writer);
+            writer.flush();
+            writer.close();
+            fos.close();
+            log.info("生成成功 " + file.getAbsolutePath());
+
+    }
 
 }

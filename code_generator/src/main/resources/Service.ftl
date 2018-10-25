@@ -4,7 +4,7 @@ import com.github.jyoghurt.core.service.BaseService;
 import ${modulePackage}.po.${className}PO;
 
 /**
- * ${codeName}服务层
+ * ${lowerName}服务层
  *
  */
 public interface ${className}Service extends BaseService<${className}PO> {
