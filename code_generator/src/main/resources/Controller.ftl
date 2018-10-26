@@ -28,13 +28,12 @@ public class ${className}Controller extends BaseController {
 	private ${className}Service ${lowerName}Service;
 
 //	/**
-//	 * 列出${lowerName}
+//	 * 查询${lowerName}
 //	 */
 //	@LogContent("查询${lowerName}")
 //	@GetMapping
 //	public ResponseEntity<?> list(${className}PO ${lowerName}PO , Pageable pageable) {
-//        return getSuccessResult(${lowerName}Service.getData(${lowerName}PO.setDeleteFlag(false),queryHandle.configPage().addOrderBy("createDateTime",
-//				"desc")));
+//        return ResponseEntity<>(${lowerName}Service.list(${lowerName}PO,pageable),HttpStatus.OK);
 //
 //	}
 //
