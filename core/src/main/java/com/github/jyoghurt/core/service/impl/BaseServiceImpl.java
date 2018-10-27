@@ -6,8 +6,11 @@ import com.github.jyoghurt.core.exception.ServiceException;
 import com.github.jyoghurt.core.po.BasePO;
 import com.github.jyoghurt.core.service.BaseService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.io.Serializable;
+import java.util.List;
 
 
 public class BaseServiceImpl<T extends BasePO> implements BaseService<T> {
@@ -49,8 +52,17 @@ public class BaseServiceImpl<T extends BasePO> implements BaseService<T> {
         return baseDAO.findById(id);
     }
 
+    @Override
+    public List<T> findAll() {
+        return baseDAO.findAll();
+    }
 
-//
+    @Override
+    public Page<T> list(T po, Pageable pageable) {
+        return baseDAO.list(po,pageable);
+    }
+
+    //
 //    @Override
 //    public void save(Object entity, String tableName) {
 //

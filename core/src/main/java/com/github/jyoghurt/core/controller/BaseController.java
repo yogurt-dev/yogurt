@@ -10,6 +10,8 @@ import com.github.jyoghurt.core.result.HttpResultHandle;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -37,7 +39,7 @@ public class BaseController {
     protected HttpSession session;
 
     @ExceptionHandler
-    public HttpResultEntity<?> exceptionHandler(HttpServletRequest request, Exception ex) {
+    public ResponseEntity<?> exceptionHandler(HttpServletRequest request, Exception ex) {
         request.setAttribute(EXCEPTION, ex);
         String logTemplate = "\n url:★{}★\n parameterValues : ★{}★";
         String parameterValues = com.github.jyoghurt.core.utils.WebUtils.getParameterValues(request);
@@ -54,14 +56,14 @@ public class BaseController {
                 log.warn(operatorLogStr + ex.getMessage() + logTemplate, request.getServletPath(),
                         parameterValues, ex);
             }
-            return HttpResultHandle.getErrorResult(((BaseAccidentException) ex).getErrorCode().replace(Constant.ERROR_CODE_PREFIX,
-                    StringUtils.EMPTY), ex.getMessage());
+            return new ResponseEntity<>(((BaseAccidentException) ex).getErrorCode().replace(Constant.ERROR_CODE_PREFIX,
+                    StringUtils.EMPTY),HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         if (ex instanceof BaseErrorException) {
             log.error(operatorLogStr + ex.getMessage() + logTemplate, request.getServletPath(),
                     parameterValues, ex);
-            return HttpResultHandle.getErrorResult(ex.getMessage());
+            return new ResponseEntity<>(ex.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         if (ex instanceof MethodArgumentNotValidException) {
@@ -72,44 +74,11 @@ public class BaseController {
             }
             log.error(operatorLogStr + ex.getMessage() + logTemplate, request.getServletPath(),
                     parameterValues, ex);
-            return new HttpResultEntity(HttpResultHandle.HttpResultEnum.ERROR.getErrorCode()
-                    , StringUtils.stripEnd(message, ","));
+            return new ResponseEntity<>(HttpResultHandle.HttpResultEnum.ERROR.getErrorCode(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         log.error(operatorLogStr + "uncaught  exception," + logTemplate, request.getServletPath(),
                 parameterValues, ex);
-        return HttpResultHandle.getErrorResult();
+        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
     }
-
-
-    public HttpResultEntity<?> getSuccessResult() {
-        return HttpResultHandle.getSuccessResult();
-    }
-
-
-    public HttpResultEntity<?> getSuccessResult(Object result) {
-        return HttpResultHandle.getSuccessResult(result);
-    }
-
-
-    public static HttpResultEntity<?> getErrorResult() {
-        return HttpResultHandle.getErrorResult();
-    }
-
-
-    public static HttpResultEntity<?> getErrorResult(BaseAccidentException e) {
-        if (null == e) {
-            return getErrorResult();
-        }
-        log.warn(e.getMessage(), e.getCause());
-        if (null == e.getExceptionBody()) {
-            return getErrorResult();
-        }
-        return HttpResultHandle.getErrorResult(e.getErrorCode(), e.getExceptionBody().getMessage());
-    }
-
-    public static HttpResultEntity<?> getErrorResult(Object result) {
-        return HttpResultHandle.getErrorResult(result);
-    }
-
 }

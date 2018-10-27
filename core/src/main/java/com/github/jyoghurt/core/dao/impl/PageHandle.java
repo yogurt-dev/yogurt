@@ -24,9 +24,10 @@ public abstract class PageHandle<T> {
 
     public Page<T> fetch() {
         int total = sql(dsl.selectCount()).fetchOneInto(int.class);
+        int pageNumber = pageable.getPageNumber()>1? pageable.getPageNumber() - 1:0;
         List<T> list = sql(dsl.select(fields()==null?new TableField[] {}:fields()))
                 .limit(pageable.getPageSize())
-                .offset((pageable.getPageNumber()-1) * pageable.getPageSize()).fetchInto(type);
+                .offset(pageNumber * pageable.getPageSize()).fetchInto(type);
         return new PageImpl<>(list, pageable, total);
     }
 }

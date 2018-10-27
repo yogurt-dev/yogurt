@@ -3,8 +3,11 @@ package com.github.jyoghurt.core.service;
 
 import com.github.jyoghurt.core.exception.ServiceException;
 import com.github.jyoghurt.core.po.BasePO;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * 服务接口的基类
@@ -15,21 +18,21 @@ public interface BaseService<T extends BasePO> {
     /**
      * 保存实体
      *
-     * @param entity 待保存的实体
+     * @param po 待保存的实体
      */
-    void save(T entity) throws ServiceException;
+    void save(T po) throws ServiceException;
 
     /**
      * 更新实体
      *
-     * @param entity 业务实体
+     * @param po 业务实体
      */
-    void update(T entity);
+    void update(T po);
 
     /**
      * 删除实体
      */
-    void delete(T entity);
+    void delete(T po);
 
     /**
      * 逻辑删除
@@ -46,6 +49,20 @@ public interface BaseService<T extends BasePO> {
      */
     <F extends Serializable> T findById(F id);
 
+    /**
+     * 查询所有记录
+     *
+     * @return 业务实体集合
+     */
+    List<T> findAll();
+
+    /**
+     * 分页查询
+     * @param po 业务实体
+     * @param pageable 分页
+     * @return
+     */
+    Page<T> list(T po, Pageable pageable);
 //
 ////    /**
 ////     * 批量保存
@@ -58,20 +75,20 @@ public interface BaseService<T extends BasePO> {
 //    /**
 //     * 根据选择的保存实体
 //     *
-//     * @param entity 待保存的实体
+//     * @param po 待保存的实体
 //     *
 //     */
-//    void saveForSelective(T entity) ;
+//    void saveForSelective(T po) ;
 //
 
 //
 //    /**
 //     * 根据选择的更新实体
 //     *
-//     * @param entity 业务实体
+//     * @param po 业务实体
 //     *
 //     */
-//    void updateForSelective(T entity) ;
+//    void updateForSelective(T po) ;
 //
 //    /**
 //     * 删除实体
@@ -85,10 +102,10 @@ public interface BaseService<T extends BasePO> {
 ////     * 根据条件逻辑删除
 ////     * 实体不需要设置deleteFlag=true，否则会将deleteFlag=true拼到条件中
 ////     *
-////     * @param entity 根据非空字段当做删除条件
+////     * @param po 根据非空字段当做删除条件
 ////     *
 ////     */
-////    void logicDeleteByCondition(T entity) ;
+////    void logicDeleteByCondition(T po) ;
 //
 ////
 ////    /**
@@ -96,58 +113,58 @@ public interface BaseService<T extends BasePO> {
 ////     * 根据条件逻辑删除
 ////     * 实体不需要设置deleteFlag=true，否则会将deleteFlag=true拼到条件中
 ////     *
-////     * @param entity      根据非空字段当做删除条件
+////     * @param po      根据非空字段当做删除条件
 ////     * @param queryHandle queryHandle
 ////     *
 ////     */
-////    void logicDeleteByCondition(T entity, QueryHandle queryHandle) ;
+////    void logicDeleteByCondition(T po, QueryHandle queryHandle) ;
 //
 ////    /**
 ////     * 根据条件删除
 ////     *
-////     * @param entity 根据非空字段当做删除条件
+////     * @param po 根据非空字段当做删除条件
 ////     *
 ////     */
-////    void deleteByCondition(T entity) ;
+////    void deleteByCondition(T po) ;
 ////
 ////    /**
 ////     * 根据条件删除
 ////     *
-////     * @param entity 根据非空字段当做删除条件
+////     * @param po 根据非空字段当做删除条件
 ////     *
 ////     */
-////    public void deleteByCondition(T entity, QueryHandle queryHandle) ;
+////    public void deleteByCondition(T po, QueryHandle queryHandle) ;
 //
 
 //
 //    /**
 //     * 获取数据
 //     *
-//     * @param entity      查询业务实体
+//     * @param po      查询业务实体
 //     * @param queryHandle 查询辅助类
 //     * @return 根据查询条件查询的查询结果集
 //     *
 //     */
-//    QueryResult<T> getData(T entity, QueryHandle queryHandle) ;
+//    QueryResult<T> getData(T po, QueryHandle queryHandle) ;
 //
 //    /**
 //     * 按条件查询记录总数
 //     *
-//     * @param entity      查询业务实体
+//     * @param po      查询业务实体
 //     * @param queryHandle 查询辅助类
 //     *
 //     */
-//    Long count(T entity, QueryHandle queryHandle) ;
+//    Long count(T po, QueryHandle queryHandle) ;
 //
 //    /**
 //     * 按条件查询记录集合
 //     *
-//     * @param entity      业务实体类或业务查询实体类
+//     * @param po      业务实体类或业务查询实体类
 //     * @param queryHandle 查询辅助类
 //     * @return 业务实体集合
 //     *
 //     */
-//    List<T> findAll(T entity, QueryHandle queryHandle) ;
+//    List<T> findAll(T po, QueryHandle queryHandle) ;
 //
 
 //
@@ -161,8 +178,8 @@ public interface BaseService<T extends BasePO> {
 //    /**
 //     * 按条件查询记录集合
 //     *
-//     * @param entity 业务实体类或业务查询实体类
+//     * @param po 业务实体类或业务查询实体类
 //     * @return 业务实体集合
 //     */
-//    List<T> findAll(T entity);
+//    List<T> findAll(T po);
 }

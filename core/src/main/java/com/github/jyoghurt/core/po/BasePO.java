@@ -50,6 +50,7 @@ public class BasePO<T extends BasePO<T>> implements Serializable {
         return (T) this;
     }
 
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     public LocalDateTime getCreateDateTime() {
         return createDateTime;
