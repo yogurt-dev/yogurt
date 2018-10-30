@@ -2,7 +2,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>com.github.jyoghurt</groupId>
+        <groupId>com.github.yogurt</groupId>
         <artifactId>root</artifactId>
         <version>1.0.4-SNAPSHOT</version>
     </parent>
@@ -52,7 +52,7 @@
             <version>3.10.8</version>
         </dependency>
         <dependency>
-            <groupId>com.github.jyoghurt</groupId>
+            <groupId>com.github.yogurt</groupId>
             <artifactId>core</artifactId>
             <version>3.0.0-SNAPSHOT</version>
         </dependency>
@@ -72,7 +72,7 @@
                 </configuration>
             </plugin>
             <plugin>
-                <groupId>com.github.jyoghurt</groupId>
+                <groupId>com.github.yogurt</groupId>
                 <artifactId>code_generator</artifactId>
                 <version>1.1.2-SNAPSHOT</version>
                 <configuration>
