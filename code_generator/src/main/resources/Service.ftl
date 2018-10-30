@@ -1,6 +1,6 @@
 package ${modulePackage}.service;
 
-import com.github.jyoghurt.core.service.BaseService;
+import com.github.yogurt.core.service.BaseService;
 import ${modulePackage}.po.${className}PO;
 
 /**

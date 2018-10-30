@@ -1,14 +1,13 @@
 package ${modulePackage}.controller;
 
-import com.github.jyoghurt.core.exception.ServiceException;
+import com.github.yogurt.core.exception.ServiceException;
 import org.springframework.http.HttpStatus;
 import javax.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
-import com.github.jyoghurt.core.controller.BaseController;
+import com.github.yogurt.core.controller.BaseController;
 import ${modulePackage}.po.${className}PO;
 import ${modulePackage}.service.${className}Service;
-import org.springframework.web.bind.annotation.RequestMethod;
-import com.github.jyoghurt.core.annotations.LogContent;
+import com.github.yogurt.core.annotations.LogContent;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 
@@ -33,17 +32,24 @@ public class ${className}Controller extends BaseController {
 //	@LogContent("查询${lowerName}")
 //	@GetMapping
 //	public ResponseEntity<?> list(${className}PO ${lowerName}PO , Pageable pageable) {
-//        return ResponseEntity<>(${lowerName}Service.list(${lowerName}PO,pageable),HttpStatus.OK);
-//
+//        return new ResponseEntity<>(${lowerName}Service.list(${lowerName}PO,pageable),HttpStatus.OK);
 //	}
 //
+//   /**
+//    * 查询单个${lowerName}
+//	  */
+//	 @LogContent("查询单个${lowerName}")
+//	 @GetMapping(value = "/{${priKey.codeName}}")
+//	 public ResponseEntity<?> get(@PathVariable ${priKey.className} ${priKey.codeName}) {
+//		 return new ResponseEntity<>(${lowerName}Service.findById(${priKey.codeName}),HttpStatus.OK);
+//	 }
 //
 //	/**
 //	 * 添加${lowerName}
 //	 */
 //	@LogContent("添加${lowerName}")
 //	@PostMapping
-//	public ResponseEntity<?> add(@RequestBody ${className}PO ${lowerName}PO) {
+//	public ResponseEntity<?> add(@RequestBody ${className}PO ${lowerName}PO) throws ServiceException {
 //		${lowerName}Service.save(${lowerName}PO);
 //        return new ResponseEntity<>(HttpStatus.OK);
 //	}
@@ -73,12 +79,5 @@ public class ${className}Controller extends BaseController {
 //		return new ResponseEntity<>(HttpStatus.OK);
 //	}
 //
-//    /**
-//     * 查询单个${lowerName}
-//	 */
-//	 @LogContent("查询单个${lowerName}")
-//	 @RequestMapping(value = "/{${priKey.codeName}}",method=RequestMethod.GET)
-//	 public ResponseEntity<?> get(@PathVariable ${priKey.className} ${priKey.codeName}) {
-//		 return new ResponseEntity<>(${lowerName}Service.findById(${priKey.codeName}),HttpStatus.OK);
-//	 }
+
 }

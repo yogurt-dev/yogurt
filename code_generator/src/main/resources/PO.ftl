@@ -1,14 +1,11 @@
 package ${modulePackage}.po;
 
-import com.github.jyoghurt.core.po.BasePO;
+import com.github.yogurt.core.po.BasePO;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import javax.persistence.Column;
-
 <#list fields as field>
-
-<#if field.columnType == "enum">
-
+    <#if field.columnType == "enum">
 import  ${field.classFullName};
     </#if>
 </#list>

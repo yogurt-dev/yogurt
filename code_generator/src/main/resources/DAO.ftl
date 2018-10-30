@@ -1,7 +1,7 @@
 package ${modulePackage}.dao;
 
 import ${modulePackage}.po.${className}PO;
-import com.github.jyoghurt.core.dao.BaseDAO;
+import com.github.yogurt.core.dao.BaseDAO;
 
 
 /**
