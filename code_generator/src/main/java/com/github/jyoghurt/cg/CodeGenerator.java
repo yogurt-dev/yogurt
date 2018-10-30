@@ -73,7 +73,8 @@ public class CodeGenerator extends AbstractMojo {
             FileSystemUtils.deleteRecursively(
                     new File(StringUtils.join(basedir, File.separator, configuration.getGenerator().getTarget().getDirectory()
                             , File.separator, classDefinition.getPackageName().replaceAll("\\.", "/"),
-                            File.separator, "dao", File.separator, "jooq", File.separator, "daos")));
+                            File.separator, "tables")));
+
         } catch (Exception e) {
             throw new MojoExecutionException(e.getMessage(), e);
         }
