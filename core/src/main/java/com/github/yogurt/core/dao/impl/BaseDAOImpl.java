@@ -12,25 +12,25 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static com.github.yogurt.core.po.BasePO.DELETE_FLAG;
 
 
 public abstract class BaseDAOImpl<T extends BasePO, R extends UpdatableRecord<R>> implements BaseDAO<T> {
 
+    private static final String IS_DELETED = "is_deleted";
+    private static final String MODIFIER_ID = "modifier_id";
     @Autowired
-    private DSLContext dsl;
+    protected DSLContext dsl;
 
     public abstract TableField getId();
 
     public abstract Class<T> getType();
 
     @SuppressWarnings("unchecked")
-    public Table<R> getTable() {
+    private Table<R> getTable() {
         return getId().getTable();
     }
 
@@ -49,21 +49,18 @@ public abstract class BaseDAOImpl<T extends BasePO, R extends UpdatableRecord<R>
         }
     }
 
-
     @Override
     public void update(T po) {
-        dsl.executeUpdate(getRecord(po.setDeleted(false).setModifiedDateTime(LocalDateTime.now())));
-    }
-
-    @Override
-    public void delete(T po) {
-        dsl.executeDelete(getRecord(po));
+        dsl.executeUpdate(getRecord(po));
     }
 
     @SuppressWarnings("unchecked")
-    public void logicDelete(Serializable id) throws DaoException {
+    public void logicDelete(Serializable id, Serializable userId) throws DaoException {
         try {
-            dsl.update(getTable()).set((Field<Boolean>) getTable().field(DELETE_FLAG), true).where(getId().eq(id)).execute();
+            dsl.update(getTable())
+                    .set((Field<Boolean>) getTable().field(IS_DELETED), true)
+                    .set((Field) getTable().field(MODIFIER_ID),userId)
+                    .where(getId().eq(id)).execute();
         } catch (Exception e) {
             throw new DaoException(e);
         }
@@ -90,15 +87,15 @@ public abstract class BaseDAOImpl<T extends BasePO, R extends UpdatableRecord<R>
         return new PageHandle<T>(dsl, pageable, getType()) {
             @Override
             public TableField[] fields() {
-                List<TableField> list = new ArrayList();
+                List<TableField> list = new ArrayList<>();
                 for (Field field : getTable().fields()) {
                     list.add((TableField) field);
                 }
-                return list.toArray(new TableField[list.size()]);
+                return list.toArray(new TableField[0]);
             }
 
             @Override
-            public SelectConditionStep<? extends Record> sql(SelectSelectStep<? extends Record> query) {
+            public SelectConditionStep<? extends Record> sql(SelectSelectStep query) {
                 Map<String, Object> map = JPAUtils.getColumnNameValueMap(po);
                 String sql = " ";
                 List values = new ArrayList();

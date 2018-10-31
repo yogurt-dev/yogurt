@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class PageHandle<T> {
@@ -18,16 +19,21 @@ public abstract class PageHandle<T> {
         this.type = type;
     }
 
-    public abstract TableField[] fields();
+    public abstract Field[] fields();
 
-    public abstract SelectConditionStep<? extends Record> sql(SelectSelectStep<? extends Record> query);
+    public abstract SelectConditionStep<? extends Record> sql(SelectSelectStep query);
 
     public Page<T> fetch() {
         int total = sql(dsl.selectCount()).fetchOneInto(int.class);
-        int pageNumber = pageable.getPageNumber()>1? pageable.getPageNumber() - 1:0;
-        List<T> list = sql(dsl.select(fields()==null?new TableField[] {}:fields()))
-                .limit(pageable.getPageSize())
-                .offset(pageNumber * pageable.getPageSize()).fetchInto(type);
+        int pageNumber = pageable.getPageNumber() > 1 ? pageable.getPageNumber() - 1 : 0;
+        List<T> list;
+        if (total != 0) {
+            list = sql(dsl.select(fields() == null ? new TableField[]{} : fields()))
+                    .limit(pageable.getPageSize())
+                    .offset(pageNumber * pageable.getPageSize()).fetchInto(type);
+        }else{
+            list = new ArrayList<>();
+        }
         return new PageImpl<>(list, pageable, total);
     }
 }

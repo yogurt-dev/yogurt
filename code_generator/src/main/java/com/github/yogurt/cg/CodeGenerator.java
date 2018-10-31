@@ -57,7 +57,7 @@ public class CodeGenerator extends AbstractMojo {
 
     private ClassDefinition classDefinition;
 
-    private static final List ingoreColumns = Arrays.asList("founderId", "founderName", "modifierId",
+    private static final List ingoreColumns = Arrays.asList("id","founderId", "founderName", "modifierId",
             "modifierName", "is_deleted", "createDateTime", "modifyDateTime");
 
     public void execute() throws MojoExecutionException {
@@ -99,7 +99,7 @@ public class CodeGenerator extends AbstractMojo {
                                 dependency(
                                         groupId("com.github.yogurt"),
                                         artifactId("code_generator"),
-                                        version("1.1.2-SNAPSHOT")),
+                                        version("2.0.0-SNAPSHOT")),
                                 dependency(
                                         groupId("org.apache.commons"),
                                         artifactId("commons-lang3"),
@@ -159,8 +159,8 @@ public class CodeGenerator extends AbstractMojo {
         Generator generator = configuration.getGenerator();
         List<FieldDefinition> fieldDefinitions = new ArrayList<>();
         String SQLColumns = "SELECT distinct COLUMN_NAME, DATA_TYPE, COLUMN_COMMENT,COLUMN_KEY,CHARACTER_MAXIMUM_LENGTH" +
-                ",IS_NULLABLE,COLUMN_DEFAULT,COLUMN_TYPE  FROM information_schema.columns WHERE table_name =  '" + generator.getDatabase().getIncludes() + "' "
-                + "and table_schema='" + generator.getDatabase().getInputSchema() + "' ";
+                ",IS_NULLABLE,COLUMN_DEFAULT,COLUMN_TYPE  FROM information_schema.columns WHERE table_name = '" + generator.getDatabase().getIncludes() + "' ";
+//                + "and table_schema='" + generator.getDatabase().getInputSchema() + "' ";
         Connection con = DriverManager.getConnection(jdbc.getUrl(), jdbc.getUser(), jdbc.getPassword());
         PreparedStatement ps = con.prepareStatement(SQLColumns);
         ResultSet rs = ps.executeQuery();
@@ -199,6 +199,7 @@ public class CodeGenerator extends AbstractMojo {
         }
         rs.close();
         ps.close();
+
         con.close();
         classDefinition.setFieldDefinitions(fieldDefinitions);
     }
@@ -213,9 +214,8 @@ public class CodeGenerator extends AbstractMojo {
             case "int":
                 return "Integer";
             case "long":
-                return "Long";
             case "bigint":
-                return "java.math.BigInteger";
+                return "Long";
             case "decimal":
                 return "java.math.BigDecimal";
             case "timestamp":

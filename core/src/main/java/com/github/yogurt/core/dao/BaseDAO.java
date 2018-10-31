@@ -15,9 +15,7 @@ public interface BaseDAO<T extends BasePO> {
 
     void update(T entity);
 
-    void delete(T entity);
-
-    void logicDelete(Serializable id) throws DaoException;
+    void logicDelete(Serializable id, Serializable userId) throws DaoException;
 
     T findById(Serializable id);
 
