@@ -11,7 +11,7 @@
 - **很清爽**：入门毫无压力，因为我们并不想自成体系，只提供了必要的实现。
 - **很高效**：再也不用写mybatis的xml了，在java文件和xml之前跳来跳去，字段对比来对比去的，一切都在java类中完成，想想都爽。
 - **通用CRUD**：已经为您准备好，不用写代码。
-- **代码生成器**：集成了JOOQ的代码生成器，Controller、Service、DAO一并生成。
+- **代码生成器**：集成了JOOQ的代码生成器，Controller、Service、DAO以及属性对应的Enum一并生成。
 
 # 涉及标准及技术
 
@@ -19,7 +19,7 @@
 
 restful命名最佳实践
 
-JOOQ（SpringBoot2将其纳入体系，开发效率优于mybatis）
+JOOQ（SpringBoot2开始将其纳入体系，开发效率优于mybatis）
 
 lombok
 
