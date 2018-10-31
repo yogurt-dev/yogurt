@@ -26,3 +26,16 @@ lombok
 guava
 
 logback
+
+# 表结构语句
+
+ALTER TABLE `表名`
+ADD COLUMN `creator_id`  bigint(9) NOT NULL DEFAULT 0 COMMENT '创建人ID',
+ADD COLUMN `gmt_create`  datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间' AFTER `creator_id`,
+ADD COLUMN `modifier_id`  bigint(9) NULL COMMENT '修改人ID' AFTER `gmt_create`,
+ADD COLUMN `gmt_modified`  datetime NULL COMMENT '修改时间' AFTER `modifier_id`,
+ADD COLUMN `is_deleted`  tinyint(1) NOT NULL DEFAULT 0 COMMENT '逻辑删除标识' AFTER `gmt_modified`;
+
+# 版权 | License
+
+[Apache License 2.0](http://www.apache.org/licenses/LICENSE-2.0)
