@@ -30,7 +30,7 @@ public class BaseServiceImpl<T extends BasePO> implements BaseService<T> {
     @Override
     public void save(T entity) throws ServiceException {
         try {
-            processCreateColumns(entity);
+            setCreator(entity);
             baseDAO.save(entity);
         } catch (DaoException e) {
             throw new ServiceException(e);
@@ -39,7 +39,7 @@ public class BaseServiceImpl<T extends BasePO> implements BaseService<T> {
 
     @Override
     public void update(T po) {
-        processModifyColumns(po);
+        setModifier(po);
         baseDAO.update(po);
     }
 
@@ -67,100 +67,62 @@ public class BaseServiceImpl<T extends BasePO> implements BaseService<T> {
         return baseDAO.list(po, pageable);
     }
 
+    @Override
+    public void batchSave(List<T> poList) {
+        poList.forEach(this::setCreator);
+        baseDAO.batchSave(poList);
+    }
+
+    @Override
+    public void batchUpdate(List<T> poList) {
+        poList.forEach(this::setModifier);
+        baseDAO.batchUpdate(poList);
+    }
+
     /**
      * 获取request
      *
      * @return HttpServletRequest
      */
     private Object getSessionAttr(String attr) {
-        return ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes())).getRequest().getSession()
-                .getAttribute(attr);
+        return ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes()))
+                .getRequest().getSession().getAttribute(attr);
     }
 
-    private void processCreateColumns(T entity) {
-        if (entity == null) {
+    private void setCreator(BasePO po) {
+        if (po == null) {
             return;
         }
-        if (entity.getGmtCreate() == null) {
-            entity.setGmtCreate(LocalDateTime.now());
-        }
-        setFounder(entity);
-    }
-
-    private void processModifyColumns(T entity) {
-        if (entity == null) {
-            return;
-        }
-        if (entity.getGmtModified() == null) {
-            entity.setGmtModified(LocalDateTime.now());
-        }
-        this.setModifyFounder(entity);
-    }
-
-    private void setFounder(BasePO po) {
         try {
             if (null == po.getCreatorId()) {
-                po.setCreatorId(null == getSessionAttr(configuration.getUserId()) ? -1L :
-                        (Long) getSessionAttr(configuration.getUserId()));
+                po.setCreatorId((Long) getSessionAttr(configuration.getUserId()));
             }
         } catch (Exception e) {
             log.debug("setFounder时session获取失败!");
-            po.setCreatorId(-1L);
         }
     }
 
-    private void setModifyFounder(BasePO po) {
+    private void setModifier(BasePO po) {
+        if (po == null) {
+            return;
+        }
+        if (po.getGmtModified() == null) {
+            po.setGmtModified(LocalDateTime.now());
+        }
         try {
             if (null == po.getModifierId()) {
-                po.setModifierId(null == getSessionAttr(configuration.getUserId()) ? -1L :
-                        (Long) getSessionAttr(configuration.getUserId()));
+                po.setModifierId((Long) getSessionAttr(configuration.getUserId()));
             }
         } catch (Exception e) {
             log.debug("update时session获取失败!");
-            po.setModifierId(-1L);
         }
     }
 
 //
 //    @Override
-//    public void updateForSelective(Object entity) {
+//    public void updateForSelective(Object po) {
 //
 //    }
-//
-//    @Override
-//    public void delete(Class clazz, Serializable id) {
-//
-//    }
-//
-//    @Override
-//    public void logicDelete(Class clazz, Serializable id) {
-//
-//    }
-//
-//    @Override
-//    public Object findById(Class clazz, Serializable id) {
-//        return null;
-//    }
-//
-//    @Override
-//    public QueryResult getData(Object entity, QueryHandle queryHandle) {
-//        return null;
-//    }
-//
-//    @Override
-//    public Long count(Object entity, QueryHandle queryHandle) {
-//        return null;
-//    }
-//
-//    @Override
-//    public List findAll(Object entity, QueryHandle queryHandle) {
-//        return null;
-//    }
-//
 
-//
-//    @Override
-//    public QueryResult getData(String mapperMethodName, Map param, QueryHandle queryHandle) {
-//        return null;
-//    }
+
 }

@@ -9,9 +9,8 @@
         <artifactId>root</artifactId>
         <version>2.0.0-SNAPSHOT</version>
     </parent>
-
     <properties>
-        <spring-boot-version>2.0.5.RELEASE</spring-boot-version>
+        <spring-boot-version>2.1.0.RELEASE</spring-boot-version>
     </properties>
     <dependencies>
         <dependency>

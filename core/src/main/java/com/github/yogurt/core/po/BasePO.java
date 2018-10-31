@@ -1,5 +1,7 @@
 package com.github.yogurt.core.po;
 
+import lombok.EqualsAndHashCode;
+
 import javax.persistence.Column;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -8,6 +10,7 @@ import java.time.LocalDateTime;
 /**
  * Created by jtwu on 2015/4/21.
  */
+@EqualsAndHashCode(of = {"id"})
 public class BasePO<T extends BasePO<T>> implements Serializable {
 
     private static final long serialVersionUID = 6468926052770326495L;

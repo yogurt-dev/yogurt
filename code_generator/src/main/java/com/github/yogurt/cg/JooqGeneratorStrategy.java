@@ -1,8 +1,9 @@
 package com.github.yogurt.cg;
 
 import org.apache.commons.lang3.StringUtils;
-import org.jooq.util.DefaultGeneratorStrategy;
-import org.jooq.util.Definition;
+import org.jooq.codegen.DefaultGeneratorStrategy;
+import org.jooq.meta.Definition;
+
 
 public class JooqGeneratorStrategy extends DefaultGeneratorStrategy {
     @Override
@@ -15,6 +16,4 @@ public class JooqGeneratorStrategy extends DefaultGeneratorStrategy {
         }
         return super.getJavaPackageName(definition, mode).replace("tables", "dao.jooq");
     }
-
-
 }

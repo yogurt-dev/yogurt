@@ -117,4 +117,15 @@ public abstract class BaseDAOImpl<T extends BasePO, R extends UpdatableRecord<R>
             }
         }.fetch();
     }
+
+    @Override
+    public void batchSave(List<T> poList) {
+        dsl.batchInsert((TableRecord<?>[]) poList.stream().map(this::getRecord).toArray());
+    }
+
+    @Override
+    public void batchUpdate(List<T> poList) {
+        dsl.batchUpdate((UpdatableRecord<?>[]) poList.stream().map(this::getRecord).toArray());
+    }
+
 }

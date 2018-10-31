@@ -10,12 +10,11 @@ import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
-import org.jooq.util.GenerationTool;
-import org.jooq.util.jaxb.Configuration;
-import org.jooq.util.jaxb.Generator;
-import org.jooq.util.jaxb.Jdbc;
+import org.jooq.meta.jaxb.Configuration;
+import org.jooq.meta.jaxb.Generator;
+import org.jooq.meta.jaxb.Jdbc;
 import org.springframework.util.FileSystemUtils;
-
+import org.jooq.codegen.GenerationTool;
 import static org.twdata.maven.mojoexecutor.MojoExecutor.*;
 
 import java.io.File;
@@ -57,8 +56,8 @@ public class CodeGenerator extends AbstractMojo {
 
     private ClassDefinition classDefinition;
 
-    private static final List ingoreColumns = Arrays.asList("id","founderId", "founderName", "modifierId",
-            "modifierName", "is_deleted", "createDateTime", "modifyDateTime");
+    private static final List ingoreColumns = Arrays.asList("creator_id",  "modifier_id",
+             "is_deleted", "gmt_create", "gmt_modified");
 
     public void execute() throws MojoExecutionException {
         try {
@@ -89,7 +88,7 @@ public class CodeGenerator extends AbstractMojo {
                 plugin(
                         groupId("org.jooq"),
                         artifactId("jooq-codegen-maven"),
-                        version("3.10.8"),
+                        version("3.11.5"),
                         dependencies(
                                 dependency(
                                         groupId("mysql"),
@@ -188,7 +187,7 @@ public class CodeGenerator extends AbstractMojo {
                         .setClassFullName(StringUtils.join(classDefinition.getPackageName(), ".enums.", fieldDefinition.getClassName()));
 
             }
-            if (ingoreColumns.contains(fieldDefinition.getCodeName())) {
+            if (ingoreColumns.contains(fieldDefinition.getColumnName())) {
                 continue;
             }
             fieldDefinitions.add(fieldDefinition);

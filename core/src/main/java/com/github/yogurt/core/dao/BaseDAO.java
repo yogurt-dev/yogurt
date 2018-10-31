@@ -22,4 +22,8 @@ public interface BaseDAO<T extends BasePO> {
     List<T> findAll();
 
     Page<T> list(T po, Pageable pageable);
+
+    void batchSave(List<T> poList);
+
+    void batchUpdate(List<T> poList);
 }

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<configuration  xmlns="http://www.jooq.org/xsd/jooq-codegen-3.10.0.xsd">
+<configuration  xmlns="http://www.jooq.org/xsd/jooq-codegen-3.11.0.xsd">
     <logging>WARN</logging>
     <jdbc>
         <driver>com.mysql.jdbc.Driver</driver>
@@ -12,9 +12,10 @@
             <name>com.github.yogurt.cg.JooqGeneratorStrategy</name>
         </strategy>
         <database>
-            <name>org.jooq.util.mysql.MySQLDatabase</name>
+            <name>org.jooq.meta.mysql.MySQLDatabase</name>
             <includes>test</includes>
             <excludes/>
+            <inputSchema>military</inputSchema>
             <forcedTypes>
                 <!-- 使用converter -->
                 <forcedType>

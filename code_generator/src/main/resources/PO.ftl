@@ -11,14 +11,16 @@ import  ${field.classFullName};
 </#list>
 
 @Data
+@EqualsAndHashCode(callSuper = true,onlyExplicitlyIncluded = true)
 @Accessors(chain = true)
 public class ${className}PO extends BasePO<${className}PO>{
 <#list fields as field>
-
+    <#if field.columnName !="id">
     /**
     *  ${field.comment}
     */
     @Column(name = "${field.columnName}")
 	private ${field.className} ${field.codeName};
+    </#if>
 </#list>
 }
