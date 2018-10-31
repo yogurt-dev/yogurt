@@ -1,6 +1,7 @@
 # 构想 
 
 搭建一套遵循规范、技术先进、减少工作量的开发框架。
+
 它就像Restfull一样，并不是什么新的框架，而是整合现有技术的最佳实践。
 
 # 特点 
@@ -15,8 +16,13 @@
 # 涉及标准及技术
 
 《阿里巴巴 Java 开发手册》
+
 restful命名最佳实践
+
 JOOQ（SpringBoot2将其纳入体系，开发效率优于mybatis）
+
 lombok
+
 guava
+
 logback
