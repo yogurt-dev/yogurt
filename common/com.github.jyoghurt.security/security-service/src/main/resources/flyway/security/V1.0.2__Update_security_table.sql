@@ -1,1 +1,0 @@
--- alter table SecurityUserT add portrait1 varchar(100) COMMENT '头像';

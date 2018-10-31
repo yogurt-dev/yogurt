@@ -1,2 +1,0 @@
-INSERT INTO `ScheduleJob` (`jobId`, `jobName`, `jobGroup`, `jobState`, `cronExpression`, `description`, `className`, `beanName`, `createDateTime`, `modifyDateTime`, `founderId`, `founderName`, `modifierId`, `modifierName`, `deleteFlag`, `rollBackTheWrong`) VALUES ('15', 'SyncOrderStateScheduled', 'SyncOrderStateScheduled', '0', '0 0/1 * * * ?', '定期同步订单支付状态', 'com.df.community.member.order.scheduled.SyncOrderStateScheduled', '', NULL, NULL, NULL, NULL, NULL, NULL, '0', '0');
-COMMIT ;

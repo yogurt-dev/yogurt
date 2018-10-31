@@ -1,8 +1,0 @@
-package ${modulePackage}.controller.form;
-import com.github.jyoghurt.medical.convenience.core.controller.form.BaseSearchForm;
-
-public class ${lowerName}SearchForm extends BaseSearchForm {
-	
-	${feilds}
-	
-}
