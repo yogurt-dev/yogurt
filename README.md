@@ -28,7 +28,7 @@ logback
 
 # 表结构语句
 
-ALTER TABLE `表名`
+ALTER TABLE `表名`  
 ADD COLUMN `creator_id`  bigint(9) NOT NULL DEFAULT 0 COMMENT '创建人ID',  
 ADD COLUMN `gmt_create`  datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间' AFTER `creator_id`,  
 ADD COLUMN `modifier_id`  bigint(9) NULL COMMENT '修改人ID' AFTER `gmt_create`,  
