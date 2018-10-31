@@ -1,1 +1,0 @@
-update DataDictItem set dictItemCode=TRIM(dictItemCode);
