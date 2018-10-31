@@ -1,6 +1,7 @@
 package com.github.yogurt.core.controller;
 
 
+import com.github.yogurt.core.Configuration;
 import com.github.yogurt.core.constant.Constant;
 import com.github.yogurt.core.exception.BaseAccidentException;
 import com.github.yogurt.core.exception.BaseErrorException;
@@ -31,16 +32,18 @@ public class BaseController {
     protected HttpServletResponse response;
     @Autowired
     protected HttpSession session;
+    @Autowired
+    private Configuration configuration;
 
     @ExceptionHandler
     public ResponseEntity<?> exceptionHandler(HttpServletRequest request, Exception ex) {
         String logTemplate = "\n url:★{}★\n parameterValues : ★{}★";
         String parameterValues = com.github.yogurt.core.utils.WebUtils.getParameterValues(request);
         String serverName = request.getServerName();
-        String operatorId = (String) WebUtils.getSessionAttribute(request, BasePO.OPERATOR_ID);
-        String operatorName = (String) WebUtils.getSessionAttribute(request, BasePO.OPERATOR_NAME);
+        String userId = (String) WebUtils.getSessionAttribute(request, configuration.getUserId());
+        String userName = (String) WebUtils.getSessionAttribute(request, configuration.getUserName());
         String operatorLogStr = "\n ★{User-Agent:[" + request.getHeader("User-Agent") + "],serverName:[" + serverName + "]" +
-                ",operatorId:[" + operatorId + "],operatorName:[" + operatorName + "]}★ \n";
+                ",userId:[" + userId + "],userName:[" + userName + "]}★ \n";
         if (ex instanceof BaseAccidentException) {
             if (((BaseAccidentException) ex).getLogFlag()) {
                 log.error(operatorLogStr + ex.getMessage() + logTemplate, request.getServletPath(),

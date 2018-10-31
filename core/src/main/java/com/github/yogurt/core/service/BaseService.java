@@ -30,11 +30,6 @@ public interface BaseService<T extends BasePO> {
     void update(T po);
 
     /**
-     * 删除实体
-     */
-    void delete(T po);
-
-    /**
      * 逻辑删除
      *
      * @param id 主键
