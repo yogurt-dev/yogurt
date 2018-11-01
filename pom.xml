@@ -10,7 +10,6 @@
     <url>https://github.com/jietianwu/yogurt</url>
     <description>Java Web lightweight development framework</description>
     <properties>
-        <com.fasterxml.jackson.version>2.9.2</com.fasterxml.jackson.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
@@ -33,12 +32,13 @@
         </developer>
     </developers>
     <modules>
-        <module>code_generator</module>
+        <module>codegen</module>
         <module>core</module>
+        <module>common</module>
     </modules>
 
     <build>
-        <outputDirectory>${basedir}/target/${project.build.finalName}/WEB-INF/classes</outputDirectory>
+        <!--<outputDirectory>${basedir}/target/${project.build.finalName}/WEB-INF/classes</outputDirectory>-->
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

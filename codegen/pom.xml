@@ -6,7 +6,7 @@
         <artifactId>root</artifactId>
         <version>2.0.0-SNAPSHOT</version>
     </parent>
-    <artifactId>code_generator</artifactId>
+    <artifactId>codegen</artifactId>
     <packaging>maven-plugin</packaging>
     <dependencies>
         <dependency>
@@ -69,7 +69,7 @@
             </plugin>
             <plugin>
                 <groupId>com.github.yogurt</groupId>
-                <artifactId>code_generator</artifactId>
+                <artifactId>codegen</artifactId>
                 <version>2.0.0-SNAPSHOT</version>
                 <configuration>
                    <configurationFile>src/main/resources/jooqConfig.xml</configurationFile>

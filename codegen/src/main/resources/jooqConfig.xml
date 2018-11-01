@@ -16,18 +16,19 @@
             <includes>test</includes>
             <excludes/>
             <inputSchema>military</inputSchema>
+            <outputSchemaToDefault>true</outputSchemaToDefault>
             <forcedTypes>
                 <!-- 使用converter -->
-                <forcedType>
-                    <enumConverter>true</enumConverter>
-                    <userType>com.test.enums.TypeEnum</userType>
-                    <expression>.*\.test\.type</expression>
-                    <types>.*</types>
-                </forcedType>
+                <!--<forcedType>-->
+                    <!--<enumConverter>true</enumConverter>-->
+                    <!--<userType>com.test.enums.TypeEnum</userType>-->
+                    <!--<expression>.*\.test\.type</expression>-->
+                    <!--<types>.*</types>-->
+                <!--</forcedType>-->
             </forcedTypes>
         </database>
         <target>
-            <packageName>com.test</packageName>
+            <packageName>com.github.yogurt.dict</packageName>
             <directory>src/main/java</directory>
 
         </target>
@@ -39,7 +40,6 @@
             <relations>false</relations>
             <tables>false</tables>
             <javaTimeTypes>true</javaTimeTypes>
-            <emptySchemas>true</emptySchemas>
         </generate>
     </generator>
 </configuration>

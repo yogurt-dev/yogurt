@@ -13,14 +13,17 @@ import org.apache.maven.project.MavenProject;
 import org.jooq.meta.jaxb.Configuration;
 import org.jooq.meta.jaxb.Generator;
 import org.jooq.meta.jaxb.Jdbc;
+import org.springframework.util.FileCopyUtils;
 import org.springframework.util.FileSystemUtils;
 import org.jooq.codegen.GenerationTool;
+
 import static org.twdata.maven.mojoexecutor.MojoExecutor.*;
 
-import java.io.File;
-import java.io.FileInputStream;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.sql.*;
 import java.util.*;
+import java.util.regex.Matcher;
 
 @Mojo(name = "generate", defaultPhase = LifecyclePhase.PACKAGE)
 
@@ -56,8 +59,7 @@ public class CodeGenerator extends AbstractMojo {
 
     private ClassDefinition classDefinition;
 
-    private static final List ingoreColumns = Arrays.asList("creator_id",  "modifier_id",
-             "is_deleted", "gmt_create", "gmt_modified");
+    private static final List<String> ignoreColumns = Arrays.asList("creator_id", "modifier_id", "is_deleted", "gmt_create", "gmt_modified");
 
     public void execute() throws MojoExecutionException {
         try {
@@ -69,10 +71,8 @@ public class CodeGenerator extends AbstractMojo {
             //创建文件
             generateFile(configuration);
             //删除jooq生成的多余daos
-            FileSystemUtils.deleteRecursively(
-                    new File(StringUtils.join(basedir, File.separator, configuration.getGenerator().getTarget().getDirectory()
-                            , File.separator, classDefinition.getPackageName().replaceAll("\\.", "/"),
-                            File.separator, "tables")));
+            postHandle(configuration);
+
 
         } catch (Exception e) {
             throw new MojoExecutionException(e.getMessage(), e);
@@ -94,10 +94,10 @@ public class CodeGenerator extends AbstractMojo {
                                         groupId("mysql"),
                                         artifactId("mysql-connector-java"),
                                         version("5.1.47")),
-//                              因为需要用到JooqGeneratorStrategy，所以将code_generator引入
+//                              因为需要用到JooqGeneratorStrategy，所以将codegen引入
                                 dependency(
                                         groupId("com.github.yogurt"),
-                                        artifactId("code_generator"),
+                                        artifactId("codegen"),
                                         version("2.0.0-SNAPSHOT")),
                                 dependency(
                                         groupId("org.apache.commons"),
@@ -167,8 +167,8 @@ public class CodeGenerator extends AbstractMojo {
             FieldDefinition fieldDefinition = new FieldDefinition();
 //          处理is开头字段，根据阿里开发规范去掉is
             String codeName = rs.getString("COLUMN_NAME");
-            if(StringUtils.startsWith(codeName,"is_")){
-                codeName = StringUtils.replaceOnce(codeName,"is_","");
+            if (StringUtils.startsWith(codeName, "is_")) {
+                codeName = StringUtils.replaceOnce(codeName, "is_", "");
             }
             fieldDefinition.setColumnName(rs.getString("COLUMN_NAME"))
                     .setColumnType(rs.getString("DATA_TYPE"))
@@ -187,7 +187,7 @@ public class CodeGenerator extends AbstractMojo {
                         .setClassFullName(StringUtils.join(classDefinition.getPackageName(), ".enums.", fieldDefinition.getClassName()));
 
             }
-            if (ingoreColumns.contains(fieldDefinition.getColumnName())) {
+            if (ignoreColumns.contains(fieldDefinition.getColumnName())) {
                 continue;
             }
             fieldDefinitions.add(fieldDefinition);
@@ -294,7 +294,7 @@ public class CodeGenerator extends AbstractMojo {
         String serviceImplPath = File.separator + "service" + File.separator + "impl" + File.separator + className + "ServiceImpl.java";
 
         String controllerPath = File.separator + "controller" + File.separator + className + "Controller.java";
-        Map context = new HashMap();
+        Map<String, Object> context = new HashMap<>();
         context.put("className", className); //
         context.put("lowerName", lowerName);
         context.put("table", table);
@@ -303,7 +303,7 @@ public class CodeGenerator extends AbstractMojo {
         context.put("priKey", classDefinition.getPriKey());
 
 
-        String fileDirPath = basedir + javaPath + classDefinition.getPackageName().replaceAll("\\.", "/");
+        String fileDirPath = basedir + javaPath + replaceSeparator(classDefinition.getPackageName());
         CommonPageParser.writerPage(context, "PO.ftl", fileDirPath, poPath);
         CommonPageParser.writerPage(context, "DAO.ftl", fileDirPath, daoPath);
         CommonPageParser.writerPage(context, "DAOImpl.ftl", fileDirPath, daoImplPath);
@@ -325,14 +325,44 @@ public class CodeGenerator extends AbstractMojo {
     /**
      * 后处理
      * 1.删除jooq多余文件，jooq目前无法通过配置方式解决
-     * 2.将jooq文件挪至制定文件夹，并替换相关内容
+     * 2.DefaultSchema的引用改为yogurt的
      */
-    private void postHandle(String path, String schema) {
-        new File(path + "DefaultCatalog.java").deleteOnExit();
-        new File(path + "Keys.java").deleteOnExit();
-        new File(path + "Keys.java").deleteOnExit();
-        new File(path + schema + ".java").deleteOnExit();
+
+    private void postHandle(Configuration configuration) throws Exception {
+        String path = StringUtils.join(basedir, File.separator, configuration.getGenerator().getTarget().getDirectory()
+                , File.separator, replaceSeparator(classDefinition.getPackageName()));
+        FileSystemUtils.deleteRecursively(new File(StringUtils.join(path, File.separator, "tables")));
+        String jooqPath = replaceSeparator(StringUtils.join(path, ".dao.jooq."));
+        //删除并替换为yogurt的DefaultSchema
+        FileSystemUtils.deleteRecursively(new File(StringUtils.join(jooqPath, "DefaultCatalog.java")));
+        FileSystemUtils.deleteRecursively(new File(StringUtils.join(jooqPath, "DefaultSchema.java")));
+
+        File file = new File(StringUtils.join(jooqPath,File.separator,classDefinition.getClassName(),".java"));
+        BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
+        CharArrayWriter caw = new CharArrayWriter();
+        String line = null;
+        //以行为单位进行遍历
+        while ((line = br.readLine()) != null) {
+            //替换每一行中符合被替换字符条件的字符串
+            line = line.replaceAll("DefaultSchema", "com.github.yogurt.core.dao.jooq.DefaultSchema");
+            //将该行写入内存
+            caw.write(line);
+            //添加换行符，并进入下次循环
+            caw.append(System.getProperty("line.separator"));
+        }
+        //关闭输入流
+        br.close();
+
+        //将内存中的流写入源文件
+        FileWriter fw = new FileWriter(file);
+        caw.writeTo(fw);
+        fw.close();
 
 
     }
+
+    private String replaceSeparator(String s){
+        return s.replaceAll("\\.", Matcher.quoteReplacement(File.separator));
+    }
+
 }

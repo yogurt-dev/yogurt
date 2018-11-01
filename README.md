@@ -16,11 +16,12 @@
 涉及标准及技术
 =============
 《阿里巴巴 Java 开发手册》  
-restful命名最佳实践  
+Restful命名最佳实践  
 JOOQ（SpringBoot2开始将其纳入体系，开发效率优于mybatis）  
-lombok  
-guava  
-logback  
+Lombok  
+Guava  
+Logback  
+Flyway  
 
 表结构语句
 ==========

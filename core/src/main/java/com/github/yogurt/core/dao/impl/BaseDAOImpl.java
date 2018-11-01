@@ -7,10 +7,13 @@ import com.github.yogurt.core.utils.JPAUtils;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jooq.*;
+import org.jooq.conf.RenderNameStyle;
+import org.jooq.conf.Settings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import javax.annotation.PostConstruct;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,9 +32,14 @@ public abstract class BaseDAOImpl<T extends BasePO, R extends UpdatableRecord<R>
 
     public abstract Class<T> getType();
 
+    @PostConstruct
+    private void init(){
+        dsl.settings().withRenderNameStyle(RenderNameStyle.AS_IS);
+    }
+
     @SuppressWarnings("unchecked")
     private Table<R> getTable() {
-        return getId().getTable();
+        return getId().getTable().as("t");
     }
 
     @Override
