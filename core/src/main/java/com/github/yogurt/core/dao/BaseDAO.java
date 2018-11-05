@@ -9,21 +9,65 @@ import org.springframework.data.domain.Pageable;
 import java.io.Serializable;
 import java.util.List;
 
+/**
+ * @author jtwu
+ */
 public interface BaseDAO<T extends BasePO> {
 
-    void save(T entity) throws DaoException;
+    /**
+     * 保存
+     * @param po 实体类
+     * @throws DaoException
+     */
+    void save(T po) throws DaoException;
 
-    void update(T entity);
+    /**
+     * 更新
+     * @param po
+     */
+    void update(T po);
 
+
+    /**
+     * 逻辑删除
+     * @param id 主键
+     * @param userId 操作人id
+     * @throws DaoException DaoException
+     */
     void logicDelete(Serializable id, Serializable userId) throws DaoException;
 
+    /**
+     * 根据主键查询
+     * @param id 主键
+     * @return po
+     */
     T findById(Serializable id);
 
+    /**
+     * 查询所有
+     * @return 所有po
+     */
     List<T> findAll();
 
+    /**
+     * 分页查询
+     * @param po 查询条件
+     * @param pageable 分页条件
+     * @return 分页集合
+     */
     Page<T> list(T po, Pageable pageable);
 
+
+    /**
+     * 批量保存
+     * @param poList po集合
+     */
     void batchSave(List<T> poList);
 
+
+    /**
+     * 批量更新
+     * @param poList po集合
+     */
     void batchUpdate(List<T> poList);
 }

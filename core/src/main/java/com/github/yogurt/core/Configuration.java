@@ -5,6 +5,11 @@ import lombok.experimental.Accessors;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+/**
+ * yogurt所需的配置参数
+ *
+ * @author jtwu
+ */
 @org.springframework.context.annotation.Configuration
 @ConfigurationProperties(prefix = "yogurt")
 @Data

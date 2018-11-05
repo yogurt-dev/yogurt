@@ -2,10 +2,8 @@ package com.github.yogurt.core.controller;
 
 
 import com.github.yogurt.core.Configuration;
-import com.github.yogurt.core.constant.Constant;
 import com.github.yogurt.core.exception.BaseAccidentException;
 import com.github.yogurt.core.exception.BaseErrorException;
-import com.github.yogurt.core.po.BasePO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +23,10 @@ import javax.servlet.http.HttpSession;
  */
 @Slf4j
 public class BaseController {
+    /**
+     * 错误码需要替换的前缀
+     */
+    private static final String ERROR_CODE_PREFIX = "ERROR_";
 
     @Autowired
     protected HttpServletRequest request;
@@ -52,7 +54,7 @@ public class BaseController {
                 log.warn(operatorLogStr + ex.getMessage() + logTemplate, request.getServletPath(),
                         parameterValues, ex);
             }
-            return new ResponseEntity<>(((BaseAccidentException) ex).getErrorCode().replace(Constant.ERROR_CODE_PREFIX,
+            return new ResponseEntity<>(((BaseAccidentException) ex).getErrorCode().replace(ERROR_CODE_PREFIX,
                     StringUtils.EMPTY),HttpStatus.INTERNAL_SERVER_ERROR);
         }
 

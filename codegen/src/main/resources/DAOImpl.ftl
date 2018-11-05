@@ -9,8 +9,7 @@ import org.springframework.stereotype.Service;
 
 import static ${modulePackage}.dao.jooq.${className}.${className?upper_case};
 /**
- * ${lowerName} DAOImpl
- *
+ * @author ${userName}
  */
 @Service
 public class ${className}DAOImpl extends BaseDAOImpl<${className}PO, ${className}Record>  implements ${className}DAO{

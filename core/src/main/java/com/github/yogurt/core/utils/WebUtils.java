@@ -3,6 +3,9 @@ package com.github.yogurt.core.utils;
 
 import javax.servlet.http.HttpServletRequest;
 
+/**
+ * @author jtwu
+ */
 public class WebUtils extends org.springframework.web.util.WebUtils {
 
     /**

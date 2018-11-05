@@ -5,7 +5,9 @@ import org.apache.commons.beanutils.PropertyUtils;
 import java.lang.reflect.InvocationTargetException;
 
 /**
- * Created by jtwu on 2016/4/8.
+ *
+ * @author jtwu
+ * @date 2016/4/8
  * 自定义异常体
  */
 public class ExceptionBody {

@@ -5,6 +5,10 @@ import lombok.experimental.Accessors;
 
 import java.util.List;
 
+
+/**
+ * @author jtwu
+ */
 @Data
 @Accessors(chain = true)
 public class ClassDefinition {

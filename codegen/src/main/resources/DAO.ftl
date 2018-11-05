@@ -5,8 +5,7 @@ import com.github.yogurt.core.dao.BaseDAO;
 
 
 /**
- * ${lowerName} DAO
- *
+ * @author ${userName}
  */
 public interface ${className}DAO extends BaseDAO<${className}PO> {
 

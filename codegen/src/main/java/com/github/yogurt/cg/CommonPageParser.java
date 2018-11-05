@@ -9,15 +9,19 @@ import lombok.extern.slf4j.Slf4j;
 import java.io.*;
 import java.util.Map;
 
+/**
+ * @author jtwu
+ */
 @Slf4j
 public class CommonPageParser {
 
 
     private final static String CONTENT_ENCODING = "UTF-8";
     private static Configuration cfg = new Configuration(Configuration.VERSION_2_3_28);
-
-    private static boolean isReplace = true; // 是否可以替换文件 true =可以替换，false =不可以替换
-
+    /**
+     * 是否可以替换文件 true =可以替换，false =不可以替换
+     */
+    private static boolean isReplace = true;
     static {
 
 
@@ -54,7 +58,6 @@ public class CommonPageParser {
             FileOutputStream fos = new FileOutputStream(file);
             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(fos, CONTENT_ENCODING));
             temp.process(map,writer);
-//            template.merge(context, writer);
             writer.flush();
             writer.close();
             fos.close();

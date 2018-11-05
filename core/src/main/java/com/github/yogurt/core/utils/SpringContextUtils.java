@@ -15,10 +15,10 @@ import java.util.Map;
 
 /**
  * Created by IntelliJ IDEA.
- * User: jtwu
  * Date: 2009-12-7
  * Time: 21:32:57
  * spring工具类
+ * @author jtwu
  */
 @Component
 public class SpringContextUtils implements ApplicationContextAware {
@@ -28,8 +28,9 @@ public class SpringContextUtils implements ApplicationContextAware {
     public SpringContextUtils() {
     }
 
-    public void setApplicationContext(ApplicationContext _applicationContext)  {
-        applicationContext = _applicationContext;
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext)  {
+        SpringContextUtils.applicationContext = applicationContext;
     }
 
     public static void refresh() {
@@ -71,7 +72,7 @@ public class SpringContextUtils implements ApplicationContextAware {
     }
 
     public static void closeConnection(Connection conn) {
-        DataSourceUtils.releaseConnection(conn, (DataSource) getBean(DATA_SOURCE));            //spring 2.0
+        DataSourceUtils.releaseConnection(conn, (DataSource) getBean(DATA_SOURCE));
     }
 
     public static Boolean containsBean(String beanName) {

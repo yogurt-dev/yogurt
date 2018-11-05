@@ -8,7 +8,9 @@ import java.time.LocalDateTime;
 
 
 /**
- * Created by jtwu on 2015/4/21.
+ *
+ * @author jtwu
+ * @date 2015/4/21
  */
 @EqualsAndHashCode(of = {"id"})
 public class BasePO<T extends BasePO<T>> implements Serializable {

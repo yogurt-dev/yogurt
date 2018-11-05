@@ -1,7 +1,9 @@
 package com.github.yogurt.core.utils;
 
 /**
- * Created by limiao on 2016/11/11.
+ *
+ * @author limiao
+ * @date 2016/11/11
  */
 public class StringUtils extends org.springframework.util.StringUtils {
 

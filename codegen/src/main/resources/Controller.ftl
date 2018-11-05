@@ -12,8 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 
 /**
- * ${lowerName}控制器
- *
+ * @author ${userName}
  */
 @RestController
 @RequestMapping("/${lowerName}s")
@@ -49,7 +48,7 @@ public class ${className}Controller extends BaseController {
 //	 */
 //	@LogContent("添加${lowerName}")
 //	@PostMapping
-//	public ResponseEntity<?> add(@RequestBody ${className}PO ${lowerName}PO) throws ServiceException {
+//	public ResponseEntity<?> save(@RequestBody ${className}PO ${lowerName}PO) throws ServiceException {
 //		${lowerName}Service.save(${lowerName}PO);
 //        return new ResponseEntity<>(HttpStatus.OK);
 //	}
@@ -59,7 +58,7 @@ public class ${className}Controller extends BaseController {
 //	 */
 //	@LogContent("编辑${lowerName}")
 //	@PutMapping
-//	public ResponseEntity<?> edit(@RequestBody ${className}PO ${lowerName}PO) {
+//	public ResponseEntity<?> update(@RequestBody ${className}PO ${lowerName}PO) {
 //		${lowerName}Service.update(${lowerName}PO);
 //        return new ResponseEntity<>(HttpStatus.OK);
 //	}

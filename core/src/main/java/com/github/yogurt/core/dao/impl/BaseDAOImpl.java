@@ -3,12 +3,11 @@ package com.github.yogurt.core.dao.impl;
 import com.github.yogurt.core.dao.BaseDAO;
 import com.github.yogurt.core.exception.DaoException;
 import com.github.yogurt.core.po.BasePO;
-import com.github.yogurt.core.utils.JPAUtils;
+import com.github.yogurt.core.utils.JpaUtils;
 import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jooq.*;
 import org.jooq.conf.RenderNameStyle;
-import org.jooq.conf.Settings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -20,7 +19,9 @@ import java.util.List;
 import java.util.Map;
 
 
-
+/**
+ * @author jtwu
+ */
 public abstract class BaseDAOImpl<T extends BasePO, R extends UpdatableRecord<R>> implements BaseDAO<T> {
 
     private static final String IS_DELETED = "is_deleted";
@@ -28,8 +29,16 @@ public abstract class BaseDAOImpl<T extends BasePO, R extends UpdatableRecord<R>
     @Autowired
     protected DSLContext dsl;
 
+    /**
+     * 获取JOOQ中，主键对应的TableField
+     * @return  主键对应的TableField
+     */
     public abstract TableField getId();
 
+    /**
+     * 获取PO类型
+     * @return PO类型
+     */
     public abstract Class<T> getType();
 
     @PostConstruct
@@ -47,7 +56,7 @@ public abstract class BaseDAOImpl<T extends BasePO, R extends UpdatableRecord<R>
     public void save(T po) throws DaoException {
         List<Object> list = new ArrayList<>();
         for (Field field : getTable().fields()) {
-            list.add(JPAUtils.getValue(po, field.getName()));
+            list.add(JpaUtils.getValue(po, field.getName()));
         }
         Object id = dsl.insertInto(getTable()).columns(getTable().fields()).values(list).returning(getId()).fetchOne().get(getId());
         try {
@@ -62,6 +71,7 @@ public abstract class BaseDAOImpl<T extends BasePO, R extends UpdatableRecord<R>
         dsl.executeUpdate(getRecord(po));
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public void logicDelete(Serializable id, Serializable userId) throws DaoException {
         try {
@@ -92,7 +102,7 @@ public abstract class BaseDAOImpl<T extends BasePO, R extends UpdatableRecord<R>
     @SuppressWarnings("unchecked")
     @Override
     public Page<T> list(T po, Pageable pageable) {
-        return new PageHandle<T>(dsl, pageable, getType()) {
+        return new BasePageHandle<T>(dsl, pageable, getType()) {
             @Override
             public TableField[] fields() {
                 List<TableField> list = new ArrayList<>();
@@ -103,8 +113,8 @@ public abstract class BaseDAOImpl<T extends BasePO, R extends UpdatableRecord<R>
             }
 
             @Override
-            public SelectConditionStep<? extends Record> sql(SelectSelectStep query) {
-                Map<String, Object> map = JPAUtils.getColumnNameValueMap(po);
+            public SelectConditionStep<? extends Record> beginWithFormSql(SelectSelectStep selectColumns) {
+                Map<String, Object> map = JpaUtils.getColumnNameValueMap(po);
                 String sql = " ";
                 List values = new ArrayList();
                 for (String columnName : map.keySet()) {
@@ -119,9 +129,9 @@ public abstract class BaseDAOImpl<T extends BasePO, R extends UpdatableRecord<R>
                     sql = StringUtils.removeEnd(sql, "and ");
                 }
                 if (sql.length() == 1) {
-                    return query.from(getTable()).where();
+                    return selectColumns.from(getTable()).where();
                 }
-                return query.from(getTable()).where(sql, values.toArray());
+                return selectColumns.from(getTable()).where(sql, values.toArray());
             }
         }.fetch();
     }

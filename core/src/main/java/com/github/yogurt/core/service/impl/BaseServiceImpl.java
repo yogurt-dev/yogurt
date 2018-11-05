@@ -18,6 +18,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 
+/**
+ * @author jtwu
+ */
 @Slf4j
 public class BaseServiceImpl<T extends BasePO> implements BaseService<T> {
 

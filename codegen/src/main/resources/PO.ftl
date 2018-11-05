@@ -12,6 +12,9 @@ import  ${field.classFullName};
     </#if>
 </#list>
 
+/**
+ * @author ${userName}
+ */
 @Data
 @Accessors(chain = true)
 @EqualsAndHashCode(callSuper = true,onlyExplicitlyIncluded = true)

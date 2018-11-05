@@ -3,10 +3,15 @@ package com.github.yogurt.cg;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import java.io.Serializable;
 
+
+/**
+ * @author jtwu
+ */
 @Data
 @Accessors(chain = true)
-public class FieldDefinition  {
+public class FieldDefinition  implements Serializable {
     /**
      * 数据库列名
      */

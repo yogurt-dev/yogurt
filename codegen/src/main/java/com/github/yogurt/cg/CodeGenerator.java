@@ -6,18 +6,14 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Component;
-import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
+import org.jooq.codegen.GenerationTool;
 import org.jooq.meta.jaxb.Configuration;
 import org.jooq.meta.jaxb.Generator;
 import org.jooq.meta.jaxb.Jdbc;
-import org.springframework.util.FileCopyUtils;
 import org.springframework.util.FileSystemUtils;
-import org.jooq.codegen.GenerationTool;
-
-import static org.twdata.maven.mojoexecutor.MojoExecutor.*;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -25,9 +21,15 @@ import java.sql.*;
 import java.util.*;
 import java.util.regex.Matcher;
 
-@Mojo(name = "generate", defaultPhase = LifecyclePhase.PACKAGE)
+import static org.twdata.maven.mojoexecutor.MojoExecutor.*;
+
+/**
+ * @author jtwu
+ */
+@Mojo(name = "generate", requiresProject = false)
 
 public class CodeGenerator extends AbstractMojo {
+
 
     @Parameter
     private String configurationFile;
@@ -37,6 +39,11 @@ public class CodeGenerator extends AbstractMojo {
      */
     @Parameter(defaultValue = "${basedir}")
     private String basedir;
+    /**
+     * 用户名
+     */
+    @Parameter(defaultValue = "${user.name}")
+    private String userName;
 
 
     /**
@@ -59,8 +66,9 @@ public class CodeGenerator extends AbstractMojo {
 
     private ClassDefinition classDefinition;
 
-    private static final List<String> ignoreColumns = Arrays.asList("creator_id", "modifier_id", "is_deleted", "gmt_create", "gmt_modified");
+    private static final List<String> IGNORE_COLUMNS = Arrays.asList("creator_id", "modifier_id", "is_deleted", "gmt_create", "gmt_modified");
 
+    @Override
     public void execute() throws MojoExecutionException {
         try {
             Configuration configuration = loadConfig();
@@ -72,8 +80,6 @@ public class CodeGenerator extends AbstractMojo {
             generateFile(configuration);
             //删除jooq生成的多余daos
             postHandle(configuration);
-
-
         } catch (Exception e) {
             throw new MojoExecutionException(e.getMessage(), e);
         }
@@ -136,11 +142,11 @@ public class CodeGenerator extends AbstractMojo {
     private Configuration loadConfig() {
         File file = new File(configurationFile);
 
-        if (!file.isAbsolute())
+        if (!file.isAbsolute()) {
             file = new File(project.getBasedir(), configurationFile);
+        }
         try (FileInputStream in = new FileInputStream(file)) {
             return GenerationTool.load(in);
-
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -157,11 +163,11 @@ public class CodeGenerator extends AbstractMojo {
         Jdbc jdbc = configuration.getJdbc();
         Generator generator = configuration.getGenerator();
         List<FieldDefinition> fieldDefinitions = new ArrayList<>();
-        String SQLColumns = "SELECT distinct COLUMN_NAME, DATA_TYPE, COLUMN_COMMENT,COLUMN_KEY,CHARACTER_MAXIMUM_LENGTH" +
-                ",IS_NULLABLE,COLUMN_DEFAULT,COLUMN_TYPE  FROM information_schema.columns WHERE table_name = '" + generator.getDatabase().getIncludes() + "' ";
-//                + "and table_schema='" + generator.getDatabase().getInputSchema() + "' ";
+        String sqLColumns = "SELECT distinct COLUMN_NAME, DATA_TYPE, COLUMN_COMMENT,COLUMN_KEY,CHARACTER_MAXIMUM_LENGTH" +
+                ",IS_NULLABLE,COLUMN_DEFAULT,COLUMN_TYPE  FROM information_schema.columns WHERE table_name = '" + generator.getDatabase().getIncludes() + "' "
+                + "and table_schema='" + generator.getDatabase().getInputSchema() + "' ";
         Connection con = DriverManager.getConnection(jdbc.getUrl(), jdbc.getUser(), jdbc.getPassword());
-        PreparedStatement ps = con.prepareStatement(SQLColumns);
+        PreparedStatement ps = con.prepareStatement(sqLColumns);
         ResultSet rs = ps.executeQuery();
         while (rs.next()) {
             FieldDefinition fieldDefinition = new FieldDefinition();
@@ -187,9 +193,10 @@ public class CodeGenerator extends AbstractMojo {
                         .setClassFullName(StringUtils.join(classDefinition.getPackageName(), ".enums.", fieldDefinition.getClassName()));
 
             }
-            if (ignoreColumns.contains(fieldDefinition.getColumnName())) {
+            if (IGNORE_COLUMNS.contains(fieldDefinition.getColumnName())) {
                 continue;
             }
+            System.out.println(fieldDefinition.toString());
             fieldDefinitions.add(fieldDefinition);
 //          设置主键
             if (fieldDefinition.getIsPriKey()) {
@@ -294,14 +301,14 @@ public class CodeGenerator extends AbstractMojo {
         String serviceImplPath = File.separator + "service" + File.separator + "impl" + File.separator + className + "ServiceImpl.java";
 
         String controllerPath = File.separator + "controller" + File.separator + className + "Controller.java";
-        Map<String, Object> context = new HashMap<>();
-        context.put("className", className); //
+        Map<String, Object> context = new HashMap<>(7);
+        context.put("className", className);
         context.put("lowerName", lowerName);
         context.put("table", table);
         context.put("modulePackage", classDefinition.getPackageName());
         context.put("fields", classDefinition.getFieldDefinitions());
         context.put("priKey", classDefinition.getPriKey());
-
+        context.put("userName", userName);
 
         String fileDirPath = basedir + javaPath + replaceSeparator(classDefinition.getPackageName());
         CommonPageParser.writerPage(context, "PO.ftl", fileDirPath, poPath);
@@ -337,10 +344,10 @@ public class CodeGenerator extends AbstractMojo {
         FileSystemUtils.deleteRecursively(new File(StringUtils.join(jooqPath, "DefaultCatalog.java")));
         FileSystemUtils.deleteRecursively(new File(StringUtils.join(jooqPath, "DefaultSchema.java")));
 
-        File file = new File(StringUtils.join(jooqPath,File.separator,classDefinition.getClassName(),".java"));
+        File file = new File(StringUtils.join(jooqPath, File.separator, classDefinition.getClassName(), ".java"));
         BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
         CharArrayWriter caw = new CharArrayWriter();
-        String line = null;
+        String line;
         //以行为单位进行遍历
         while ((line = br.readLine()) != null) {
             //替换每一行中符合被替换字符条件的字符串
@@ -361,7 +368,7 @@ public class CodeGenerator extends AbstractMojo {
 
     }
 
-    private String replaceSeparator(String s){
+    private String replaceSeparator(String s) {
         return s.replaceAll("\\.", Matcher.quoteReplacement(File.separator));
     }
 

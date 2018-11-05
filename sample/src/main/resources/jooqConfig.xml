@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<configuration  xmlns="http://www.jooq.org/xsd/jooq-codegen-3.11.0.xsd">
-    <logging>TRACE</logging>
+<configuration xmlns="http://www.jooq.org/xsd/jooq-codegen-3.11.0.xsd">
+    <logging>WARN</logging>
     <jdbc>
         <driver>com.mysql.jdbc.Driver</driver>
         <url>jdbc:mysql://localhost:3306/military?useUnicode=true&amp;characterEncoding=utf8&amp;autoReconnect=true&amp;rewriteBatchedStatements=TRUE&amp;useSSL=false&amp;serverTimezone=UTC</url>
@@ -14,28 +14,32 @@
         <database>
             <name>org.jooq.meta.mysql.MySQLDatabase</name>
             <includes>test</includes>
-            <excludes/>
-            <inputSchema>military</inputSchema>
+            <inputSchema>test</inputSchema>
             <outputSchemaToDefault>true</outputSchemaToDefault>
             <forcedTypes>
-                <!-- 定义枚举类型 -->
-                <!--<forcedType>-->
-                    <!--<enumConverter>true</enumConverter>-->
-                    <!--&lt;!&ndash;这里需要手动定义类名，命名规则: packageName.enums.字段名Enum&ndash;&gt;-->
-                    <!--<userType>com.test.enums.TypeEnum</userType>-->
-                    <!--<expression>.*\.test\.type</expression>-->
-                    <!--<types>.*</types>-->
-                <!--</forcedType>-->
+                <forcedType>
+                    <name>BOOLEAN</name>
+                    <expression>is_deleted</expression>
+                </forcedType>
 
+                <!-- 需要手动设置Enum配置 -->
+                <forcedType>
+                    <enumConverter>true</enumConverter>
+                    <userType>com.github.yogurt.sample.test.enums.TypeEnum</userType>
+                    <expression>.*\.test\.type</expression>
+                    <types>.*</types>
+                </forcedType>
             </forcedTypes>
         </database>
+
         <target>
-            <packageName>com.github.yogurt.dict</packageName>
+            <packageName>com.github.yogurt.sample.test</packageName>
             <directory>src/main/java</directory>
 
         </target>
         <generate>
             <daos>true</daos>
+            <records>false</records>
             <globalObjectReferences>false</globalObjectReferences>
             <generatedAnnotation>false</generatedAnnotation>
             <indexes>false</indexes>
