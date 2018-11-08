@@ -16,25 +16,16 @@ public interface BaseDAO<T extends BasePO> {
 
     /**
      * 保存
-     * @param po 实体类
+     * @param po 持久化对象
      * @throws DaoException
      */
     void save(T po) throws DaoException;
 
     /**
      * 更新
-     * @param po
+     * @param po 持久化对象
      */
     void update(T po);
-
-
-    /**
-     * 逻辑删除
-     * @param id 主键
-     * @param userId 操作人id
-     * @throws DaoException DaoException
-     */
-    void logicDelete(Serializable id, Serializable userId) throws DaoException;
 
     /**
      * 根据主键查询
@@ -60,14 +51,20 @@ public interface BaseDAO<T extends BasePO> {
 
     /**
      * 批量保存
-     * @param poList po集合
+     * @param poList 持久化对象集合
      */
     void batchSave(List<T> poList);
 
 
     /**
      * 批量更新
-     * @param poList po集合
+     * @param poList 持久化对象集合
      */
     void batchUpdate(List<T> poList);
+
+    /**
+     * 更新非空字段
+     * @param po 持久化对象
+     */
+	void updateForSelective(T po);
 }

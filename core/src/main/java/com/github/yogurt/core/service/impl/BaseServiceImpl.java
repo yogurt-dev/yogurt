@@ -14,6 +14,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.io.Serializable;
+import java.lang.reflect.ParameterizedType;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -24,102 +25,112 @@ import java.util.Objects;
 @Slf4j
 public class BaseServiceImpl<T extends BasePO> implements BaseService<T> {
 
-    @Autowired
-    private Configuration configuration;
+	@Autowired
+	private Configuration configuration;
 
-    @Autowired
-    protected BaseDAO<T> baseDAO;
+	@Autowired
+	protected BaseDAO<T> baseDAO;
 
-    @Override
-    public void save(T entity) throws ServiceException {
-        try {
-            setCreator(entity);
-            baseDAO.save(entity);
-        } catch (DaoException e) {
-            throw new ServiceException(e);
-        }
-    }
+	@Override
+	public void save(T entity) throws ServiceException {
+		try {
+			setCreator(entity);
+			baseDAO.save(entity);
+		} catch (DaoException e) {
+			throw new ServiceException(e);
+		}
+	}
 
-    @Override
-    public void update(T po) {
-        setModifier(po);
-        baseDAO.update(po);
-    }
+	@Override
+	public void update(T po) {
+		setModifier(po);
+		baseDAO.update(po);
+	}
 
-    @Override
-    public void logicDelete(Serializable id) throws ServiceException {
-        try {
-            baseDAO.logicDelete(id, (String) getSessionAttr(configuration.getUserId()));
-        } catch (Exception e) {
-            throw new ServiceException(e);
-        }
-    }
+	@Override
+	public void updateForSelective(T po) {
+		setModifier(po);
+		baseDAO.updateForSelective(po);
+	}
 
-    @Override
-    public <F extends Serializable> T findById(F id) {
-        return baseDAO.findById(id);
-    }
+	@SuppressWarnings("unchecked")
+	@Override
+	public void logicDelete(Long id) throws ServiceException {
+		try {
+			ParameterizedType pt = (ParameterizedType) this.getClass().getGenericSuperclass();
+			Class<T> clazz = (Class<T>) pt.getActualTypeArguments()[0];
+			updateForSelective((T) clazz.newInstance().setId(id).setDeleted(true));
+		} catch (Exception e) {
+			throw new ServiceException(e);
+		}
+	}
 
-    @Override
-    public List<T> findAll() {
-        return baseDAO.findAll();
-    }
+	@Override
+	public <F extends Serializable> T findById(F id) {
+		return baseDAO.findById(id);
+	}
 
-    @Override
-    public Page<T> list(T po, Pageable pageable) {
-        return baseDAO.list(po, pageable);
-    }
+	@Override
+	public List<T> findAll() {
+		return baseDAO.findAll();
+	}
 
-    @Override
-    public void batchSave(List<T> poList) {
-        poList.forEach(this::setCreator);
-        baseDAO.batchSave(poList);
-    }
+	@Override
+	public Page<T> list(T po, Pageable pageable) {
+		return baseDAO.list(po, pageable);
+	}
 
-    @Override
-    public void batchUpdate(List<T> poList) {
-        poList.forEach(this::setModifier);
-        baseDAO.batchUpdate(poList);
-    }
+	@Override
+	public void batchSave(List<T> poList) {
+		poList.forEach(this::setCreator);
+		baseDAO.batchSave(poList);
+	}
 
-    /**
-     * 获取request
-     *
-     * @return HttpServletRequest
-     */
-    private Object getSessionAttr(String attr) {
-        return ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes()))
-                .getRequest().getSession().getAttribute(attr);
-    }
+	@Override
+	public void batchUpdate(List<T> poList) {
+		poList.forEach(this::setModifier);
+		baseDAO.batchUpdate(poList);
+	}
 
-    private void setCreator(BasePO po) {
-        if (po == null) {
-            return;
-        }
-        try {
-            if (null == po.getCreatorId()) {
-                po.setCreatorId((Long) getSessionAttr(configuration.getUserId()));
-            }
-        } catch (Exception e) {
-            log.debug("setFounder时session获取失败!");
-        }
-    }
+	/**
+	 * 获取request
+	 *
+	 * @return HttpServletRequest
+	 */
+	private Object getSessionAttr(String attr) {
+		return ((ServletRequestAttributes) Objects.requireNonNull(RequestContextHolder.getRequestAttributes()))
+				.getRequest().getSession().getAttribute(attr);
+	}
 
-    private void setModifier(BasePO po) {
-        if (po == null) {
-            return;
-        }
-        if (po.getGmtModified() == null) {
-            po.setGmtModified(LocalDateTime.now());
-        }
-        try {
-            if (null == po.getModifierId()) {
-                po.setModifierId((Long) getSessionAttr(configuration.getUserId()));
-            }
-        } catch (Exception e) {
-            log.debug("update时session获取失败!");
-        }
-    }
+	private void setCreator(BasePO po) {
+		if (po == null) {
+			return;
+		}
+		try {
+			if (null == po.getCreatorId()) {
+				po.setCreatorId((Long) getSessionAttr(configuration.getUserId()));
+			}
+		} catch (Exception e) {
+			log.debug("setFounder时session获取失败!");
+		}
+	}
+
+	private void setModifier(BasePO po) {
+		if (po == null) {
+			return;
+		}
+		if (po.getGmtModified() == null) {
+			po.setGmtModified(LocalDateTime.now());
+		}
+		try {
+			if (null == po.getModifierId()) {
+				Object sessionAttr = getSessionAttr(configuration.getUserId());
+				po.setModifierId(sessionAttr == null ? 0L : (Long) sessionAttr);
+			}
+		} catch (Exception e) {
+			log.debug("update时session获取失败!");
+		}
+	}
 
 //
 //    @Override

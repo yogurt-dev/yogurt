@@ -10,9 +10,9 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * 服务接口的基类
+ * service层基类，提供单表的crud接口
  *
- * @param <T>此服务接口服务的数据模型，即model
+ * @param <T> PO类型
  * @author jtwu
  */
 public interface BaseService<T extends BasePO> {
@@ -27,9 +27,16 @@ public interface BaseService<T extends BasePO> {
 	/**
 	 * 更新实体
 	 *
-	 * @param po 业务实体
+	 * @param po 持久化对象
 	 */
 	void update(T po);
+
+	/**
+	 * 更新非空字段
+	 *
+	 * @param po 持久化对象
+	 */
+	void updateForSelective(T po);
 
 	/**
 	 * 逻辑删除
@@ -37,27 +44,27 @@ public interface BaseService<T extends BasePO> {
 	 * @param id 主键
 	 * @throws ServiceException 业务异常
 	 */
-	void logicDelete(Serializable id) throws ServiceException;
+	void logicDelete(Long id) throws ServiceException;
 
 	/**
 	 * 根据ID获取实体
 	 *
-	 * @param id 业务实体ID
-	 * @return 业务实体
+	 * @param id 主键
+	 * @return 持久化对象
 	 */
 	<F extends Serializable> T findById(F id);
 
 	/**
 	 * 查询所有记录
 	 *
-	 * @return 业务实体集合
+	 * @return 持久化对象集合
 	 */
 	List<T> findAll();
 
 	/**
 	 * 分页查询
 	 *
-	 * @param po       业务实体
+	 * @param po       持久化对象
 	 * @param pageable 分页
 	 * @return spring-data的分页对象
 	 */
@@ -66,24 +73,16 @@ public interface BaseService<T extends BasePO> {
 	/**
 	 * 批量保存
 	 *
-	 * @param poList 实体列表
+	 * @param poList 持久化对象列表
 	 */
 	void batchSave(List<T> poList);
 
 	/**
 	 * 批量更新
 	 *
-	 * @param poList 实体列表
+	 * @param poList 持久化对象列表
 	 */
 	void batchUpdate(List<T> poList);
-//
-//
-//    /**
-//     * 根据选择的更新实体
-//     *
-//     * @param po 业务实体
-//     *
-//     */
-//    void updateForSelective(T po) ;
-//
+
+
 }
