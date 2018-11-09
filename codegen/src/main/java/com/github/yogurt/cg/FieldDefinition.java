@@ -8,6 +8,8 @@ import java.io.Serializable;
 
 /**
  * @author jtwu
+ *
+ * 字段描述类
  */
 @Data
 @Accessors(chain = true)
@@ -57,7 +59,7 @@ public class FieldDefinition  implements Serializable {
     /**
      * 枚举值列表
      */
-    private String[] enumValues;
+    private EnumFieldDefinition[] enumValues;
 
 
 }

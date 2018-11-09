@@ -15,17 +15,17 @@
             <name>org.jooq.meta.mysql.MySQLDatabase</name>
             <includes>test</includes>
             <excludes/>
-            <inputSchema>military</inputSchema>
+            <inputSchema>test</inputSchema>
             <outputSchemaToDefault>true</outputSchemaToDefault>
             <forcedTypes>
                 <!-- 定义枚举类型 -->
-                <!--<forcedType>-->
-                    <!--<enumConverter>true</enumConverter>-->
-                    <!--&lt;!&ndash;这里需要手动定义类名，命名规则: packageName.enums.字段名Enum&ndash;&gt;-->
-                    <!--<userType>com.test.enums.TypeEnum</userType>-->
-                    <!--<expression>.*\.test\.type</expression>-->
-                    <!--<types>.*</types>-->
-                <!--</forcedType>-->
+                <forcedType>
+                    <enumConverter>true</enumConverter>
+                    <!--这里需要手动定义类名，命名规则: packageName.enums.字段名Enum-->
+                    <userType>com.github.yogurt.dict.enums.TypeEnum</userType>
+                    <expression>.*\.test\.type</expression>
+                    <types>.*</types>
+                </forcedType>
 
             </forcedTypes>
         </database>
