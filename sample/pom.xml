@@ -4,7 +4,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
         <artifactId>root</artifactId>
-        <groupId>com.github.yogurt</groupId>
+        <groupId>com.github.yogurt-dev</groupId>
         <version>2.0.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
@@ -13,7 +13,7 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.github.yogurt</groupId>
+            <groupId>com.github.yogurt-dev</groupId>
             <artifactId>core</artifactId>
             <version>2.0.0-SNAPSHOT</version>
         </dependency>
@@ -31,7 +31,7 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
             <plugin>
-                <groupId>com.github.yogurt</groupId>
+                <groupId>com.github.yogurt-dev</groupId>
                 <artifactId>codegen</artifactId>
                 <version>2.0.0-SNAPSHOT</version>
                 <configuration>

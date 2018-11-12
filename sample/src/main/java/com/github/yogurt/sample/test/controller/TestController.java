@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 import com.github.yogurt.core.controller.BaseController;
 import com.github.yogurt.sample.test.po.TestPO;
 import com.github.yogurt.sample.test.service.TestService;
-import com.github.yogurt.core.annotations.LogContent;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 
@@ -27,7 +26,6 @@ public class TestController extends BaseController {
 	/**
 	 * 查询test
 	 */
-	@LogContent("查询test")
 	@GetMapping
 	public ResponseEntity<?> list(TestPO testPO , Pageable pageable) {
         return new ResponseEntity<>(testService.list(testPO,pageable),HttpStatus.OK);
@@ -36,7 +34,6 @@ public class TestController extends BaseController {
    /**
     * 查询单个test
 	  */
-	 @LogContent("查询单个test")
 	 @GetMapping(value = "/{id}")
 	 public ResponseEntity<?> get(@PathVariable Long id) {
 		 return new ResponseEntity<>(testService.findById(id),HttpStatus.OK);
@@ -45,7 +42,6 @@ public class TestController extends BaseController {
 	/**
 	 * 添加test
 	 */
-	@LogContent("添加test")
 	@PostMapping
 	public ResponseEntity<?> save(@RequestBody TestPO testPO) throws ServiceException {
 		testService.save(testPO);
@@ -55,7 +51,6 @@ public class TestController extends BaseController {
 	/**
 	 * 编辑test
 	 */
-	@LogContent("编辑test")
 	@PutMapping
 	public ResponseEntity<?> update(@RequestBody TestPO testPO) {
 		testService.updateForSelective(testPO);
@@ -65,7 +60,6 @@ public class TestController extends BaseController {
 	/**
 	 * 删除单个test
 	 */
-	@LogContent("删除test")
 	@DeleteMapping(value = "/{id}")
 	public ResponseEntity<?> logicDelete(@PathVariable Long id) {
 		try {

@@ -1,18 +1,21 @@
 package com.github.yogurt.sample.test;
 
 import com.github.yogurt.core.Configuration;
-import com.github.yogurt.sample.test.controller.TestController;
-import com.github.yogurt.sample.test.service.TestService;
+import com.github.yogurt.sample.test.enums.TypeEnum;
+import com.github.yogurt.sample.test.po.TestPO;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.reactive.server.WebTestClient;
+import reactor.core.publisher.Mono;
 
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * @Author: jtwu
@@ -20,19 +23,34 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 
 @RunWith(SpringRunner.class)
-@WebMvcTest(TestController.class)
+@Import(Configuration.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class TestControllerTests {
-    @Autowired
-    private MockMvc mvc;
+	@Autowired
+	private WebTestClient webClient;
 
-    @MockBean
-    private TestService testService;
+	@Test
+	public void testList() {
+		this.webClient.get().uri("/tests").exchange().expectStatus().isOk().expectBodyList(TestPO.class);
 
-    @MockBean
-    private Configuration configuration;
+	}
 
-    @Test
-    public void testGet() throws Exception {
-        mvc.perform(get("/tests")).andExpect(status().isOk());
-    }
+	@Test
+	public void testSave() {
+		this.webClient.post().uri("/tests").body(Mono.just(new TestPO().setName("haha").setTime(LocalDateTime.now())
+				.setType(TypeEnum.Y)), TestPO.class).exchange().expectStatus().isOk();
+	}
+
+	@Test
+	public void testUpdate() {
+		this.webClient.put().uri("/tests").body(Mono.just(new TestPO().setId(41L).setName("haha1").setTime(LocalDateTime.now())
+				.setType(TypeEnum.N)), TestPO.class).exchange().expectStatus().isOk();
+
+	}
+
+
+	@Test
+	public void testDelete() {
+		this.webClient.delete().uri("/tests/40").exchange().expectStatus().isOk();
+	}
 }
