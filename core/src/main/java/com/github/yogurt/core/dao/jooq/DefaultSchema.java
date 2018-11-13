@@ -17,7 +17,7 @@ public class DefaultSchema extends SchemaImpl {
     private static final long serialVersionUID = 1451483127;
 
     /**
-     * The reference instance of <code></code>
+     * The reference instance of
      */
     public static final DefaultSchema DEFAULT_SCHEMA = new DefaultSchema();
 

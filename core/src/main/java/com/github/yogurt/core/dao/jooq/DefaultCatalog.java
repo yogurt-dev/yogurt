@@ -16,7 +16,7 @@ public class DefaultCatalog extends CatalogImpl {
     private static final long serialVersionUID = 2113000207;
 
     /**
-     * The reference instance of <code></code>
+     * The reference instance of
      */
     public static final DefaultCatalog DEFAULT_CATALOG = new DefaultCatalog();
 
