@@ -134,7 +134,8 @@ public class CodeGenerator extends AbstractMojo {
 		Generator generator = configuration.getGenerator();
 		classDefinition = new ClassDefinition().setPackageName(generator.getTarget().getPackageName())
 				.setClassName(getClassName(generator.getDatabase().getIncludes()));
-		createFieldDesc(configuration);
+		createTableDesc(configuration);
+
 	}
 
 
@@ -154,23 +155,47 @@ public class CodeGenerator extends AbstractMojo {
 		}
 	}
 
+	/**
+	 * 创建表描述信息
+	 *
+	 * @param configuration 配置信息
+	 */
+	private void createTableDesc(Configuration configuration) throws SQLException, ClassNotFoundException {
+		Class.forName("com.mysql.jdbc.Driver");
+		Jdbc jdbc = configuration.getJdbc();
+		Generator generator = configuration.getGenerator();
+		String sqLColumns = "select TABLE_SCHEMA,TABLE_NAME,TABLE_COMMENT from information_schema.`TABLES` where table_name = '" + generator.getDatabase().getIncludes() + "' "
+				+ "and table_schema='" + generator.getDatabase().getInputSchema() + "' ";
+		Connection con = DriverManager.getConnection(jdbc.getUrl(), jdbc.getUser(), jdbc.getPassword());
+		PreparedStatement ps = con.prepareStatement(sqLColumns);
+		ResultSet rs = ps.executeQuery();
+		while (rs.next()) {
+			classDefinition.setComment(rs.getString("TABLE_COMMENT"));
+		}
+		rs.close();
+		ps.close();
+		con.close();
+		createFieldDefinition(configuration);
+	}
 
 	/**
 	 * 创建属性描述信息
 	 *
 	 * @param configuration 配置信息
 	 */
-	private void createFieldDesc(Configuration configuration) throws SQLException, ClassNotFoundException {
+	private void createFieldDefinition(Configuration configuration) throws SQLException, ClassNotFoundException {
 		Class.forName("com.mysql.jdbc.Driver");
 		Jdbc jdbc = configuration.getJdbc();
 		Generator generator = configuration.getGenerator();
 		List<FieldDefinition> fieldDefinitions = new ArrayList<>();
 		String sqLColumns = "SELECT distinct COLUMN_NAME, DATA_TYPE, COLUMN_COMMENT,COLUMN_KEY,CHARACTER_MAXIMUM_LENGTH" +
-				",IS_NULLABLE,COLUMN_DEFAULT,COLUMN_TYPE  FROM information_schema.columns WHERE table_name = '" + generator.getDatabase().getIncludes() + "' "
-				+ "and table_schema='" + generator.getDatabase().getInputSchema() + "' ";
+				",IS_NULLABLE,COLUMN_DEFAULT,COLUMN_TYPE,ORDINAL_POSITION  FROM information_schema.columns WHERE table_name = '" + generator.getDatabase().getIncludes() + "' "
+				+ "and table_schema='" + generator.getDatabase().getInputSchema() + "' order by ORDINAL_POSITION";
 		Connection con = DriverManager.getConnection(jdbc.getUrl(), jdbc.getUser(), jdbc.getPassword());
 		PreparedStatement ps = con.prepareStatement(sqLColumns);
 		ResultSet rs = ps.executeQuery();
+//		支持联合主键
+		classDefinition.setPriKeys(new ArrayList<>());
 		while (rs.next()) {
 			FieldDefinition fieldDefinition = new FieldDefinition();
 //          处理is开头字段，根据阿里开发规范去掉is
@@ -203,7 +228,7 @@ public class CodeGenerator extends AbstractMojo {
 			fieldDefinitions.add(fieldDefinition);
 //          设置主键
 			if (fieldDefinition.getIsPriKey()) {
-				classDefinition.setPriKey(fieldDefinition);
+				classDefinition.getPriKeys().add(fieldDefinition);
 			}
 		}
 		rs.close();
@@ -220,7 +245,7 @@ public class CodeGenerator extends AbstractMojo {
 		List<EnumFieldDefinition> list = new ArrayList<>();
 		Map<String, String> enumComments = parseComment(comment);
 		if (enumComments == null) {
-			log.warn("'{}'注释的格式不对，无法生成创建enum注解，注释示例：渠道类型(ALI:某宝,JD:东哥)",columnName);
+			log.warn("'{}'注释格式无法解析，不能生成创建enum注解，注释示例：渠道类型(ALI:某宝,JD:东哥)", columnName);
 		}
 		for (String enumField : enumFields) {
 			list.add(new EnumFieldDefinition().setName(enumField).setAnnotation(MapUtils.getString(enumComments, enumField)));
@@ -361,10 +386,32 @@ public class CodeGenerator extends AbstractMojo {
 		context.put("table", table);
 		context.put("modulePackage", classDefinition.getPackageName());
 		context.put("fields", classDefinition.getFieldDefinitions());
-		context.put("priKey", classDefinition.getPriKey());
+		context.put("priKeys", classDefinition.getPriKeys());
 		context.put("userName", userName);
+		context.put("tableComment", StringUtils.endsWith(classDefinition.getComment(), "表")
+				? StringUtils.substringBeforeLast(classDefinition.getComment(), "表")
+				: classDefinition.getComment());
 
 		String fileDirPath = basedir + javaPath + replaceSeparator(classDefinition.getPackageName());
+		log.info("\n                                      " +
+				"\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" +
+				"\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" +
+				"\n@@@@@  @@@@@  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" +
+				"\n@@@@@@  @@@  @@@@    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" +
+				"\n@@@@@@@  @  @@@  @@@  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" +
+				"\n@@@@@@@@@  @@@@  @@@  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" +
+				"\n@@@@@@@@  @@@@@@@   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" +
+				"\n@@@@@@@  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" +
+				"\n@@@@@@  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" +
+				"\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" +
+				"\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" +
+				"\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" +
+				"\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" +
+				"\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" +
+				"\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" +
+				"\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" +
+				"\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" +
+				"\n                                      ");
 		CommonPageParser.writerPage(context, "PO.ftl", fileDirPath, poPath);
 		CommonPageParser.writerPage(context, "DAO.ftl", fileDirPath, daoPath);
 		CommonPageParser.writerPage(context, "DAOImpl.ftl", fileDirPath, daoImplPath);

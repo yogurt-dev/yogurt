@@ -17,9 +17,8 @@ public interface BaseDAO<T extends BasePO> {
     /**
      * 保存
      * @param po 持久化对象
-     * @throws DaoException dao异常
      */
-    void save(T po) throws DaoException;
+    void save(T po) ;
 
     /**
      * 更新

@@ -4,7 +4,6 @@ import com.github.yogurt.core.dao.BaseDAO;
 import com.github.yogurt.core.exception.DaoException;
 import com.github.yogurt.core.po.BasePO;
 import com.github.yogurt.core.utils.JpaUtils;
-import org.apache.commons.beanutils.BeanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jooq.*;
 import org.jooq.conf.RenderNameStyle;
@@ -14,47 +13,52 @@ import org.springframework.data.domain.Pageable;
 
 import javax.annotation.PostConstruct;
 import java.io.Serializable;
+import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 
 /**
  * @author jtwu
  */
 public abstract class BaseDAOImpl<T extends BasePO, R extends UpdatableRecord<R>> implements BaseDAO<T> {
-	private static final String ALIAS = "T";
+	private static final String ALIAS = "t";
 
 	@Autowired
 	protected DSLContext dsl;
-
-	/**
-	 * 获取JOOQ中，主键对应的TableField
-	 *
-	 * @return 主键对应的TableField
-	 */
-	public abstract TableField getId();
 
 	/**
 	 * 获取PO类型
 	 *
 	 * @return PO类型
 	 */
-	public abstract Class<T> getType();
+	public Class<T> getPoClass(){
+		ParameterizedType pt = (ParameterizedType) this.getClass().getGenericSuperclass();
+		Class<T> clazz = (Class<T>) pt.getActualTypeArguments()[0];
+		return clazz;
+	}
 
 	@PostConstruct
 	private void init() {
+//		去掉sql中的单引号
 		dsl.settings().withRenderNameStyle(RenderNameStyle.AS_IS);
 	}
 
+	/**
+	 * @return 获取JOOQ对应的Table
+	 */
 	@SuppressWarnings("unchecked")
-	private Table<R> getTable() {
-		return getId().getTable();
+	public abstract Table<R> getTable();
+
+	private Table<R> getAliasTable() {
+		return getTable().as(ALIAS);
 	}
 
 	@Override
 	@SuppressWarnings({"unchecked"})
-	public void save(T po) throws DaoException {
+	public void save(T po) {
 		List<Object> valueList = new ArrayList<>();
 		List<Object> fieldList = new ArrayList<>();
 		Map<String, Object> valueMap = JpaUtils.getColumnNameValueMap(po);
@@ -69,19 +73,14 @@ public abstract class BaseDAOImpl<T extends BasePO, R extends UpdatableRecord<R>
 			fieldList.add(field);
 			valueList.add(valueMap.get(field.getName()));
 		}
-		Object id = dsl.insertInto(getTable()).columns(fieldList.toArray(new Field[fieldList.size()]))
-				.values(valueList).returning(getId()).fetchOne().get(getId());
-		try {
-			BeanUtils.setProperty(po, getId().getName(), id);
-		} catch (Exception e) {
-			throw new DaoException(e);
-		}
+		dsl.insertInto(getTable()).columns(fieldList.toArray(new Field[fieldList.size()]))
+				.values(valueList).returning().fetchOne().into(po);
 	}
 
 	@Override
 	public void update(T po) {
 		Map<String, Object> valueMap = JpaUtils.getColumnNameValueMap(po);
-		UpdateQuery updateQuery = dsl.updateQuery(getTable());
+		UpdateQuery updateQuery = dsl.updateQuery(getAliasTable());
 		addValue(valueMap, updateQuery);
 		updateQuery.execute();
 	}
@@ -89,22 +88,24 @@ public abstract class BaseDAOImpl<T extends BasePO, R extends UpdatableRecord<R>
 	@Override
 	public void updateForSelective(T po) {
 		Map<String, Object> valueMap = JpaUtils.getColumnNameValueMap(po);
-		UpdateQuery updateQuery = dsl.updateQuery(getTable());
+		UpdateQuery updateQuery = dsl.updateQuery(getAliasTable());
 		addValue(valueMap, updateQuery);
 		updateQuery.execute();
 	}
 
 	@SuppressWarnings("unchecked")
 	private void addValue(Map<String, Object> valueMap, UpdateQuery updateQuery) {
-		for (Field field : getTable().fields()) {
+//		getAliasTable().getPrimaryKey().getFields()本期望获取别名.列名，实际表名.列名
+		List<String> primaryKeys = getAliasTable().getPrimaryKey().getFields().stream().map(Field::getName).collect(Collectors.toList());
+		for (Field field : getAliasTable().fields()) {
 			if (!valueMap.containsKey(field.getName())) {
 				continue;
 			}
 			if (null == valueMap.get(field.getName())) {
 				continue;
 			}
-			if (getId().getName().equals(field.getName())) {
-				updateQuery.addConditions(getId().eq(valueMap.get(field.getName())));
+			if (primaryKeys.contains(field.getName())) {
+				updateQuery.addConditions(field.eq(valueMap.get(field.getName())));
 				continue;
 			}
 			updateQuery.addValue(field, valueMap.get(field.getName()));
@@ -118,23 +119,36 @@ public abstract class BaseDAOImpl<T extends BasePO, R extends UpdatableRecord<R>
 	@SuppressWarnings("unchecked")
 	@Override
 	public T findById(Serializable id) {
-		return dsl.selectFrom(getTable().as(ALIAS)).where(getId().equal(id)).fetchOneInto(getType());
+//		单主键
+		if (id instanceof Number) {
+			TableField tableField = getAliasTable().getPrimaryKey().getFields().get(0);
+			return dsl.selectFrom(getAliasTable()).where(getAliasTable().field(tableField).eq(id)).fetchOneInto(getPoClass());
+		}
+//		联合主键
+
+		List<Condition> list = new ArrayList<>();
+		for (TableField field : getAliasTable().getPrimaryKey().getFields()) {
+			list.add(getAliasTable().field(field).eq(JpaUtils.getValue(id,field.getName())));
+		}
+		return dsl.selectFrom(getAliasTable()).where(list.toArray(new Condition[list.size()])).fetchOneInto(getPoClass());
 	}
 
 	@Override
 	public List<T> findAll() {
-		return dsl.selectFrom(getTable().as(ALIAS)).fetchInto(getType());
+		return dsl.selectFrom(getAliasTable()).fetchInto(getPoClass());
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public Page<T> list(T po, Pageable pageable) {
-		return new BasePageHandle<T>(dsl, pageable, getType()) {
+		return new BasePageHandle<T>(dsl, pageable, getPoClass()) {
 			@Override
 			public TableField[] fields() {
 				List<TableField> list = new ArrayList<>();
-				for (Field field : getTable().fields()) {
-					list.add((TableField) field);
+				for (Field field : getAliasTable().fields()) {
+					TableField tableField = (TableField) field;
+
+					list.add(tableField);
 				}
 				return list.toArray(new TableField[0]);
 			}
@@ -156,9 +170,9 @@ public abstract class BaseDAOImpl<T extends BasePO, R extends UpdatableRecord<R>
 					sql = StringUtils.removeEnd(sql, "and ");
 				}
 				if (sql.length() == 1) {
-					return selectColumns.from(getTable()).where();
+					return selectColumns.from(getAliasTable()).where();
 				}
-				return selectColumns.from(getTable().as(ALIAS)).where(sql, values.toArray());
+				return selectColumns.from(getAliasTable()).where(sql, values.toArray());
 			}
 		}.fetch();
 	}

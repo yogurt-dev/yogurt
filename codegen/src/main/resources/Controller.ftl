@@ -1,6 +1,5 @@
 package ${modulePackage}.controller;
 
-import com.github.yogurt.core.exception.ServiceException;
 import org.springframework.http.HttpStatus;
 import javax.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
@@ -18,14 +17,12 @@ import org.springframework.http.ResponseEntity;
 public class ${className}Controller extends BaseController {
 
 
-	/**
-	 * ${lowerName}服务类
-	 */
+
 	@Resource
 	private ${className}Service ${lowerName}Service;
 
 //	/**
-//	 * 查询${lowerName}
+//	 * 查询${tableComment}
 //	 */
 //	@GetMapping
 //	public ResponseEntity<?> list(${className}PO ${lowerName}PO , Pageable pageable) {
@@ -33,24 +30,29 @@ public class ${className}Controller extends BaseController {
 //	}
 //
 //   /**
-//    * 查询单个${lowerName}
+//    * 查询单个${tableComment}
 //	  */
-//	 @GetMapping(value = "/{${priKey.codeName}}")
-//	 public ResponseEntity<?> get(@PathVariable ${priKey.className} ${priKey.codeName}) {
-//		 return new ResponseEntity<>(${lowerName}Service.findById(${priKey.codeName}),HttpStatus.OK);
+//	 @GetMapping(value = "<#list priKeys as priKey>/{${priKey.codeName}}</#list>")
+//	 public ResponseEntity<?> get( <#list priKeys as priKey>@PathVariable ${priKey.className} ${priKey.codeName}<#if priKey_has_next>,</#if></#list>) {
+<#if (priKeys?size=1)>
+//		 return new ResponseEntity<>(${lowerName}Service.findById(${priKeys[0].codeName}),HttpStatus.OK);
+</#if>
+<#if (priKeys?size>1)>
+//		 return new ResponseEntity<>(${lowerName}Service.findById(new ${className}PO()<#list priKeys as priKey>.set${priKey.codeName?cap_first}(${priKey.codeName})</#list>),HttpStatus.OK);
+</#if>
 //	 }
 //
 //	/**
-//	 * 添加${lowerName}
+//	 * 添加${tableComment}
 //	 */
 //	@PostMapping
-//	public ResponseEntity<?> save(@RequestBody ${className}PO ${lowerName}PO) throws ServiceException {
+//	public ResponseEntity<?> save(@RequestBody ${className}PO ${lowerName}PO){
 //		${lowerName}Service.save(${lowerName}PO);
 //        return new ResponseEntity<>(HttpStatus.OK);
 //	}
 //
 //	/**
-//	 * 编辑${lowerName}
+//	 * 编辑${tableComment}
 //	 */
 //	@PutMapping
 //	public ResponseEntity<?> update(@RequestBody ${className}PO ${lowerName}PO) {
@@ -59,16 +61,16 @@ public class ${className}Controller extends BaseController {
 //	}
 //
 //	/**
-//	 * 删除单个${lowerName}
+//	 * 删除单个${tableComment}
 //	 */
-//	@DeleteMapping(value = "/{${priKey.codeName}}")
-//	public ResponseEntity<?> logicDelete(@PathVariable ${priKey.className} ${priKey.codeName}) {
-//
-//		try {
-//			${lowerName}Service.logicDelete(${priKey.codeName});
-//		} catch (ServiceException e) {
-//			return new ResponseEntity<>("操作失败",HttpStatus.INTERNAL_SERVER_ERROR);
-//		}
+//	@DeleteMapping(value = "<#list priKeys as priKey>/{${priKey.codeName}}</#list>")
+//	public ResponseEntity<?> logicDelete(<#list priKeys as priKey>@PathVariable ${priKey.className} ${priKey.codeName}<#if priKey_has_next>,</#if></#list>) {
+<#if (priKeys?size=1)>
+//		${lowerName}Service.logicDelete(${priKeys[0].codeName});
+</#if>
+<#if (priKeys?size>1)>
+//		${lowerName}Service.logicDelete(new ${className}PO()<#list priKeys as priKey>.set${priKey.codeName?cap_first}(${priKey.codeName})</#list>);
+</#if>
 //		return new ResponseEntity<>(HttpStatus.OK);
 //	}
 //

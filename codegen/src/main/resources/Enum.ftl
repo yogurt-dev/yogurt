@@ -9,6 +9,6 @@ public enum ${fieldDefinition.enumClassName} {
      * ${enumValue.annotation}
      */
     </#if>
-     ${enumValue.name},
+     ${enumValue.name}<#if enumValue_has_next>,</#if>
     </#list>
 }

@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.yogurt-dev</groupId>
     <artifactId>root</artifactId>
-    <version>2.0.0</version>
+    <version>2.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>yogurt</name>
     <url>https://github.com/yogurt-dev/yogurt</url>
@@ -12,6 +12,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <yogurt.version>2.0.1-SNAPSHOT</yogurt.version>
     </properties>
     <scm>
         <connection>scm:git@github.com:yogurt-dev/yogurt.git</connection>

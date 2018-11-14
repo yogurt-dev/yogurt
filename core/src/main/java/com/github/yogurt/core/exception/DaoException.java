@@ -5,7 +5,7 @@ package com.github.yogurt.core.exception;
  * Date: 12-12-5 Time: 上午10:46 Dao层异常
  * @author jtwu
  */
-public class DaoException extends BaseAccidentException {
+public class DaoException extends BaseErrorException {
     private static final long serialVersionUID = 7799029148591208607L;
 
     public DaoException() {

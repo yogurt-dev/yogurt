@@ -7,6 +7,7 @@ import com.github.yogurt.core.exception.ServiceException;
 import com.github.yogurt.core.po.BasePO;
 import com.github.yogurt.core.service.BaseService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,13 +33,9 @@ public class BaseServiceImpl<T extends BasePO> implements BaseService<T> {
 	protected BaseDAO<T> baseDAO;
 
 	@Override
-	public void save(T entity) throws ServiceException {
-		try {
-			setCreator(entity);
-			baseDAO.save(entity);
-		} catch (DaoException e) {
-			throw new ServiceException(e);
-		}
+	public void save(T entity) {
+		setCreator(entity);
+		baseDAO.save(entity);
 	}
 
 	@Override
@@ -55,11 +52,19 @@ public class BaseServiceImpl<T extends BasePO> implements BaseService<T> {
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public void logicDelete(Long id) throws ServiceException {
+	public <F extends Serializable> void logicDelete(F id) {
 		try {
 			ParameterizedType pt = (ParameterizedType) this.getClass().getGenericSuperclass();
 			Class<T> clazz = (Class<T>) pt.getActualTypeArguments()[0];
-			updateForSelective((T) clazz.newInstance().setId(id).setDeleted(true));
+//			单主键
+			T t = clazz.newInstance();
+			if(id instanceof Number){
+				updateForSelective((T) t.setId(((Number)id).longValue()).setDeleted(true));
+				return;
+			}
+//			联合主键
+			BeanUtils.copyProperties(id,t);
+			updateForSelective((T)t.setDeleted(true));
 		} catch (Exception e) {
 			throw new ServiceException(e);
 		}

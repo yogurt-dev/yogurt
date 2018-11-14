@@ -12,23 +12,25 @@ import java.util.List;
 @Data
 @Accessors(chain = true)
 public class ClassDefinition {
-    /**
-     * 类名
-     */
-    private String className;
-    /**
-     * 包名
-     */
-    private String packageName;
-    /**
-     * 字段列表
-     */
-    private List<FieldDefinition> fieldDefinitions;
+	/**
+	 * 类名
+	 */
+	private String className;
+	/**
+	 * 包名
+	 */
+	private String packageName;
+	/**
+	 * 注释
+	 */
+	private String comment;
+	/**
+	 * 字段列表
+	 */
+	private List<FieldDefinition> fieldDefinitions;
 
-    /**
-     * 主键
-     */
-    private FieldDefinition priKey ;
-
-
+	/**
+	 * 主键
+	 */
+	private List<FieldDefinition> priKeys;
 }

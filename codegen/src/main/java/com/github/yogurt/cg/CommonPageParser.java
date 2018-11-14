@@ -5,6 +5,9 @@ import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateExceptionHandler;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
+import org.jooq.SchemaMapping;
+import org.jooq.tools.JooqLogger;
 
 import java.io.*;
 import java.util.Map;
@@ -12,10 +15,9 @@ import java.util.Map;
 /**
  * @author jtwu
  */
-@Slf4j
 public class CommonPageParser {
 
-
+	private static JooqLogger logger =  JooqLogger.getLogger(CommonPageParser.class);
 	private final static String CONTENT_ENCODING = "UTF-8";
 	private static Configuration cfg = new Configuration(Configuration.VERSION_2_3_28);
 
@@ -50,7 +52,8 @@ public class CommonPageParser {
 		writer.flush();
 		writer.close();
 		fos.close();
-		log.info("成功创建 " + file.getAbsolutePath());
+
+		logger.info("Generating " + StringUtils.substringBefore(templateName,"."),StringUtils.substringAfterLast(targetFile,File.separator));
 	}
 
 }

@@ -20,9 +20,8 @@ public interface BaseService<T extends BasePO> {
 	 * 保存实体
 	 *
 	 * @param po 待保存的实体
-	 * @throws ServiceException 业务异常
 	 */
-	void save(T po) throws ServiceException;
+	void save(T po);
 
 	/**
 	 * 更新实体
@@ -44,7 +43,7 @@ public interface BaseService<T extends BasePO> {
 	 * @param id 主键
 	 * @throws ServiceException 业务异常
 	 */
-	void logicDelete(Long id) throws ServiceException;
+	<F extends Serializable> void logicDelete(F id) throws ServiceException;
 
 	/**
 	 * 根据ID获取实体
