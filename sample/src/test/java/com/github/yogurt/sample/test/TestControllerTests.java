@@ -3,19 +3,16 @@ package com.github.yogurt.sample.test;
 import com.github.yogurt.core.Configuration;
 import com.github.yogurt.sample.test.enums.TypeEnum;
 import com.github.yogurt.sample.test.po.TestPO;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 /**
  * @Author: jtwu

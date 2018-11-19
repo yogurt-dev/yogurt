@@ -15,8 +15,8 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Data
 @Accessors(chain = true)
 public class Configuration {
-    @Value("${yogurt.userId:userId}")
-    private String userId;
-    @Value("${yogurt.userName:userName}")
-    private String userName;
+	@Value("${yogurt.userId:userId}")
+	private String userId;
+	@Value("${yogurt.userName:userName}")
+	private String userName;
 }

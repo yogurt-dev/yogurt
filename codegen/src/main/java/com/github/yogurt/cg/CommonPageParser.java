@@ -4,12 +4,14 @@ package com.github.yogurt.cg;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateExceptionHandler;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-import org.jooq.SchemaMapping;
+import org.apache.maven.plugin.MojoExecutionException;
 import org.jooq.tools.JooqLogger;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 import java.util.Map;
 
 /**
@@ -43,7 +45,10 @@ public class CommonPageParser {
 	static void writerPage(Map map, String templateName, String fileDirPath, String targetFile) throws Exception {
 		File file = new File(fileDirPath + targetFile);
 		if (!file.exists()) {
-			new File(file.getParent()).mkdirs();
+			boolean mkResult = new File(file.getParent()).mkdirs();
+			if(!mkResult){
+				throw new MojoExecutionException("文件夹创建失败");
+			}
 		}
 		Template temp = cfg.getTemplate(templateName);
 		FileOutputStream fos = new FileOutputStream(file);

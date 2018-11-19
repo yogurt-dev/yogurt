@@ -15,10 +15,10 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ElementType.METHOD, ElementType.TYPE})
 public @interface LogContent {
-    //模块名称,方法上定义优先于类上定义
-    String module() default StringUtils.EMPTY;
+	//模块名称,方法上定义优先于类上定义
+	String module() default StringUtils.EMPTY;
 
-    //日志内容
-    String value() default StringUtils.EMPTY;
+	//日志内容
+	String value() default StringUtils.EMPTY;
 
 }

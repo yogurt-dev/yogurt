@@ -11,13 +11,13 @@ import java.io.Serializable;
  */
 public class BaseSnapshotPO<T extends BaseSnapshotPO<T>> extends BasePO<T> implements Serializable {
 
-    private Integer version;
+	private Integer version;
 
-    public Integer getVersion() {
-        return version;
-    }
+	public Integer getVersion() {
+		return version;
+	}
 
-    public void setVersion(Integer version) {
-        this.version = version;
-    }
+	public void setVersion(Integer version) {
+		this.version = version;
+	}
 }

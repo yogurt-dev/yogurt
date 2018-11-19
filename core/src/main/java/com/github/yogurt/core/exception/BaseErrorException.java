@@ -15,60 +15,61 @@ import java.text.MessageFormat;
  * 谁来处理（Who cares about it）	    调用方法的上游代码	            需要修复此问题的人员
  * 实例（Examples）	                另一种返回模式	                编程缺陷，硬件故障，配置错误，文件丢失，服务器无法使用
  * 最佳映射（Best Mapping）	        已检查异常	                未检查异常
+ *
  * @author jtwu
  */
 public class BaseErrorException extends RuntimeException {
-    private static final long serialVersionUID = 8686960428281101221L;
-    /**
-     * 异常码
-     */
-    private String errorCode;
+	private static final long serialVersionUID = 8686960428281101221L;
+	/**
+	 * 异常码
+	 */
+	private String errorCode;
 
-    /**
-     * 自定义异常体
-     */
-    private ExceptionBody exceptionBody;
+	/**
+	 * 自定义异常体
+	 */
+	private ExceptionBody exceptionBody;
 
-    public BaseErrorException(String refBizId, String logContent, Exception e) {
-        super();
-    }
+	public BaseErrorException(String refBizId, String logContent, Exception e) {
+		super();
+	}
 
-    @Deprecated
-    public BaseErrorException(ExceptionBody exceptionBody) {
-        super(exceptionBody.getMessage());
-        this.exceptionBody = exceptionBody;
-        this.errorCode = exceptionBody.getCode();
-    }
+	@Deprecated
+	public BaseErrorException(ExceptionBody exceptionBody) {
+		super(exceptionBody.getMessage());
+		this.exceptionBody = exceptionBody;
+		this.errorCode = exceptionBody.getCode();
+	}
 
-    @Deprecated
-    public BaseErrorException(ExceptionBody exceptionBody, Throwable cause) {
-        super(exceptionBody.getMessage(), cause);
-        this.exceptionBody = exceptionBody;
-        this.errorCode = exceptionBody.getCode();
+	@Deprecated
+	public BaseErrorException(ExceptionBody exceptionBody, Throwable cause) {
+		super(exceptionBody.getMessage(), cause);
+		this.exceptionBody = exceptionBody;
+		this.errorCode = exceptionBody.getCode();
 
-    }
+	}
 
-    public BaseErrorException() {
-        super();
-    }
+	public BaseErrorException() {
+		super();
+	}
 
-    public BaseErrorException(Throwable cause) {
-        super(cause.getMessage(), cause);
-    }
+	public BaseErrorException(Throwable cause) {
+		super(cause.getMessage(), cause);
+	}
 
-    public BaseErrorException(String message) {
-        super(message);
-    }
+	public BaseErrorException(String message) {
+		super(message);
+	}
 
-    public BaseErrorException(String message, Object... objects) {
-        super(MessageFormat.format(message, objects));
-    }
+	public BaseErrorException(String message, Object... objects) {
+		super(MessageFormat.format(message, objects));
+	}
 
-    public BaseErrorException(String message, Throwable cause) {
-        super(message, cause);
-    }
+	public BaseErrorException(String message, Throwable cause) {
+		super(message, cause);
+	}
 
-    public BaseErrorException(String message, Throwable cause, Object... objects) {
-        super(MessageFormat.format(message, objects), cause);
-    }
+	public BaseErrorException(String message, Throwable cause, Object... objects) {
+		super(MessageFormat.format(message, objects), cause);
+	}
 }

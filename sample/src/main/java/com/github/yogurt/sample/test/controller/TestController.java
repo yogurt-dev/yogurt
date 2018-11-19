@@ -1,14 +1,11 @@
 package com.github.yogurt.sample.test.controller;
 
-import com.github.yogurt.core.exception.ServiceException;
-import org.springframework.http.HttpStatus;
-import javax.annotation.Resource;
-import org.springframework.web.bind.annotation.*;
 import com.github.yogurt.core.controller.BaseController;
-import com.github.yogurt.sample.test.po.TestPO;
 import com.github.yogurt.sample.test.service.TestService;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.annotation.Resource;
 
 /**
  * @author Administrator
@@ -17,56 +14,53 @@ import org.springframework.http.ResponseEntity;
 @RequestMapping("/tests")
 public class TestController extends BaseController {
 
-	/**
-	 * test服务类
-	 */
+
+
 	@Resource
 	private TestService testService;
 
-	/**
-	 * 查询test
-	 */
-	@GetMapping
-	public ResponseEntity<?> list(TestPO testPO , Pageable pageable) {
-        return new ResponseEntity<>(testService.list(testPO,pageable),HttpStatus.OK);
-	}
+//	/**
+//	 * 查询测试
+//	 */
+//	@GetMapping
+//	public ResponseEntity<?> list(TestPO testPO , Pageable pageable) {
+//        return new ResponseEntity<>(testService.list(testPO,pageable),HttpStatus.OK);
+//	}
+//
+//   /**
+//    * 查询单个测试
+//	  */
+//	 @GetMapping(value = "/{id}")
+//	 public ResponseEntity<?> get( @PathVariable Long id) {
+//		 return new ResponseEntity<>(testService.findById(id),HttpStatus.OK);
+//	 }
+//
+//	/**
+//	 * 添加测试
+//	 */
+//	@PostMapping
+//	public ResponseEntity<?> save(@RequestBody TestPO testPO){
+//		testService.save(testPO);
+//        return new ResponseEntity<>(HttpStatus.OK);
+//	}
+//
+//	/**
+//	 * 编辑测试
+//	 */
+//	@PutMapping
+//	public ResponseEntity<?> update(@RequestBody TestPO testPO) {
+//		testService.update(testPO);
+//        return new ResponseEntity<>(HttpStatus.OK);
+//	}
+//
+//	/**
+//	 * 删除单个测试
+//	 */
+//	@DeleteMapping(value = "/{id}")
+//	public ResponseEntity<?> logicDelete(@PathVariable Long id) {
+//		testService.logicDelete(id);
+//		return new ResponseEntity<>(HttpStatus.OK);
+//	}
+//
 
-   /**
-    * 查询单个test
-	  */
-	 @GetMapping(value = "/{id}")
-	 public ResponseEntity<?> get(@PathVariable Long id) {
-		 return new ResponseEntity<>(testService.findById(id),HttpStatus.OK);
-	 }
-
-	/**
-	 * 添加test
-	 */
-	@PostMapping
-	public ResponseEntity<?> save(@RequestBody TestPO testPO) throws ServiceException {
-		testService.save(testPO);
-        return new ResponseEntity<>(HttpStatus.OK);
-	}
-
-	/**
-	 * 编辑test
-	 */
-	@PutMapping
-	public ResponseEntity<?> update(@RequestBody TestPO testPO) {
-		testService.updateForSelective(testPO);
-        return new ResponseEntity<>(HttpStatus.OK);
-	}
-
-	/**
-	 * 删除单个test
-	 */
-	@DeleteMapping(value = "/{id}")
-	public ResponseEntity<?> logicDelete(@PathVariable Long id) {
-		try {
-			testService.logicDelete(id);
-		} catch (ServiceException e) {
-			return new ResponseEntity<>("操作失败",HttpStatus.INTERNAL_SERVER_ERROR);
-		}
-		return new ResponseEntity<>(HttpStatus.OK);
-	}
 }

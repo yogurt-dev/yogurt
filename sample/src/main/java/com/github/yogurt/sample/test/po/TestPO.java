@@ -1,12 +1,12 @@
 package com.github.yogurt.sample.test.po;
 
 import com.github.yogurt.core.po.BasePO;
+import com.github.yogurt.sample.test.enums.TypeEnum;
 import lombok.Data;
-import lombok.experimental.Accessors;
-import javax.persistence.Column;
 import lombok.EqualsAndHashCode;
+import lombok.experimental.Accessors;
 
-import  com.github.yogurt.sample.test.enums.TypeEnum;
+import javax.persistence.Column;
 
 /**
  * @author Administrator
@@ -21,7 +21,7 @@ public class TestPO extends BasePO<TestPO>{
     @Column(name = "name")
 	private String name;
     /**
-    *  类型
+    *  类型(N:否,Y:是)
     */
     @Column(name = "type")
 	private TypeEnum type;

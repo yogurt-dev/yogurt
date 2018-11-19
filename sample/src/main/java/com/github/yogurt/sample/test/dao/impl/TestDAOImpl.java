@@ -1,10 +1,10 @@
 package com.github.yogurt.sample.test.dao.impl;
 
-import org.jooq.TableField;
-import com.github.yogurt.sample.test.po.TestPO;
-import com.github.yogurt.sample.test.dao.TestDAO;
 import com.github.yogurt.core.dao.impl.BaseDAOImpl;
+import com.github.yogurt.sample.test.dao.TestDAO;
 import com.github.yogurt.sample.test.dao.jooq.TestRecord;
+import com.github.yogurt.sample.test.po.TestPO;
+import org.jooq.Table;
 import org.springframework.stereotype.Service;
 
 import static com.github.yogurt.sample.test.dao.jooq.Test.TEST;
@@ -15,12 +15,8 @@ import static com.github.yogurt.sample.test.dao.jooq.Test.TEST;
 public class TestDAOImpl extends BaseDAOImpl<TestPO, TestRecord>  implements TestDAO{
 
     @Override
-    public TableField getId() {
-    return TEST.ID;
+    public Table<TestRecord> getTable() {
+    return TEST;
     }
 
-    @Override
-    public Class<TestPO> getType() {
-        return TestPO.class;
-    }
 }

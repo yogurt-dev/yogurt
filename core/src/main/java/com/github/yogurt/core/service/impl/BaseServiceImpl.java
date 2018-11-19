@@ -2,7 +2,6 @@ package com.github.yogurt.core.service.impl;
 
 import com.github.yogurt.core.Configuration;
 import com.github.yogurt.core.dao.BaseDAO;
-import com.github.yogurt.core.exception.DaoException;
 import com.github.yogurt.core.exception.ServiceException;
 import com.github.yogurt.core.po.BasePO;
 import com.github.yogurt.core.service.BaseService;
@@ -58,13 +57,13 @@ public class BaseServiceImpl<T extends BasePO> implements BaseService<T> {
 			Class<T> clazz = (Class<T>) pt.getActualTypeArguments()[0];
 //			单主键
 			T t = clazz.newInstance();
-			if(id instanceof Number){
-				updateForSelective((T) t.setId(((Number)id).longValue()).setDeleted(true));
+			if (id instanceof Number) {
+				updateForSelective((T) t.setId(((Number) id).longValue()).setDeleted(true));
 				return;
 			}
 //			联合主键
-			BeanUtils.copyProperties(id,t);
-			updateForSelective((T)t.setDeleted(true));
+			BeanUtils.copyProperties(id, t);
+			updateForSelective((T) t.setDeleted(true));
 		} catch (Exception e) {
 			throw new ServiceException(e);
 		}

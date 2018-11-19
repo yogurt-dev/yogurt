@@ -23,49 +23,49 @@ import javax.servlet.http.HttpSession;
  */
 @Slf4j
 public class BaseController {
-    /**
-     * 错误码需要替换的前缀
-     */
-    private static final String ERROR_CODE_PREFIX = "ERROR_";
+	/**
+	 * 错误码需要替换的前缀
+	 */
+	private static final String ERROR_CODE_PREFIX = "ERROR_";
 
-    @Autowired
-    protected HttpServletRequest request;
-    @Autowired
-    protected HttpServletResponse response;
-    @Autowired
-    protected HttpSession session;
-    @Autowired
-    private Configuration configuration;
+	@Autowired
+	protected HttpServletRequest request;
+	@Autowired
+	protected HttpServletResponse response;
+	@Autowired
+	protected HttpSession session;
+	@Autowired
+	private Configuration configuration;
 
-    @ExceptionHandler
-    public ResponseEntity<?> exceptionHandler(HttpServletRequest request, Exception ex) {
-        String logTemplate = "\n url:★{}★\n parameterValues : ★{}★";
-        String parameterValues = com.github.yogurt.core.utils.WebUtils.getParameterValues(request);
-        String serverName = request.getServerName();
-        String userId = (String) WebUtils.getSessionAttribute(request, configuration.getUserId());
-        String userName = (String) WebUtils.getSessionAttribute(request, configuration.getUserName());
-        String operatorLogStr = "\n ★{User-Agent:[" + request.getHeader("User-Agent") + "],serverName:[" + serverName + "]" +
-                ",userId:[" + userId + "],userName:[" + userName + "]}★ \n";
-        if (ex instanceof BaseAccidentException) {
-            if (((BaseAccidentException) ex).getLogFlag()) {
-                log.error(operatorLogStr + ex.getMessage() + logTemplate, request.getServletPath(),
-                        parameterValues, ex);
-            } else {
-                log.warn(operatorLogStr + ex.getMessage() + logTemplate, request.getServletPath(),
-                        parameterValues, ex);
-            }
-            return new ResponseEntity<>(((BaseAccidentException) ex).getErrorCode().replace(ERROR_CODE_PREFIX,
-                    StringUtils.EMPTY),HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+	@ExceptionHandler
+	public ResponseEntity<?> exceptionHandler(HttpServletRequest request, Exception ex) {
+		String logTemplate = "\n url:★{}★\n parameterValues : ★{}★";
+		String parameterValues = com.github.yogurt.core.utils.WebUtils.getParameterValues(request);
+		String serverName = request.getServerName();
+		String userId = (String) WebUtils.getSessionAttribute(request, configuration.getUserId());
+		String userName = (String) WebUtils.getSessionAttribute(request, configuration.getUserName());
+		String operatorLogStr = "\n ★{User-Agent:[" + request.getHeader("User-Agent") + "],serverName:[" + serverName + "]" +
+				",userId:[" + userId + "],userName:[" + userName + "]}★ \n";
+		if (ex instanceof BaseAccidentException) {
+			if (((BaseAccidentException) ex).getLogFlag()) {
+				log.error(operatorLogStr + ex.getMessage() + logTemplate, request.getServletPath(),
+						parameterValues, ex);
+			} else {
+				log.warn(operatorLogStr + ex.getMessage() + logTemplate, request.getServletPath(),
+						parameterValues, ex);
+			}
+			return new ResponseEntity<>(((BaseAccidentException) ex).getErrorCode().replace(ERROR_CODE_PREFIX,
+					StringUtils.EMPTY), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 
-        if (ex instanceof BaseErrorException) {
-            log.error(operatorLogStr + ex.getMessage() + logTemplate, request.getServletPath(),
-                    parameterValues, ex);
-            return new ResponseEntity<>(ex.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+		if (ex instanceof BaseErrorException) {
+			log.error(operatorLogStr + ex.getMessage() + logTemplate, request.getServletPath(),
+					parameterValues, ex);
+			return new ResponseEntity<>(ex.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 
-        log.error(operatorLogStr + "uncaught  exception," + logTemplate, request.getServletPath(),
-                parameterValues, ex);
-        return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-    }
+		log.error(operatorLogStr + "uncaught  exception," + logTemplate, request.getServletPath(),
+				parameterValues, ex);
+		return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+	}
 }

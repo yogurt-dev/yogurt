@@ -1,7 +1,6 @@
 package com.github.yogurt.core.dao.impl;
 
 import com.github.yogurt.core.dao.BaseDAO;
-import com.github.yogurt.core.exception.DaoException;
 import com.github.yogurt.core.po.BasePO;
 import com.github.yogurt.core.utils.JpaUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -34,10 +33,10 @@ public abstract class BaseDAOImpl<T extends BasePO, R extends UpdatableRecord<R>
 	 *
 	 * @return PO类型
 	 */
-	public Class<T> getPoClass(){
+	@SuppressWarnings("unchecked")
+	private Class<T> getPoClass() {
 		ParameterizedType pt = (ParameterizedType) this.getClass().getGenericSuperclass();
-		Class<T> clazz = (Class<T>) pt.getActualTypeArguments()[0];
-		return clazz;
+		return (Class<T>) pt.getActualTypeArguments()[0];
 	}
 
 	@PostConstruct
@@ -47,7 +46,9 @@ public abstract class BaseDAOImpl<T extends BasePO, R extends UpdatableRecord<R>
 	}
 
 	/**
-	 * @return 获取JOOQ对应的Table
+	 * 获取JOOQ对应的Table
+	 *
+	 * @return org.jooq.Table
 	 */
 	@SuppressWarnings("unchecked")
 	public abstract Table<R> getTable();
@@ -73,8 +74,12 @@ public abstract class BaseDAOImpl<T extends BasePO, R extends UpdatableRecord<R>
 			fieldList.add(field);
 			valueList.add(valueMap.get(field.getName()));
 		}
-		dsl.insertInto(getTable()).columns(fieldList.toArray(new Field[fieldList.size()]))
-				.values(valueList).returning().fetchOne().into(po);
+		R r = dsl.insertInto(getTable()).columns(fieldList.toArray(new Field[0]))
+				.values(valueList).returning(getTable().getPrimaryKey().getFields()).fetchOne();
+		for (TableField field : getTable().getPrimaryKey().getFields()) {
+			JpaUtils.setValue(po, field.getName(), r.get(field));
+		}
+		System.out.println();
 	}
 
 	@Override
@@ -128,9 +133,9 @@ public abstract class BaseDAOImpl<T extends BasePO, R extends UpdatableRecord<R>
 
 		List<Condition> list = new ArrayList<>();
 		for (TableField field : getAliasTable().getPrimaryKey().getFields()) {
-			list.add(getAliasTable().field(field).eq(JpaUtils.getValue(id,field.getName())));
+			list.add(getAliasTable().field(field).eq(JpaUtils.getValue(id, field.getName())));
 		}
-		return dsl.selectFrom(getAliasTable()).where(list.toArray(new Condition[list.size()])).fetchOneInto(getPoClass());
+		return dsl.selectFrom(getAliasTable()).where(list.toArray(new Condition[0])).fetchOneInto(getPoClass());
 	}
 
 	@Override

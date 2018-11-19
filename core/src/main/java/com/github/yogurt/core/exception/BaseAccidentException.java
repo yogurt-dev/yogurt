@@ -19,67 +19,69 @@ import java.text.MessageFormat;
  * @author jtwu
  */
 public class BaseAccidentException extends Exception {
-    private static final long serialVersionUID = 8686960428281101225L;
-    private boolean logFlag = false;
-    /**
-     * 异常码
-     */
-    private String errorCode;
+	private static final long serialVersionUID = 8686960428281101225L;
+	private boolean logFlag = false;
+	/**
+	 * 异常码
+	 */
+	private String errorCode;
 
-    /**
-     * 自定义异常体
-     */
-    private ExceptionBody exceptionBody;
+	/**
+	 * 自定义异常体
+	 */
+	private ExceptionBody exceptionBody;
 
-    public BaseAccidentException(ExceptionBody exceptionBody, Object... objects) {
-        super(MessageFormat.format(exceptionBody.getMessage(), objects));
-        this.exceptionBody = exceptionBody;
-        this.errorCode = exceptionBody.getCode();
-    }
+	public BaseAccidentException(ExceptionBody exceptionBody, Object... objects) {
+		super(MessageFormat.format(exceptionBody.getMessage(), objects));
+		this.exceptionBody = exceptionBody;
+		this.errorCode = exceptionBody.getCode();
+	}
 
-    public BaseAccidentException(ExceptionBody exceptionBody, Throwable cause, Object... objects) {
-        super(MessageFormat.format(exceptionBody.getMessage(), objects), cause);
-        this.exceptionBody = exceptionBody;
-        this.errorCode = exceptionBody.getCode();
-        if (!(cause instanceof BaseAccidentException) || ((BaseAccidentException) cause).logFlag) {
-            logFlag = true;
-        }
-    }
+	public BaseAccidentException(ExceptionBody exceptionBody, Throwable cause, Object... objects) {
+		super(MessageFormat.format(exceptionBody.getMessage(), objects), cause);
+		this.exceptionBody = exceptionBody;
+		this.errorCode = exceptionBody.getCode();
+		if (!(cause instanceof BaseAccidentException) || ((BaseAccidentException) cause).logFlag) {
+			logFlag = true;
+		}
+	}
 
-    public BaseAccidentException() {
-        super();
-    }
+	public BaseAccidentException() {
+		super();
+	}
 
-    public BaseAccidentException(String message) {
-        super(message);
-    }
+	public BaseAccidentException(String message) {
+		super(message);
+	}
 
-    public BaseAccidentException(Throwable cause) {
-        super(cause.getMessage(), cause);
-        if (!(cause instanceof BaseAccidentException)) {
-            logFlag = true;
-        }
-    }
-    public BaseAccidentException(String message, Throwable cause) {
-        super(message, cause);
-        if (!(cause instanceof BaseAccidentException)) {
-            logFlag = true;
-        }
-    }
+	public BaseAccidentException(Throwable cause) {
+		super(cause.getMessage(), cause);
+		if (!(cause instanceof BaseAccidentException)) {
+			logFlag = true;
+		}
+	}
 
-    public BaseAccidentException(BaseAccidentException exception){
-        this.exceptionBody = exception.getExceptionBody();
-    }
-    public String getErrorCode() {
-        return errorCode;
-    }
+	public BaseAccidentException(String message, Throwable cause) {
+		super(message, cause);
+		if (!(cause instanceof BaseAccidentException)) {
+			logFlag = true;
+		}
+	}
 
-    public ExceptionBody getExceptionBody() {
-        return exceptionBody;
-    }
+	public BaseAccidentException(BaseAccidentException exception) {
+		this.exceptionBody = exception.getExceptionBody();
+	}
 
-    public boolean getLogFlag() {
-        return logFlag;
-    }
+	public String getErrorCode() {
+		return errorCode;
+	}
+
+	public ExceptionBody getExceptionBody() {
+		return exceptionBody;
+	}
+
+	public boolean getLogFlag() {
+		return logFlag;
+	}
 
 }

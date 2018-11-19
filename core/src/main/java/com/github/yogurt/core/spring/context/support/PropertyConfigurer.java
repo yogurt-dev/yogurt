@@ -9,23 +9,22 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- *
  * @author jtwu
  * @date 2016/9/18
  */
 public class PropertyConfigurer extends PropertyPlaceholderConfigurer {
-    private static Map<String, String> propertiesMap = new HashMap<>();
+	private static Map<String, String> propertiesMap = new HashMap<>();
 
-    @Override
-    protected void processProperties(ConfigurableListableBeanFactory beanFactoryToProcess, Properties props) throws BeansException {
-        super.processProperties(beanFactoryToProcess, props);
+	@Override
+	protected void processProperties(ConfigurableListableBeanFactory beanFactoryToProcess, Properties props) throws BeansException {
+		super.processProperties(beanFactoryToProcess, props);
 
-        for (Object key : props.keySet()) {
-            propertiesMap.put(key.toString(), props.get(key).toString());
-        }
-    }
+		for (Object key : props.keySet()) {
+			propertiesMap.put(key.toString(), props.get(key).toString());
+		}
+	}
 
-    public static String getProperty(String key) {
-        return propertiesMap.get(key);
-    }
+	public static String getProperty(String key) {
+		return propertiesMap.get(key);
+	}
 }
