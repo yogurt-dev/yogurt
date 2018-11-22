@@ -104,9 +104,9 @@ public class CodeGenerator extends AbstractMojo {
 										version("5.1.47")),
 //                              因为需要用到JooqGeneratorStrategy，所以将codegen引入
 								dependency(
-										groupId("com.github.yogurt"),
+										groupId("com.github.yogurt-dev"),
 										artifactId("codegen"),
-										version("2.0.0-SNAPSHOT")),
+										version("2.0.1-SNAPSHOT")),
 								dependency(
 										groupId("org.apache.commons"),
 										artifactId("commons-lang3"),

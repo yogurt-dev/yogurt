@@ -45,10 +45,8 @@ public class CommonPageParser {
 	static void writerPage(Map map, String templateName, String fileDirPath, String targetFile) throws Exception {
 		File file = new File(fileDirPath + targetFile);
 		if (!file.exists()) {
-			boolean mkResult = new File(file.getParent()).mkdirs();
-			if(!mkResult){
-				throw new MojoExecutionException("文件夹创建失败");
-			}
+			new File(file.getParent()).mkdirs();
+
 		}
 		Template temp = cfg.getTemplate(templateName);
 		FileOutputStream fos = new FileOutputStream(file);
