@@ -1,12 +1,12 @@
 package com.github.yogurt.sample.test.po;
 
 import com.github.yogurt.core.po.BasePO;
-import com.github.yogurt.sample.test.enums.TypeEnum;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
-
 import javax.persistence.Column;
+import lombok.EqualsAndHashCode;
+
+import  com.github.yogurt.sample.test.enums.TypeEnum;
 
 /**
  * @author Administrator

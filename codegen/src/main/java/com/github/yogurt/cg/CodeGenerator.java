@@ -96,7 +96,7 @@ public class CodeGenerator extends AbstractMojo {
 				plugin(
 						groupId("org.jooq"),
 						artifactId("jooq-codegen-maven"),
-						version("3.11.5"),
+						version("3.11.7"),
 						dependencies(
 								dependency(
 										groupId("mysql"),
