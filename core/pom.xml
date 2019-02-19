@@ -10,7 +10,7 @@
         <version>2.0.1-SNAPSHOT</version>
     </parent>
     <properties>
-        <spring-boot-version>2.0.6.RELEASE</spring-boot-version>
+        <spring-boot-version>2.1.2.RELEASE</spring-boot-version>
     </properties>
     <dependencies>
         <dependency>
@@ -80,7 +80,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.2</version>
+            <version>1.18.4</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -91,12 +91,12 @@
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjweaver</artifactId>
-            <version>1.9.1</version>
+            <version>1.9.2</version>
         </dependency>
         <dependency>
             <groupId>org.flywaydb</groupId>
             <artifactId>flyway-core</artifactId>
-            <version>5.2.0</version>
+            <version>5.2.4</version>
         </dependency>
     </dependencies>
 </project>
