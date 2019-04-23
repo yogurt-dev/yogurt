@@ -130,7 +130,7 @@ public class CodeGenerator extends AbstractMojo {
 	 *
 	 * @param configuration jooq配置信息
 	 */
-	private void createClassDefinition(Configuration configuration) throws SQLException, ClassNotFoundException {
+	private void createClassDefinition(Configuration configuration) throws SQLException, ClassNotFoundException, MojoExecutionException {
 		Generator generator = configuration.getGenerator();
 		classDefinition = new ClassDefinition().setPackageName(generator.getTarget().getPackageName())
 				.setClassName(getClassName(generator.getDatabase().getIncludes()));
@@ -160,7 +160,7 @@ public class CodeGenerator extends AbstractMojo {
 	 *
 	 * @param configuration 配置信息
 	 */
-	private void createTableDesc(Configuration configuration) throws SQLException, ClassNotFoundException {
+	private void createTableDesc(Configuration configuration) throws SQLException, ClassNotFoundException, MojoExecutionException {
 		Class.forName("com.mysql.jdbc.Driver");
 		Jdbc jdbc = configuration.getJdbc();
 		Generator generator = configuration.getGenerator();
@@ -175,6 +175,9 @@ public class CodeGenerator extends AbstractMojo {
 		rs.close();
 		ps.close();
 		con.close();
+		if(StringUtils.isEmpty(classDefinition.getComment())){
+			throw new MojoExecutionException("表"+generator.getDatabase().getInputSchema()+"."+generator.getDatabase().getIncludes()+"不存在或没有表描述信息");
+		}
 		createFieldDefinition(configuration);
 	}
 
