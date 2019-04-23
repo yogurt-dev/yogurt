@@ -83,5 +83,14 @@ public interface BaseService<T extends BasePO> {
 	 */
 	void batchUpdate(List<T> poList);
 
+	/**
+	 * 设置创建人
+	 */
+	void setCreator(BasePO po);
 
+	/**
+	 * 设置修改人
+	 * @param po
+	 */
+	void setModifier(BasePO po);
 }

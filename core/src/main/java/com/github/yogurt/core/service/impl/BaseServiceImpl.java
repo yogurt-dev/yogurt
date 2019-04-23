@@ -106,7 +106,8 @@ public class BaseServiceImpl<T extends BasePO> implements BaseService<T> {
 				.getRequest().getSession().getAttribute(attr);
 	}
 
-	private void setCreator(BasePO po) {
+	@Override
+	public void setCreator(BasePO po) {
 		if (po == null) {
 			return;
 		}
@@ -119,7 +120,8 @@ public class BaseServiceImpl<T extends BasePO> implements BaseService<T> {
 		}
 	}
 
-	private void setModifier(BasePO po) {
+	@Override
+	public void setModifier(BasePO po) {
 		if (po == null) {
 			return;
 		}
