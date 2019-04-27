@@ -4,11 +4,21 @@ package ${modulePackage}.enums;
  */
 public enum ${fieldDefinition.enumClassName} {
     <#list fieldDefinition.enumValues as enumValue>
-    <#if enumValue.annotation??>
-    /**
-     * ${enumValue.annotation}
-     */
-    </#if>
-     ${enumValue.name}<#if enumValue_has_next>,</#if>
+    <#--<#if enumValue.annotation??>-->
+    <#--/**-->
+     <#--* ${enumValue.annotation}-->
+     <#--*/-->
+    <#--</#if>-->
+     ${enumValue.name}("${enumValue.annotation}")<#if enumValue_has_next>,</#if>
     </#list>
+
+	private String content;
+
+	GenderEnum(String content) {
+		this.content = content;
+	}
+
+	public String getContent() {
+		return content;
+	}
 }

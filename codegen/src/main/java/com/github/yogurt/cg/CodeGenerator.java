@@ -373,6 +373,8 @@ public class CodeGenerator extends AbstractMojo {
 
 		String poPath = File.separator + "po" + File.separator + className + "PO.java";
 
+		String voPath = File.separator + "vo" + File.separator + className + "VO.java";
+
 
 		String daoPath = File.separator + "dao" + File.separator + className + "DAO.java";
 
@@ -412,6 +414,7 @@ public class CodeGenerator extends AbstractMojo {
 				"\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"+
 				"\n");
 		CommonPageParser.writerPage(context, "PO.ftl", fileDirPath, poPath);
+		CommonPageParser.writerPage(context, "VO.ftl", fileDirPath, voPath);
 		CommonPageParser.writerPage(context, "DAO.ftl", fileDirPath, daoPath);
 		CommonPageParser.writerPage(context, "DAOImpl.ftl", fileDirPath, daoImplPath);
 		CommonPageParser.writerPage(context, "Service.ftl", fileDirPath, servicePath);

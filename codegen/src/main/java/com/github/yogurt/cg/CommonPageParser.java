@@ -46,7 +46,9 @@ public class CommonPageParser {
 		File file = new File(fileDirPath + targetFile);
 		if (!file.exists()) {
 			new File(file.getParent()).mkdirs();
-
+		}else{
+			logger.info(fileDirPath + targetFile+"文件已存在!");
+			return;
 		}
 		Template temp = cfg.getTemplate(templateName);
 		FileOutputStream fos = new FileOutputStream(file);
