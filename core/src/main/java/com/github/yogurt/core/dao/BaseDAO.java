@@ -2,6 +2,8 @@ package com.github.yogurt.core.dao;
 
 
 import com.github.yogurt.core.po.BasePO;
+import org.jooq.Condition;
+import org.jooq.SortField;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -42,6 +44,35 @@ public interface BaseDAO<T extends BasePO> {
 	 */
 	List<T> findAll();
 
+
+	/**
+	 * 根据非空属性进行单表查询
+	 *
+	 * @param po 查询条件
+	 * @return 符合条件单表集合
+	 */
+	List<T> find(T po);
+
+	/**
+	 * 根据非空属性进行单表查询
+	 *
+	 * @param condition  查询条件
+	 * @param sortFields 排序字段
+	 * @return 符合条件单表集合
+	 */
+
+
+	/**
+	 * 根据非空属性进行单表查询
+	 *
+	 * @param condition  查询条件
+	 * @param sortFields 排序字段
+	 * @return 符合条件单表集合
+	 */
+
+
+	List<T> find(Condition condition, SortField... sortFields);
+
 	/**
 	 * 分页查询
 	 *
@@ -73,4 +104,13 @@ public interface BaseDAO<T extends BasePO> {
 	 * @param po 持久化对象
 	 */
 	void updateForSelective(T po);
+
+	/**
+	 * 根据条件更新非空字段
+	 *
+	 * @param po        持久化对象
+	 * @param condition 条件字段
+	 */
+	void updateForSelective(T po, Condition condition);
+
 }

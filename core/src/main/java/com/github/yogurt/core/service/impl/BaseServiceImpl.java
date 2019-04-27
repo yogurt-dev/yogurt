@@ -15,6 +15,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
@@ -53,10 +54,8 @@ public class BaseServiceImpl<T extends BasePO> implements BaseService<T> {
 	@Override
 	public <F extends Serializable> void logicDelete(F id) {
 		try {
-			ParameterizedType pt = (ParameterizedType) this.getClass().getGenericSuperclass();
-			Class<T> clazz = (Class<T>) pt.getActualTypeArguments()[0];
 //			单主键
-			T t = clazz.newInstance();
+			T t = getInstance(this.getClass());
 			if (id instanceof Number) {
 				updateForSelective((T) t.setId(((Number) id).longValue()).setDeleted(true));
 				return;
@@ -64,6 +63,21 @@ public class BaseServiceImpl<T extends BasePO> implements BaseService<T> {
 //			联合主键
 			BeanUtils.copyProperties(id, t);
 			updateForSelective((T) t.setDeleted(true));
+		} catch (Exception e) {
+			throw new ServiceException(e);
+		}
+	}
+
+	private T getInstance(Class sourceClass) {
+		Type type = sourceClass.getGenericSuperclass();
+
+		if (!(type instanceof ParameterizedType)) {
+			return getInstance(sourceClass.getSuperclass());
+		}
+		ParameterizedType pt = (ParameterizedType) type;
+		Class<T> clazz = (Class<T>) pt.getActualTypeArguments()[0];
+		try {
+			return clazz.newInstance();
 		} catch (Exception e) {
 			throw new ServiceException(e);
 		}
@@ -113,7 +127,8 @@ public class BaseServiceImpl<T extends BasePO> implements BaseService<T> {
 		}
 		try {
 			if (null == po.getCreatorId()) {
-				po.setCreatorId((Long) getSessionAttr(configuration.getUserId()));
+				Object sessionAttr = getSessionAttr(configuration.getUserId());
+				po.setCreatorId(sessionAttr == null ? 0L : (Long) sessionAttr);
 			}
 		} catch (Exception e) {
 			log.debug("setFounder时session获取失败!");

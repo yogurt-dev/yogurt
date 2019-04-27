@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
  * @author jtwu
  */
 public abstract class BaseDAOImpl<T extends BasePO, R extends UpdatableRecord<R>> implements BaseDAO<T> {
-	private static final String ALIAS = "t";
+	protected static final String ALIAS = "t";
 
 	@Autowired
 	protected DSLContext dsl;
@@ -98,6 +98,24 @@ public abstract class BaseDAOImpl<T extends BasePO, R extends UpdatableRecord<R>
 		updateQuery.execute();
 	}
 
+	@Override
+	public void updateForSelective(T po, Condition condition) {
+		Map<String, Object> valueMap = JpaUtils.getColumnNameValueMap(po);
+		UpdateQuery updateQuery = dsl.updateQuery(getTable());
+
+		for (Field field : getTable().fields()) {
+			if (!valueMap.containsKey(field.getName())) {
+				continue;
+			}
+			if (null == valueMap.get(field.getName())) {
+				continue;
+			}
+			updateQuery.addValue(field, valueMap.get(field.getName()));
+		}
+		updateQuery.addConditions(condition);
+		updateQuery.execute();
+	}
+
 	@SuppressWarnings("unchecked")
 	private void addValue(Map<String, Object> valueMap, UpdateQuery updateQuery) {
 //		getAliasTable().getPrimaryKey().getFields()本期望获取别名.列名，实际表名.列名
@@ -143,6 +161,37 @@ public abstract class BaseDAOImpl<T extends BasePO, R extends UpdatableRecord<R>
 		return dsl.selectFrom(getAliasTable()).fetchInto(getPoClass());
 	}
 
+	@Override
+	public List<T> find(T po) {
+		Map<String, Object> map = JpaUtils.getColumnNameValueMap(po);
+		List<String> columns = new ArrayList<>();
+		List<Object> values = new ArrayList<>();
+		createPoCondition(map, columns, values);
+		if (columns.isEmpty()) {
+			return findAll();
+		}
+		return dsl.selectFrom(getAliasTable()).where(StringUtils.join(columns, " and "), values.toArray()).fetchInto(getPoClass());
+	}
+
+	@Override
+	public List<T> find(Condition condition, SortField... orderFields) {
+		SelectQuery<R> rs = dsl.selectQuery(getAliasTable());
+		rs.addConditions(condition);
+		rs.addOrderBy(orderFields);
+		return rs.fetchInto(getPoClass());
+	}
+
+	private void createPoCondition(Map<String, Object> map, List<String> columns, List<Object> values) {
+		for (String columnName : map.keySet()) {
+			Object property = map.get(columnName);
+			if (null == property) {
+				continue;
+			}
+			columns.add(StringUtils.join(columnName, "=? "));
+			values.add(map.get(columnName));
+		}
+	}
+
 	@SuppressWarnings("unchecked")
 	@Override
 	public Page<T> list(T po, Pageable pageable) {
@@ -161,23 +210,13 @@ public abstract class BaseDAOImpl<T extends BasePO, R extends UpdatableRecord<R>
 			@Override
 			public SelectConditionStep<? extends Record> beginWithFormSql(SelectSelectStep selectColumns) {
 				Map<String, Object> map = JpaUtils.getColumnNameValueMap(po);
-				String sql = " ";
-				List values = new ArrayList();
-				for (String columnName : map.keySet()) {
-					Object property = map.get(columnName);
-					if (null == property) {
-						continue;
-					}
-					sql += StringUtils.join(columnName, "=? and ");
-					values.add(map.get(columnName));
-				}
-				if (sql.length() > 1) {
-					sql = StringUtils.removeEnd(sql, "and ");
-				}
-				if (sql.length() == 1) {
+				List<String> columns = new ArrayList<>();
+				List<Object> values = new ArrayList<>();
+				createPoCondition(map, columns, values);
+				if (columns.isEmpty()) {
 					return selectColumns.from(getAliasTable()).where();
 				}
-				return selectColumns.from(getAliasTable()).where(sql, values.toArray());
+				return selectColumns.from(getAliasTable()).where(StringUtils.join(columns, " and "), values.toArray());
 			}
 		}.fetch();
 	}
