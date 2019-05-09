@@ -5,12 +5,9 @@ import com.github.yogurt.core.po.BasePO;
 import com.github.yogurt.core.utils.JpaUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jooq.*;
-import org.jooq.conf.RenderNameStyle;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-import javax.annotation.PostConstruct;
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.util.ArrayList;
@@ -22,12 +19,7 @@ import java.util.stream.Collectors;
 /**
  * @author jtwu
  */
-public abstract class BaseDAOImpl<T extends BasePO, R extends UpdatableRecord<R>> implements BaseDAO<T> {
-	protected static final String ALIAS = "t";
-
-	@Autowired
-	protected DSLContext dsl;
-
+public abstract class BaseDAOImpl<T extends BasePO, R extends UpdatableRecord<R>> extends JOOQHandle implements BaseDAO<T> {
 	/**
 	 * 获取PO类型
 	 *
@@ -37,12 +29,6 @@ public abstract class BaseDAOImpl<T extends BasePO, R extends UpdatableRecord<R>
 	private Class<T> getPoClass() {
 		ParameterizedType pt = (ParameterizedType) this.getClass().getGenericSuperclass();
 		return (Class<T>) pt.getActualTypeArguments()[0];
-	}
-
-	@PostConstruct
-	private void init() {
-//		去掉sql中的单引号
-		dsl.settings().withRenderNameStyle(RenderNameStyle.AS_IS);
 	}
 
 	/**
@@ -223,12 +209,18 @@ public abstract class BaseDAOImpl<T extends BasePO, R extends UpdatableRecord<R>
 
 	@Override
 	public void batchSave(List<T> poList) {
-		dsl.batchInsert((TableRecord<?>[]) poList.stream().map(this::getRecord).toArray());
+//		dsl.batchInsert((TableRecord<?>[]) poList.stream().map(this::getRecord).toArray()).execute();
+//		todo 需要调整
+		List list = poList.stream().map(this::getRecord).collect(Collectors.toList());
+		TableRecord<?>[] array = new TableRecord[list.size()];
+		list.toArray(array);
+		dsl.batchInsert(array).execute();
 	}
 
 	@Override
 	public void batchUpdate(List<T> poList) {
-		dsl.batchUpdate((UpdatableRecord<?>[]) poList.stream().map(this::getRecord).toArray());
+		dsl.batchUpdate((UpdatableRecord<?>[]) poList.stream().map(this::getRecord).toArray()).execute();
+
 	}
 
 
