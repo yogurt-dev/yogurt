@@ -25,7 +25,7 @@ public class ${className}Controller extends BaseController {
 //	 * 查询${tableComment}
 //	 */
 //	@GetMapping
-//	public ResponseEntity<?> list(${className}PO ${lowerName}PO , Pageable pageable) {
+//	public ResponseEntity list(${className}PO ${lowerName}PO , Pageable pageable) {
 //        return new ResponseEntity<>(${lowerName}Service.list(${lowerName}PO,pageable),HttpStatus.OK);
 //	}
 //
@@ -33,7 +33,7 @@ public class ${className}Controller extends BaseController {
 //    * 查询单个${tableComment}
 //	  */
 //	 @GetMapping(value = "<#list priKeys as priKey>/{${priKey.codeName}}</#list>")
-//	 public ResponseEntity<?> get( <#list priKeys as priKey>@PathVariable ${priKey.className} ${priKey.codeName}<#if priKey_has_next>,</#if></#list>) {
+//	 public ResponseEntity get( <#list priKeys as priKey>@PathVariable ${priKey.className} ${priKey.codeName}<#if priKey_has_next>,</#if></#list>) {
 <#if (priKeys?size=1)>
 //		 return new ResponseEntity<>(${lowerName}Service.findById(${priKeys[0].codeName}),HttpStatus.OK);
 </#if>
@@ -46,7 +46,7 @@ public class ${className}Controller extends BaseController {
 //	 * 添加${tableComment}
 //	 */
 //	@PostMapping
-//	public ResponseEntity<?> save(@RequestBody ${className}PO ${lowerName}PO){
+//	public ResponseEntity save(@RequestBody ${className}PO ${lowerName}PO){
 //		${lowerName}Service.save(${lowerName}PO);
 //        return new ResponseEntity<>(HttpStatus.OK);
 //	}
@@ -55,7 +55,7 @@ public class ${className}Controller extends BaseController {
 //	 * 编辑${tableComment}
 //	 */
 //	@PutMapping
-//	public ResponseEntity<?> update(@RequestBody ${className}PO ${lowerName}PO) {
+//	public ResponseEntity update(@RequestBody ${className}PO ${lowerName}PO) {
 //		${lowerName}Service.update(${lowerName}PO);
 //        return new ResponseEntity<>(HttpStatus.OK);
 //	}
@@ -64,7 +64,7 @@ public class ${className}Controller extends BaseController {
 //	 * 删除单个${tableComment}
 //	 */
 //	@DeleteMapping(value = "<#list priKeys as priKey>/{${priKey.codeName}}</#list>")
-//	public ResponseEntity<?> logicDelete(<#list priKeys as priKey>@PathVariable ${priKey.className} ${priKey.codeName}<#if priKey_has_next>,</#if></#list>) {
+//	public ResponseEntity logicDelete(<#list priKeys as priKey>@PathVariable ${priKey.className} ${priKey.codeName}<#if priKey_has_next>,</#if></#list>) {
 <#if (priKeys?size=1)>
 //		${lowerName}Service.logicDelete(${priKeys[0].codeName});
 </#if>
