@@ -56,7 +56,7 @@ public class ${className}Controller extends BaseController {
 //	 */
 //	@PutMapping
 //	public ResponseEntity update(@RequestBody ${className}PO ${lowerName}PO) {
-//		${lowerName}Service.update(${lowerName}PO);
+//		${lowerName}Service.updateForSelective(${lowerName}PO);
 //        return new ResponseEntity<>(HttpStatus.OK);
 //	}
 //

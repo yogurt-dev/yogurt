@@ -22,6 +22,10 @@ import java.util.*;
 public class JpaUtils {
 	private static Logger logger = LoggerFactory.getLogger(JpaUtils.class);
 
+	private JpaUtils() {
+		throw new IllegalStateException("Utility class");
+	}
+
 	/**
 	 * 获取所有属性，包括父类属性
 	 *

@@ -47,7 +47,7 @@ public abstract class BasePageHandle<T> {
 	 * @param selectColumns 查询语句的select部分
 	 * @return 完整的sql
 	 */
-	public abstract SelectConditionStep<? extends Record> beginWithFormSql(SelectSelectStep selectColumns);
+	public abstract SelectConditionStep<Record> beginWithFormSql(SelectSelectStep selectColumns);
 
 	public Page<T> fetch() {
 		int total = beginWithFormSql(dsl.selectCount()).fetchOneInto(int.class);

@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<configuration  xmlns="http://www.jooq.org/xsd/jooq-codegen-3.11.0.xsd">
-    <logging>TRACE</logging>
+<configuration xmlns="http://www.jooq.org/xsd/jooq-codegen-3.11.0.xsd">
+    <logging>WARN</logging>
+    <!--数据库配置信息-->
     <jdbc>
         <driver>com.mysql.jdbc.Driver</driver>
-        <url>jdbc:mysql://localhost:3306/test?useUnicode=true&amp;characterEncoding=utf8&amp;autoReconnect=true&amp;rewriteBatchedStatements=TRUE&amp;useSSL=false&amp;serverTimezone=UTC</url>
-        <user>root</user>
+        <url>jdbc:mysql://192.168.3.56:3306/middle?useUnicode=true&amp;characterEncoding=utf8&amp;autoReconnect=true&amp;rewriteBatchedStatements=TRUE&amp;useSSL=false&amp;serverTimezone=UTC</url>
+        <user>dev</user>
         <password>123456</password>
     </jdbc>
     <generator>
@@ -13,29 +14,39 @@
         </strategy>
         <database>
             <name>org.jooq.meta.mysql.MySQLDatabase</name>
-            <includes>test_composite</includes>
-            <excludes/>
-            <inputSchema>test</inputSchema>
+            <!--表名-->
+            <includes>config_project</includes>
+            <!--数据库名-->
+            <inputSchema>middle</inputSchema>
             <outputSchemaToDefault>true</outputSchemaToDefault>
             <forcedTypes>
-                <!-- 定义枚举类型 -->
+                <forcedType>
+                    <name>BOOLEAN</name>
+                    <expression>is_deleted</expression>
+                </forcedType>
+
+                <!-- 如果有枚举类型，需要手动设置Enum相关信息 -->
                 <forcedType>
                     <enumConverter>true</enumConverter>
-                    <!--这里需要手动定义类名，命名规则: packageName.enums.字段名Enum-->
-                    <userType>com.github.yogurt.dict.enums.TypeEnum</userType>
-                    <expression>.*\.test\.type</expression>
+                    <userType>com.hopestarting.middle.config.config.enums.GenderEnum</userType>
+                    <!--匹配某表某列-->
+                    <expression>.*\.config_project\.gender</expression>
                     <types>.*</types>
                 </forcedType>
 
             </forcedTypes>
         </database>
+
         <target>
-            <packageName>com.github.yogurt.dict</packageName>
+            <!--包名-->
+            <packageName>com.hopestarting.middle.config.config</packageName>
             <directory>src/main/java</directory>
+            <!--是否删除文件夹中已有文件-->
             <clean>false</clean>
         </target>
         <generate>
             <daos>true</daos>
+            <records>false</records>
             <globalObjectReferences>false</globalObjectReferences>
             <generatedAnnotation>false</generatedAnnotation>
             <indexes>false</indexes>

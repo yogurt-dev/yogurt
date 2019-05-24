@@ -60,17 +60,6 @@ public interface BaseDAO<T extends BasePO> {
 	 * @param sortFields 排序字段
 	 * @return 符合条件单表集合
 	 */
-
-
-	/**
-	 * 根据非空属性进行单表查询
-	 *
-	 * @param condition  查询条件
-	 * @param sortFields 排序字段
-	 * @return 符合条件单表集合
-	 */
-
-
 	List<T> find(Condition condition, SortField... sortFields);
 
 	/**

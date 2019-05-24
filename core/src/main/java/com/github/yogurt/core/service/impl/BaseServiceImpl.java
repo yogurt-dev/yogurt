@@ -153,11 +153,6 @@ public class BaseServiceImpl<T extends BasePO> implements BaseService<T> {
 		}
 	}
 
-//
-//    @Override
-//    public void updateForSelective(Object po) {
-//
-//    }
 
 
 }

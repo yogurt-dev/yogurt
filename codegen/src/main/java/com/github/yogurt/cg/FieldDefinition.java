@@ -14,6 +14,7 @@ import java.io.Serializable;
 @Data
 @Accessors(chain = true)
 public class FieldDefinition  implements Serializable {
+    private static final long serialVersionUID = 2405172041950221807L;
     /**
      * 数据库列名
      */

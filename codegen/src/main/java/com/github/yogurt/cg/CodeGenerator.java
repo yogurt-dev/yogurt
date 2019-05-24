@@ -1,5 +1,6 @@
 package com.github.yogurt.cg;
 
+import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -130,7 +131,7 @@ public class CodeGenerator extends AbstractMojo {
 	 *
 	 * @param configuration jooq配置信息
 	 */
-	private void createClassDefinition(Configuration configuration) throws SQLException, ClassNotFoundException, MojoExecutionException {
+	private void createClassDefinition(Configuration configuration) throws ClassNotFoundException, MojoExecutionException {
 		Generator generator = configuration.getGenerator();
 		classDefinition = new ClassDefinition().setPackageName(generator.getTarget().getPackageName())
 				.setClassName(getClassName(generator.getDatabase().getIncludes()));
@@ -142,7 +143,7 @@ public class CodeGenerator extends AbstractMojo {
 	/**
 	 * 读取jooq的配置文件
 	 */
-	private Configuration loadConfig() {
+	private Configuration loadConfig() throws MojoExecutionException {
 		File file = new File(configurationFile);
 
 		if (!file.isAbsolute()) {
@@ -151,7 +152,7 @@ public class CodeGenerator extends AbstractMojo {
 		try (FileInputStream in = new FileInputStream(file)) {
 			return GenerationTool.load(in);
 		} catch (Exception e) {
-			throw new RuntimeException(e);
+			throw new MojoExecutionException("配置文件",e);
 		}
 	}
 
@@ -160,23 +161,37 @@ public class CodeGenerator extends AbstractMojo {
 	 *
 	 * @param configuration 配置信息
 	 */
-	private void createTableDesc(Configuration configuration) throws SQLException, ClassNotFoundException, MojoExecutionException {
+	private void createTableDesc(Configuration configuration) throws ClassNotFoundException, MojoExecutionException {
 		Class.forName("com.mysql.jdbc.Driver");
 		Jdbc jdbc = configuration.getJdbc();
 		Generator generator = configuration.getGenerator();
 		String sqLColumns = "select TABLE_SCHEMA,TABLE_NAME,TABLE_COMMENT from information_schema.`TABLES` where table_name = '" + generator.getDatabase().getIncludes() + "' "
 				+ "and table_schema='" + generator.getDatabase().getInputSchema() + "' ";
-		Connection con = DriverManager.getConnection(jdbc.getUrl(), jdbc.getUser(), jdbc.getPassword());
-		PreparedStatement ps = con.prepareStatement(sqLColumns);
-		ResultSet rs = ps.executeQuery();
-		while (rs.next()) {
-			classDefinition.setComment(rs.getString("TABLE_COMMENT"));
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		try {
+			con = DriverManager.getConnection(jdbc.getUrl(), jdbc.getUser(), jdbc.getPassword());
+
+			ps = con.prepareStatement(sqLColumns);
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				classDefinition.setComment(rs.getString("TABLE_COMMENT"));
+			}
+
+		} catch (SQLException e) {
+			throw new MojoExecutionException("读取数据库失败", e);
+		} finally {
+			try {
+				rs.close();
+				ps.close();
+				con.close();
+			} catch (SQLException e) {
+				throw new MojoExecutionException("读取数据库失败", e);
+			}
 		}
-		rs.close();
-		ps.close();
-		con.close();
-		if(StringUtils.isEmpty(classDefinition.getComment())){
-			throw new MojoExecutionException("表"+generator.getDatabase().getInputSchema()+"."+generator.getDatabase().getIncludes()+"不存在或没有表描述信息");
+		if (StringUtils.isEmpty(classDefinition.getComment())) {
+			throw new MojoExecutionException("表" + generator.getDatabase().getInputSchema() + "." + generator.getDatabase().getIncludes() + "不存在或没有表描述信息");
 		}
 		createFieldDefinition(configuration);
 	}
@@ -186,7 +201,7 @@ public class CodeGenerator extends AbstractMojo {
 	 *
 	 * @param configuration 配置信息
 	 */
-	private void createFieldDefinition(Configuration configuration) throws SQLException, ClassNotFoundException {
+	private void createFieldDefinition(Configuration configuration) throws ClassNotFoundException, MojoExecutionException {
 		Class.forName("com.mysql.jdbc.Driver");
 		Jdbc jdbc = configuration.getJdbc();
 		Generator generator = configuration.getGenerator();
@@ -194,50 +209,59 @@ public class CodeGenerator extends AbstractMojo {
 		String sqLColumns = "SELECT distinct COLUMN_NAME, DATA_TYPE, COLUMN_COMMENT,COLUMN_KEY,CHARACTER_MAXIMUM_LENGTH" +
 				",IS_NULLABLE,COLUMN_DEFAULT,COLUMN_TYPE,ORDINAL_POSITION  FROM information_schema.columns WHERE table_name = '" + generator.getDatabase().getIncludes() + "' "
 				+ "and table_schema='" + generator.getDatabase().getInputSchema() + "' order by ORDINAL_POSITION";
-		Connection con = DriverManager.getConnection(jdbc.getUrl(), jdbc.getUser(), jdbc.getPassword());
-		PreparedStatement ps = con.prepareStatement(sqLColumns);
-		ResultSet rs = ps.executeQuery();
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		try {
+			con = DriverManager.getConnection(jdbc.getUrl(), jdbc.getUser(), jdbc.getPassword());
+			ps = con.prepareStatement(sqLColumns);
+			rs = ps.executeQuery();
 //		支持联合主键
-		classDefinition.setPriKeys(new ArrayList<>());
-		while (rs.next()) {
-			FieldDefinition fieldDefinition = new FieldDefinition();
+			classDefinition.setPriKeys(new ArrayList<>());
+			while (rs.next()) {
+				FieldDefinition fieldDefinition = new FieldDefinition();
 //          处理is开头字段，根据阿里开发规范去掉is
-			String codeName = rs.getString("COLUMN_NAME");
-			if (StringUtils.startsWith(codeName, "is_")) {
-				codeName = StringUtils.replaceOnce(codeName, "is_", "");
-			}
-			fieldDefinition.setColumnName(rs.getString("COLUMN_NAME"))
-					.setColumnType(rs.getString("DATA_TYPE"))
-					.setCodeName(getFieldName(codeName))
-					.setClassName(getType(rs.getString("DATA_TYPE"), codeName))
-					.setComment(rs.getString("COLUMN_COMMENT"))
-					.setIsPriKey("PRI".equals(rs.getString("COLUMN_KEY")))
-					.setColumnLength(rs.getInt("CHARACTER_MAXIMUM_LENGTH"))
-					.setNullable("NO".equals(rs.getString("IS_NULLABLE")));
+				String codeName = rs.getString("COLUMN_NAME");
+				if (StringUtils.startsWith(codeName, "is_")) {
+					codeName = StringUtils.replaceOnce(codeName, "is_", "");
+				}
+				fieldDefinition.setColumnName(rs.getString("COLUMN_NAME"))
+						.setColumnType(rs.getString("DATA_TYPE"))
+						.setCodeName(getFieldName(codeName))
+						.setClassName(getType(rs.getString("DATA_TYPE"), codeName))
+						.setComment(rs.getString("COLUMN_COMMENT"))
+						.setIsPriKey("PRI".equals(rs.getString("COLUMN_KEY")))
+						.setColumnLength(rs.getInt("CHARACTER_MAXIMUM_LENGTH"))
+						.setNullable("NO".equals(rs.getString("IS_NULLABLE")));
 //          enum类型的字段需要动态创建
-			if ("enum".equalsIgnoreCase(fieldDefinition.getColumnType())) {
-				fieldDefinition.setEnumClassName(getClassName(fieldDefinition.getCodeName()) + "Enum")
-						.setEnumValues(
-								getEnumValues(fieldDefinition.getColumnName(), rs.getString("COLUMN_TYPE"),
-										fieldDefinition.getComment()))
-						.setClassFullName(StringUtils.join(classDefinition.getPackageName(), ".enums.",
-								fieldDefinition.getClassName()));
-
-
-			}
-			if (IGNORE_COLUMNS.contains(fieldDefinition.getColumnName())) {
-				continue;
-			}
-			fieldDefinitions.add(fieldDefinition);
+				if ("enum".equalsIgnoreCase(fieldDefinition.getColumnType())) {
+					fieldDefinition.setEnumClassName(getClassName(fieldDefinition.getCodeName()) + "Enum")
+							.setEnumValues(
+									getEnumValues(fieldDefinition.getColumnName(), rs.getString("COLUMN_TYPE"),
+											fieldDefinition.getComment()))
+							.setClassFullName(StringUtils.join(classDefinition.getPackageName(), ".enums.",
+									fieldDefinition.getClassName()));
+				}
+				if (IGNORE_COLUMNS.contains(fieldDefinition.getColumnName())) {
+					continue;
+				}
+				fieldDefinitions.add(fieldDefinition);
 //          设置主键
-			if (fieldDefinition.getIsPriKey()) {
-				classDefinition.getPriKeys().add(fieldDefinition);
+				if (fieldDefinition.getIsPriKey()) {
+					classDefinition.getPriKeys().add(fieldDefinition);
+				}
+			}
+		} catch (SQLException e) {
+			throw new MojoExecutionException("读取数据库失败", e);
+		} finally {
+			try {
+				rs.close();
+				ps.close();
+				con.close();
+			} catch (SQLException e) {
+				throw new MojoExecutionException("读取数据库失败", e);
 			}
 		}
-		rs.close();
-		ps.close();
-
-		con.close();
 		classDefinition.setFieldDefinitions(fieldDefinitions);
 	}
 
@@ -360,7 +384,7 @@ public class CodeGenerator extends AbstractMojo {
 		}
 	}
 
-	private void generateFile(Configuration configuration) throws Exception {
+	private void generateFile(Configuration configuration) throws MojoExecutionException {
 //        此处使用jooq的配置文件及加载
 		Generator generator = configuration.getGenerator();
 		String table = generator.getDatabase().getIncludes();
@@ -399,21 +423,23 @@ public class CodeGenerator extends AbstractMojo {
 
 		String fileDirPath = basedir + javaPath + replaceSeparator(classDefinition.getPackageName());
 		log.info("\n                                      " +
-				"\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"+
-				"\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"+
-				"\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@  @@@@@@@@"+
-				"\n@@@@  @@@@@  @@@@    @@@@@@@   @@@@@@  @@@  @@@@@  @  @@@@      @@@@@@"+
-				"\n@@@@@  @@@  @@@  @@@  @@@@  @@@  @@@@  @@@  @@@@@   @@@@@@@@  @@@@@@@@"+
-				"\n@@@@@@  @  @@@@  @@@  @@@@  @@@  @@@@  @@@  @@@@@  @@@@@@@@@  @  @@@@@"+
-				"\n@@@@@@@@  @@@@@@@   @@@@@@@@     @@@@@    @  @@@@  @@@@@@@@@@   @@@@@@"+
-				"\n@@@@@@@  @@@@@@@@@@@@@@@@@@@@@@  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"+
-				"\n@@@@@@  @@@@@@@@@@@@@@@@@@@  @@  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"+
-				"\n@@@@@  @@@@@@@@@@@@@@@@@@@@@    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"+
-				"\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"+
-				"\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"+
-				"\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@"+
+				"\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" +
+				"\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" +
+				"\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@  @@@@@@@@" +
+				"\n@@@@  @@@@@  @@@@    @@@@@@@   @@@@@@  @@@  @@@@@  @  @@@@      @@@@@@" +
+				"\n@@@@@  @@@  @@@  @@@  @@@@  @@@  @@@@  @@@  @@@@@   @@@@@@@@  @@@@@@@@" +
+				"\n@@@@@@  @  @@@@  @@@  @@@@  @@@  @@@@  @@@  @@@@@  @@@@@@@@@  @  @@@@@" +
+				"\n@@@@@@@@  @@@@@@@   @@@@@@@@     @@@@@    @  @@@@  @@@@@@@@@@   @@@@@@" +
+				"\n@@@@@@@  @@@@@@@@@@@@@@@@@@@@@@  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" +
+				"\n@@@@@@  @@@@@@@@@@@@@@@@@@@  @@  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" +
+				"\n@@@@@  @@@@@@@@@@@@@@@@@@@@@    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" +
+				"\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" +
+				"\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" +
+				"\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" +
 				"\n");
-		CommonPageParser.writerPage(context, "PO.ftl", fileDirPath, poPath);
+		try {
+			CommonPageParser.writerPage(context, "PO.ftl", fileDirPath, poPath);
+
 		CommonPageParser.writerPage(context, "VO.ftl", fileDirPath, voPath);
 		CommonPageParser.writerPage(context, "DAO.ftl", fileDirPath, daoPath);
 		CommonPageParser.writerPage(context, "DAOImpl.ftl", fileDirPath, daoImplPath);
@@ -428,6 +454,9 @@ public class CodeGenerator extends AbstractMojo {
 			context.put("fieldDefinition", fieldDefinition);
 			String enumPath = File.separator + "enums" + File.separator + getClassName(fieldDefinition.getColumnName()) + "Enum.java";
 			CommonPageParser.writerPage(context, "Enum.ftl", fileDirPath, enumPath);
+		}
+		} catch (Exception e) {
+			throw new MojoExecutionException("文件生成失败",e);
 		}
 
 	}

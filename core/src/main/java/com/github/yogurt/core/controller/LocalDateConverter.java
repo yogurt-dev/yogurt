@@ -33,8 +33,6 @@ public class LocalDateConverter {
 				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 				return formatter.format(localDateTime);
 			}
-
-
 		};
 	}
 
@@ -64,6 +62,5 @@ public class LocalDateConverter {
 		om.registerModule(javaTimeModule);
 		return om;
 	}
-
 
 }

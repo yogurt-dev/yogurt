@@ -65,14 +65,13 @@ public abstract class BaseDAOImpl<T extends BasePO, R extends UpdatableRecord<R>
 		for (TableField field : getTable().getPrimaryKey().getFields()) {
 			JpaUtils.setValue(po, field.getName(), r.get(field));
 		}
-		System.out.println();
 	}
 
 	@Override
 	public void update(T po) {
 		Map<String, Object> valueMap = JpaUtils.getColumnNameValueMap(po);
 		UpdateQuery updateQuery = dsl.updateQuery(getAliasTable());
-		addValue(valueMap, updateQuery);
+		addValue(valueMap, updateQuery,true);
 		updateQuery.execute();
 	}
 
@@ -80,7 +79,7 @@ public abstract class BaseDAOImpl<T extends BasePO, R extends UpdatableRecord<R>
 	public void updateForSelective(T po) {
 		Map<String, Object> valueMap = JpaUtils.getColumnNameValueMap(po);
 		UpdateQuery updateQuery = dsl.updateQuery(getAliasTable());
-		addValue(valueMap, updateQuery);
+		addValue(valueMap, updateQuery,false);
 		updateQuery.execute();
 	}
 
@@ -103,14 +102,15 @@ public abstract class BaseDAOImpl<T extends BasePO, R extends UpdatableRecord<R>
 	}
 
 	@SuppressWarnings("unchecked")
-	private void addValue(Map<String, Object> valueMap, UpdateQuery updateQuery) {
+
+	private void addValue(Map<String, Object> valueMap, UpdateQuery updateQuery, boolean nullable) {
 //		getAliasTable().getPrimaryKey().getFields()本期望获取别名.列名，实际表名.列名
 		List<String> primaryKeys = getAliasTable().getPrimaryKey().getFields().stream().map(Field::getName).collect(Collectors.toList());
 		for (Field field : getAliasTable().fields()) {
 			if (!valueMap.containsKey(field.getName())) {
 				continue;
 			}
-			if (null == valueMap.get(field.getName())) {
+			if (!nullable && null == valueMap.get(field.getName())) {
 				continue;
 			}
 			if (primaryKeys.contains(field.getName())) {
@@ -168,14 +168,14 @@ public abstract class BaseDAOImpl<T extends BasePO, R extends UpdatableRecord<R>
 	}
 
 	private void createPoCondition(Map<String, Object> map, List<String> columns, List<Object> values) {
-		for (String columnName : map.keySet()) {
-			Object property = map.get(columnName);
-			if (null == property) {
+		for(Map.Entry<String,Object> entry : map.entrySet()){
+			if(entry.getValue() == null){
 				continue;
 			}
-			columns.add(StringUtils.join(columnName, "=? "));
-			values.add(map.get(columnName));
+			columns.add(StringUtils.join(entry.getKey(), "=? "));
+			values.add(entry.getValue());
 		}
+
 	}
 
 	@SuppressWarnings("unchecked")
@@ -194,7 +194,7 @@ public abstract class BaseDAOImpl<T extends BasePO, R extends UpdatableRecord<R>
 			}
 
 			@Override
-			public SelectConditionStep<? extends Record> beginWithFormSql(SelectSelectStep selectColumns) {
+			public SelectConditionStep<Record> beginWithFormSql(SelectSelectStep selectColumns) {
 				Map<String, Object> map = JpaUtils.getColumnNameValueMap(po);
 				List<String> columns = new ArrayList<>();
 				List<Object> values = new ArrayList<>();
@@ -209,8 +209,6 @@ public abstract class BaseDAOImpl<T extends BasePO, R extends UpdatableRecord<R>
 
 	@Override
 	public void batchSave(List<T> poList) {
-//		dsl.batchInsert((TableRecord<?>[]) poList.stream().map(this::getRecord).toArray()).execute();
-//		todo 需要调整
 		List list = poList.stream().map(this::getRecord).collect(Collectors.toList());
 		TableRecord<?>[] array = new TableRecord[list.size()];
 		list.toArray(array);
@@ -219,7 +217,10 @@ public abstract class BaseDAOImpl<T extends BasePO, R extends UpdatableRecord<R>
 
 	@Override
 	public void batchUpdate(List<T> poList) {
-		dsl.batchUpdate((UpdatableRecord<?>[]) poList.stream().map(this::getRecord).toArray()).execute();
+		List list = poList.stream().map(this::getRecord).collect(Collectors.toList());
+		UpdatableRecord<?>[] array = new UpdatableRecord[list.size()];
+		list.toArray(array);
+		dsl.batchUpdate(array).execute();
 
 	}
 

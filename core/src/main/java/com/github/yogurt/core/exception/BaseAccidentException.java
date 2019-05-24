@@ -21,10 +21,6 @@ import java.text.MessageFormat;
 public class BaseAccidentException extends Exception {
 	private static final long serialVersionUID = 8686960428281101225L;
 	private boolean logFlag = false;
-	/**
-	 * 异常码
-	 */
-	private String errorCode;
 
 	/**
 	 * 自定义异常体
@@ -32,38 +28,14 @@ public class BaseAccidentException extends Exception {
 	private ExceptionBody exceptionBody;
 
 	public BaseAccidentException(ExceptionBody exceptionBody, Object... objects) {
-		super(MessageFormat.format(exceptionBody.getMessage(), objects));
+		super(MessageFormat.format(exceptionBody.getErrorMessage(), objects));
 		this.exceptionBody = exceptionBody;
-		this.errorCode = exceptionBody.getCode();
 	}
 
 	public BaseAccidentException(ExceptionBody exceptionBody, Throwable cause, Object... objects) {
-		super(MessageFormat.format(exceptionBody.getMessage(), objects), cause);
+		super(MessageFormat.format(exceptionBody.getErrorMessage(), objects), cause);
 		this.exceptionBody = exceptionBody;
-		this.errorCode = exceptionBody.getCode();
 		if (!(cause instanceof BaseAccidentException) || ((BaseAccidentException) cause).logFlag) {
-			logFlag = true;
-		}
-	}
-
-	public BaseAccidentException() {
-		super();
-	}
-
-	public BaseAccidentException(String message) {
-		super(message);
-	}
-
-	public BaseAccidentException(Throwable cause) {
-		super(cause.getMessage(), cause);
-		if (!(cause instanceof BaseAccidentException)) {
-			logFlag = true;
-		}
-	}
-
-	public BaseAccidentException(String message, Throwable cause) {
-		super(message, cause);
-		if (!(cause instanceof BaseAccidentException)) {
 			logFlag = true;
 		}
 	}
@@ -72,9 +44,6 @@ public class BaseAccidentException extends Exception {
 		this.exceptionBody = exception.getExceptionBody();
 	}
 
-	public String getErrorCode() {
-		return errorCode;
-	}
 
 	public ExceptionBody getExceptionBody() {
 		return exceptionBody;

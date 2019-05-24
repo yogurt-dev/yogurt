@@ -20,34 +20,11 @@ import java.text.MessageFormat;
  */
 public class BaseErrorException extends RuntimeException {
 	private static final long serialVersionUID = 8686960428281101221L;
-	/**
-	 * 异常码
-	 */
-	private String errorCode;
 
 	/**
 	 * 自定义异常体
 	 */
 	private ExceptionBody exceptionBody;
-
-	public BaseErrorException(String refBizId, String logContent, Exception e) {
-		super();
-	}
-
-	@Deprecated
-	public BaseErrorException(ExceptionBody exceptionBody) {
-		super(exceptionBody.getMessage());
-		this.exceptionBody = exceptionBody;
-		this.errorCode = exceptionBody.getCode();
-	}
-
-	@Deprecated
-	public BaseErrorException(ExceptionBody exceptionBody, Throwable cause) {
-		super(exceptionBody.getMessage(), cause);
-		this.exceptionBody = exceptionBody;
-		this.errorCode = exceptionBody.getCode();
-
-	}
 
 	public BaseErrorException() {
 		super();
@@ -71,5 +48,13 @@ public class BaseErrorException extends RuntimeException {
 
 	public BaseErrorException(String message, Throwable cause, Object... objects) {
 		super(MessageFormat.format(message, objects), cause);
+	}
+
+	public ExceptionBody getExceptionBody() {
+		return exceptionBody;
+	}
+
+	public void setExceptionBody(ExceptionBody exceptionBody) {
+		this.exceptionBody = exceptionBody;
 	}
 }
