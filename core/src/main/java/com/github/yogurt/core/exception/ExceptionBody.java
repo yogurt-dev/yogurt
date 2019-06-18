@@ -11,15 +11,29 @@ import java.lang.reflect.InvocationTargetException;
  * 自定义异常体
  */
 public class ExceptionBody implements Serializable {
-	public static final String MESSAGE = "errorMessage";
+	private static final String MESSAGE = "errorMessage";
+	/**
+	 * 异常编码
+	 */
 	private String errorCode;
+	/**
+	 * 异常描述信息
+	 */
 	private String errorMessage;
+	/**
+	 * 异常内容体，只有在返回具体异常信息时使用
+	 */
+	private Serializable errorBody;
 
 	public ExceptionBody(String code, String errorMessage) {
 		this.errorCode = code;
 		this.errorMessage = errorMessage;
 	}
-
+	public ExceptionBody(String code, String errorMessage,String errorBody) {
+		this.errorCode = code;
+		this.errorMessage = errorMessage;
+		this.errorBody = errorBody;
+	}
 	public ExceptionBody(Enum errorEnum) {
 		this.errorCode = errorEnum.name();
 		try {
@@ -47,6 +61,13 @@ public class ExceptionBody implements Serializable {
 		return this;
 	}
 
+	public Serializable getErrorBody() {
+		return errorBody;
+	}
+
+	public void setErrorBody(Serializable errorBody) {
+		this.errorBody = errorBody;
+	}
 
 	@Override
 	public String toString() {
