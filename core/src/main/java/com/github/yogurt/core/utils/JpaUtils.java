@@ -13,6 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.Transient;
 import java.lang.reflect.Field;
 import java.util.*;
+import java.util.function.Supplier;
 
 /**
  * @author jtwu
@@ -56,6 +57,24 @@ public class JpaUtils {
 		}
 		Collections.addAll(fields, entityClass.getDeclaredFields());
 		return getAllFields(entityClass.getSuperclass(), fields);
+	}
+
+	/**
+	 * 获取非空属性列表
+	 *
+	 *
+	 */
+	public static String[] getNotNullProperties(Object obj){
+		if(null==obj){
+			return new String[]{};
+		}
+		Set<String> properties = new HashSet<>();
+		for(Field field : getAllFields(obj.getClass())){
+			if(null == getValue(obj,field)){
+				properties.add(field.getName());
+			}
+		}
+		return properties.toArray(new String[properties.size()]);
 	}
 
 

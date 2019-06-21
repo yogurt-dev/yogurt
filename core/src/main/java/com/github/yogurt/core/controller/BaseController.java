@@ -62,7 +62,7 @@ public class BaseController {
 		}
 		log.error(operatorLogStr + "uncaught  exception," + logTemplate, request.getServletPath(),
 				parameterValues, ex);
-		return new ResponseEntity(((BaseErrorException) ex).getExceptionBody(),HttpStatus.INTERNAL_SERVER_ERROR);
+		return new ResponseEntity(HttpStatus.INTERNAL_SERVER_ERROR);
 	}
 
 	/**

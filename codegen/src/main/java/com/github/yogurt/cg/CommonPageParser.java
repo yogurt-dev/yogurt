@@ -6,7 +6,8 @@ import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import freemarker.template.TemplateExceptionHandler;
 import org.apache.commons.lang3.StringUtils;
-import org.jooq.tools.JooqLogger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.Map;
@@ -19,7 +20,7 @@ import java.util.Map;
 		throw new IllegalStateException("Utility class");
 	}
 
-	private static JooqLogger logger =  JooqLogger.getLogger(CommonPageParser.class);
+	private static Logger logger =  LoggerFactory.getLogger(CommonPageParser.class);
 	private static final String CONTENT_ENCODING = "UTF-8";
 	private static Configuration cfg = new Configuration(Configuration.VERSION_2_3_28);
 

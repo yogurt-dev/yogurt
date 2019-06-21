@@ -65,7 +65,7 @@
         <!-- 添加附加的appender,最多只能添加一个 -->
         <appender-ref ref ="FILE"/>
     </appender>
-    <logger name="org.jooq" level="DEBUG"/>
+
     <root level="info">
         <!--<appender-ref ref="CONSOLE" />-->
         <appender-ref ref="ASYNC" />

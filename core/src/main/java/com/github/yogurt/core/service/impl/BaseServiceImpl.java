@@ -5,11 +5,13 @@ import com.github.yogurt.core.dao.BaseDAO;
 import com.github.yogurt.core.exception.ServiceException;
 import com.github.yogurt.core.po.BasePO;
 import com.github.yogurt.core.service.BaseService;
+import com.github.yogurt.core.utils.JpaUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -19,6 +21,7 @@ import java.lang.reflect.Type;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * @author jtwu
@@ -33,21 +36,88 @@ public class BaseServiceImpl<T extends BasePO> implements BaseService<T> {
 	protected BaseDAO<T> baseDAO;
 
 	@Override
-	public void save(T entity) {
-		setCreator(entity);
-		baseDAO.save(entity);
+	public <S extends T> S save(S po) {
+
+		if(null==po.getId()){
+			setCreator(po);
+		}else{
+			setModifier(po);
+		}
+
+		baseDAO.save(po);
+		return po;
 	}
 
 	@Override
-	public void update(T po) {
-		setModifier(po);
-		baseDAO.update(po);
+	public <S extends T> Iterable<S> saveAll(Iterable<S> pos) {
+		pos.forEach(this::setCreator);
+		baseDAO.saveAll(pos);
+		return pos;
+	}
+
+	@Override
+	public Optional<T> findById(Long id) {
+		return baseDAO.findById(id);
+	}
+
+	@Override
+	public boolean existsById(Long id) {
+		return baseDAO.existsById(id);
+	}
+
+	@Override
+	public List<T> findAll() {
+		return baseDAO.findAll();
+	}
+
+	@Override
+	public Iterable<T> findAllById(Iterable<Long> ids) {
+		return baseDAO.findAllById(ids);
+	}
+
+	@Override
+	public long count() {
+		return baseDAO.count();
+	}
+
+	@Override
+	public void deleteById(Long id) {
+		baseDAO.deleteById(id);
+	}
+
+	@Override
+	public void delete(T po) {
+		baseDAO.delete(po);
+	}
+
+	@Override
+	public void deleteAll(Iterable<? extends T> pos) {
+		baseDAO.deleteAll(pos);
+	}
+
+	@Override
+	public void deleteAll() {
+		baseDAO.deleteAll();
 	}
 
 	@Override
 	public void updateForSelective(T po) {
 		setModifier(po);
-		baseDAO.updateForSelective(po);
+		Optional<T> optional = findById(po.getId());
+		optional.ifPresent(t -> {
+			BeanUtils.copyProperties(po,t, JpaUtils.getNotNullProperties(po));
+			this.save(t);
+		});
+	}
+
+	@Override
+	public Iterable<T> findAll(Sort sort) {
+		return null;
+	}
+
+	@Override
+	public Page<T> findAll(Pageable pageable) {
+		return null;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -83,32 +153,6 @@ public class BaseServiceImpl<T extends BasePO> implements BaseService<T> {
 		}
 	}
 
-	@Override
-	public <F extends Serializable> T findById(F id) {
-		return baseDAO.findById(id);
-	}
-
-	@Override
-	public List<T> findAll() {
-		return baseDAO.findAll();
-	}
-
-	@Override
-	public Page<T> list(T po, Pageable pageable) {
-		return baseDAO.list(po, pageable);
-	}
-
-	@Override
-	public void batchSave(List<T> poList) {
-		poList.forEach(this::setCreator);
-		baseDAO.batchSave(poList);
-	}
-
-	@Override
-	public void batchUpdate(List<T> poList) {
-		poList.forEach(this::setModifier);
-		baseDAO.batchUpdate(poList);
-	}
 
 	/**
 	 * 获取request
@@ -152,7 +196,4 @@ public class BaseServiceImpl<T extends BasePO> implements BaseService<T> {
 			log.debug("update时session获取失败!");
 		}
 	}
-
-
-
 }

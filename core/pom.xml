@@ -7,7 +7,7 @@
     <parent>
         <groupId>com.github.yogurt-dev</groupId>
         <artifactId>root</artifactId>
-        <version>2.0.1-SNAPSHOT</version>
+        <version>3.0.1-SNAPSHOT</version>
     </parent>
     <properties>
         <spring-boot-version>2.1.2.RELEASE</spring-boot-version>
@@ -41,14 +41,9 @@
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-jooq</artifactId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
             <version>${spring-boot-version}</version>
         </dependency>
-        <!--<dependency>-->
-            <!--<groupId>org.jooq</groupId>-->
-            <!--<artifactId>jooq</artifactId>-->
-            <!--<version>${jooq.version}</version>-->
-        <!--</dependency>-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -59,8 +54,6 @@
             <artifactId>spring-boot-starter-webflux</artifactId>
             <version>${spring-boot-version}</version>
         </dependency>
-
-
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>

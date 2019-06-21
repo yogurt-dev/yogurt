@@ -1,8 +1,10 @@
 package com.github.yogurt.core.po;
 
 import lombok.EqualsAndHashCode;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
-import javax.persistence.Column;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
@@ -11,6 +13,10 @@ import java.time.LocalDateTime;
  * @author jtwu
  * @date 2015/4/21
  */
+@DynamicInsert
+@DynamicUpdate
+
+@MappedSuperclass
 @EqualsAndHashCode(of = {"id"})
 public class BasePO<T extends BasePO<T>> implements Serializable {
 
@@ -18,6 +24,8 @@ public class BasePO<T extends BasePO<T>> implements Serializable {
 	/**
 	 * 主键
 	 */
+	@Id
+	@GeneratedValue(strategy= GenerationType.IDENTITY)
 	@Column(name = "id")
 	private Long id;
 	/**

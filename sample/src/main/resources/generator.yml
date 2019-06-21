@@ -1,0 +1,7 @@
+jdbcUrl: jdbc:mysql://192.168.3.56:3306/test?useUnicode=true&amp;characterEncoding=utf8&amp;autoReconnect=true&amp;rewriteBatchedStatements=TRUE&amp;useSSL=false&amp;serverTimezone=UTC
+jdbcUser: dev
+jdbcPassword: 123456
+tableName: config_project
+tableSchema: test
+packageName: com.hopestarting.middle.config.project
+directory: src/main/java

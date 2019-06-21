@@ -5,7 +5,7 @@
     <parent>
         <artifactId>root</artifactId>
         <groupId>com.github.yogurt-dev</groupId>
-        <version>2.0.1-SNAPSHOT</version>
+        <version>3.0.1-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -35,7 +35,7 @@
                 <artifactId>codegen</artifactId>
                 <version>${yogurt.version}</version>
                 <configuration>
-                    <configurationFile>src/main/resources/jooqConfig.xml</configurationFile>
+                    <configurationFile>src/main/resources/generator.yml</configurationFile>
                 </configuration>
             </plugin>
         </plugins>

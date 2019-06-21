@@ -4,7 +4,7 @@
     <parent>
         <groupId>com.github.yogurt-dev</groupId>
         <artifactId>root</artifactId>
-        <version>2.0.1-SNAPSHOT</version>
+        <version>3.0.1-SNAPSHOT</version>
     </parent>
     <artifactId>codegen</artifactId>
     <packaging>maven-plugin</packaging>
@@ -49,10 +49,11 @@
         </dependency>
 
         <dependency>
-            <groupId>org.jooq</groupId>
-            <artifactId>jooq-codegen</artifactId>
-            <version>${jooq.version}</version>
+            <groupId>com.github.sanjusoftware</groupId>
+            <artifactId>yamlbeans</artifactId>
+            <version>1.11</version>
         </dependency>
+
     </dependencies>
     <build>
         <plugins>
@@ -71,9 +72,9 @@
             <plugin>
                 <groupId>com.github.yogurt-dev</groupId>
                 <artifactId>codegen</artifactId>
-                <version>2.0.1-SNAPSHOT</version>
+                <version>3.0.1-SNAPSHOT</version>
                 <configuration>
-                   <configurationFile>src/main/resources/jooqConfig.xml</configurationFile>
+                   <configurationFile>src/main/resources/generator.yml</configurationFile>
                 </configuration>
             </plugin>
         </plugins>

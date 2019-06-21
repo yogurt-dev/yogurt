@@ -10,11 +10,11 @@ public enum ${fieldDefinition.enumClassName} {
      <#--*/-->
     <#--</#if>-->
      ${enumValue.name}("${enumValue.annotation}")<#if enumValue_has_next>,</#if>
-    </#list>
+    </#list>;
 
 	private String content;
 
-	GenderEnum(String content) {
+${fieldDefinition.enumClassName}(String content) {
 		this.content = content;
 	}
 

@@ -1,6 +1,6 @@
 package com.github.yogurt.cg;
 
-import freemarker.template.TemplateException;
+import com.esotericsoftware.yamlbeans.YamlReader;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -12,19 +12,13 @@ import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
-import org.jooq.codegen.GenerationTool;
-import org.jooq.meta.jaxb.Configuration;
-import org.jooq.meta.jaxb.Generator;
-import org.jooq.meta.jaxb.Jdbc;
-import org.springframework.util.FileSystemUtils;
 
-import java.io.*;
-import java.nio.charset.StandardCharsets;
+import java.io.File;
+import java.io.FileReader;
 import java.sql.*;
 import java.util.*;
 import java.util.regex.Matcher;
 
-import static org.twdata.maven.mojoexecutor.MojoExecutor.*;
 
 /**
  * @author jtwu
@@ -75,67 +69,28 @@ public class CodeGenerator extends AbstractMojo {
 	public void execute() throws MojoExecutionException {
 		try {
 			Configuration configuration = loadConfig();
-			//调用jooq生成所需文件
-			executeJooqCodegen();
 			//初始化类描述信息
 			createClassDefinition(configuration);
 			//创建文件
 			generateFile(configuration);
-			//删除jooq生成的多余daos
-			postHandle(configuration);
+
 		} catch (Exception e) {
+			log.error("生成失败",e);
 			throw new MojoExecutionException(e.getMessage(), e);
 		}
 	}
 
 
-	/**
-	 * 调用jooq代码生成器
-	 */
-	private void executeJooqCodegen() throws MojoExecutionException {
-		executeMojo(
-				plugin(
-						groupId("org.jooq"),
-						artifactId("jooq-codegen-maven"),
-						version("3.11.9"),
-						dependencies(
-								dependency(
-										groupId("mysql"),
-										artifactId("mysql-connector-java"),
-										version("5.1.47")),
-//                              因为需要用到JooqGeneratorStrategy，所以将codegen引入
-								dependency(
-										groupId("com.github.yogurt-dev"),
-										artifactId("codegen"),
-										version("2.0.1-SNAPSHOT")),
-								dependency(
-										groupId("org.apache.commons"),
-										artifactId("commons-lang3"),
-										version("3.7"))
-						)
-				),
-				goal("generate"),
-				configuration(
-						element(name("configurationFile"), "src/main/resources/jooqConfig.xml")
-				),
-				executionEnvironment(
-						project,
-						session,
-						pluginManager
-				)
-		);
-	}
 
 	/**
 	 * 创建类描述信息
 	 *
-	 * @param configuration jooq配置信息
+	 * @param conf jooq配置信息
 	 */
-	private void createClassDefinition(Configuration configuration) throws ClassNotFoundException, MojoExecutionException {
-		Generator generator = configuration.getGenerator();
-		classDefinition = new ClassDefinition().setPackageName(generator.getTarget().getPackageName())
-				.setClassName(getClassName(generator.getDatabase().getIncludes()));
-		createTableDesc(configuration);
+	private void createClassDefinition(Configuration conf) throws ClassNotFoundException, MojoExecutionException {
+		classDefinition = new ClassDefinition().setPackageName(conf.getPackageName())
+				.setClassName(getClassName(conf.getTableName()));
+		createTableDesc(conf);
 
 	}
 
@@ -144,34 +99,35 @@ public class CodeGenerator extends AbstractMojo {
 	 * 读取jooq的配置文件
 	 */
 	private Configuration loadConfig() throws MojoExecutionException {
-		File file = new File(configurationFile);
-
-		if (!file.isAbsolute()) {
-			file = new File(project.getBasedir(), configurationFile);
-		}
-		try (FileInputStream in = new FileInputStream(file)) {
-			return GenerationTool.load(in);
+//		File file = new File(configurationFile);
+//
+//		if (!file.isAbsolute()) {
+//			file = new File(project.getBasedir(), configurationFile);
+//		}
+//		ClassLoader classLoader = getClass().getClassLoader();
+//		String path = classLoader.getResource("generator.yml").getPath();
+		try  {
+			YamlReader reader = new YamlReader(new FileReader(project.getBasedir()+File.separator+configurationFile));
+			return reader.read(Configuration.class);
 		} catch (Exception e) {
-			throw new MojoExecutionException("配置文件",e);
+			throw new MojoExecutionException("配置文件", e);
 		}
 	}
 
 	/**
 	 * 创建表描述信息
 	 *
-	 * @param configuration 配置信息
+	 * @param conf 配置信息
 	 */
-	private void createTableDesc(Configuration configuration) throws ClassNotFoundException, MojoExecutionException {
+	private void createTableDesc(Configuration conf) throws ClassNotFoundException, MojoExecutionException {
 		Class.forName("com.mysql.jdbc.Driver");
-		Jdbc jdbc = configuration.getJdbc();
-		Generator generator = configuration.getGenerator();
-		String sqLColumns = "select TABLE_SCHEMA,TABLE_NAME,TABLE_COMMENT from information_schema.`TABLES` where table_name = '" + generator.getDatabase().getIncludes() + "' "
-				+ "and table_schema='" + generator.getDatabase().getInputSchema() + "' ";
+		String sqLColumns = "select TABLE_SCHEMA,TABLE_NAME,TABLE_COMMENT from information_schema.`TABLES` where table_name = '"
+				+ conf.getTableName() + "' and table_schema='" + conf.getTableSchema() + "' ";
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		try {
-			con = DriverManager.getConnection(jdbc.getUrl(), jdbc.getUser(), jdbc.getPassword());
+			con = DriverManager.getConnection(conf.getJdbcUrl(), conf.getJdbcUser(), conf.getJdbcPassword());
 
 			ps = con.prepareStatement(sqLColumns);
 			rs = ps.executeQuery();
@@ -191,29 +147,28 @@ public class CodeGenerator extends AbstractMojo {
 			}
 		}
 		if (StringUtils.isEmpty(classDefinition.getComment())) {
-			throw new MojoExecutionException("表" + generator.getDatabase().getInputSchema() + "." + generator.getDatabase().getIncludes() + "不存在或没有表描述信息");
+			throw new MojoExecutionException("表" +conf.getTableSchema() + "." + conf.getTableName() + "不存在或没有表描述信息");
 		}
-		createFieldDefinition(configuration);
+		createFieldDefinition(conf);
 	}
 
 	/**
 	 * 创建属性描述信息
 	 *
-	 * @param configuration 配置信息
+	 * @param conf 配置信息
 	 */
-	private void createFieldDefinition(Configuration configuration) throws ClassNotFoundException, MojoExecutionException {
+	private void createFieldDefinition(Configuration conf) throws ClassNotFoundException, MojoExecutionException {
 		Class.forName("com.mysql.jdbc.Driver");
-		Jdbc jdbc = configuration.getJdbc();
-		Generator generator = configuration.getGenerator();
+
 		List<FieldDefinition> fieldDefinitions = new ArrayList<>();
 		String sqLColumns = "SELECT distinct COLUMN_NAME, DATA_TYPE, COLUMN_COMMENT,COLUMN_KEY,CHARACTER_MAXIMUM_LENGTH" +
-				",IS_NULLABLE,COLUMN_DEFAULT,COLUMN_TYPE,ORDINAL_POSITION  FROM information_schema.columns WHERE table_name = '" + generator.getDatabase().getIncludes() + "' "
-				+ "and table_schema='" + generator.getDatabase().getInputSchema() + "' order by ORDINAL_POSITION";
+				",IS_NULLABLE,COLUMN_DEFAULT,COLUMN_TYPE,ORDINAL_POSITION  FROM information_schema.columns WHERE table_name = '"
+				+ conf.getTableName() + "' and table_schema='" + conf.getTableSchema() + "' order by ORDINAL_POSITION";
 		Connection con = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		try {
-			con = DriverManager.getConnection(jdbc.getUrl(), jdbc.getUser(), jdbc.getPassword());
+			con = DriverManager.getConnection(conf.getJdbcUrl(), conf.getJdbcUser(), conf.getJdbcPassword());
 			ps = con.prepareStatement(sqLColumns);
 			rs = ps.executeQuery();
 //		支持联合主键
@@ -232,7 +187,7 @@ public class CodeGenerator extends AbstractMojo {
 						.setComment(rs.getString("COLUMN_COMMENT"))
 						.setIsPriKey("PRI".equals(rs.getString("COLUMN_KEY")))
 						.setColumnLength(rs.getInt("CHARACTER_MAXIMUM_LENGTH"))
-						.setNullable("NO".equals(rs.getString("IS_NULLABLE")));
+						.setNullable("YES".equals(rs.getString("IS_NULLABLE")));
 //          enum类型的字段需要动态创建
 				if ("enum".equalsIgnoreCase(fieldDefinition.getColumnType())) {
 					fieldDefinition.setEnumClassName(getClassName(fieldDefinition.getCodeName()) + "Enum")
@@ -384,21 +339,21 @@ public class CodeGenerator extends AbstractMojo {
 		}
 	}
 
-	private void generateFile(Configuration configuration) throws MojoExecutionException {
+	private void generateFile(Configuration conf) throws MojoExecutionException {
 //        此处使用jooq的配置文件及加载
-		Generator generator = configuration.getGenerator();
-		String table = generator.getDatabase().getIncludes();
+		String table = conf.getTableName();
 		String className = classDefinition.getClassName();
 
 		String lowerName = className.substring(0, 1).toLowerCase() + className.substring(1);
 
 		// java路径
-		String javaPath = File.separator + configuration.getGenerator().getTarget().getDirectory() + File.separator;
+		String javaPath = File.separator + conf.getDirectory() + File.separator;
 
 		String poPath = File.separator + "po" + File.separator + className + "PO.java";
 
 		String voPath = File.separator + "vo" + File.separator + className + "VO.java";
 
+		String aoPath = File.separator + "ao" + File.separator + className + "AO.java";
 
 		String daoPath = File.separator + "dao" + File.separator + className + "DAO.java";
 
@@ -440,66 +395,26 @@ public class CodeGenerator extends AbstractMojo {
 		try {
 			CommonPageParser.writerPage(context, "PO.ftl", fileDirPath, poPath);
 
-		CommonPageParser.writerPage(context, "VO.ftl", fileDirPath, voPath);
-		CommonPageParser.writerPage(context, "DAO.ftl", fileDirPath, daoPath);
-		CommonPageParser.writerPage(context, "DAOImpl.ftl", fileDirPath, daoImplPath);
-		CommonPageParser.writerPage(context, "Service.ftl", fileDirPath, servicePath);
-		CommonPageParser.writerPage(context, "ServiceImpl.ftl", fileDirPath, serviceImplPath);
-		CommonPageParser.writerPage(context, "Controller.ftl", fileDirPath, controllerPath);
+			CommonPageParser.writerPage(context, "VO.ftl", fileDirPath, voPath);
+			CommonPageParser.writerPage(context, "AO.ftl", fileDirPath, aoPath);
+			CommonPageParser.writerPage(context, "DAO.ftl", fileDirPath, daoPath);
+//			CommonPageParser.writerPage(context, "DAOImpl.ftl", fileDirPath, daoImplPath);
+			CommonPageParser.writerPage(context, "Service.ftl", fileDirPath, servicePath);
+			CommonPageParser.writerPage(context, "ServiceImpl.ftl", fileDirPath, serviceImplPath);
+			CommonPageParser.writerPage(context, "Controller.ftl", fileDirPath, controllerPath);
 //      生成枚举类型
-		for (FieldDefinition fieldDefinition : classDefinition.getFieldDefinitions()) {
-			if (!"enum".equals(fieldDefinition.getColumnType())) {
-				continue;
+			for (FieldDefinition fieldDefinition : classDefinition.getFieldDefinitions()) {
+				if (!"enum".equals(fieldDefinition.getColumnType())) {
+					continue;
+				}
+				context.put("fieldDefinition", fieldDefinition);
+				String enumPath = File.separator + "enums" + File.separator + getClassName(fieldDefinition.getColumnName()) + "Enum.java";
+				CommonPageParser.writerPage(context, "Enum.ftl", fileDirPath, enumPath);
 			}
-			context.put("fieldDefinition", fieldDefinition);
-			String enumPath = File.separator + "enums" + File.separator + getClassName(fieldDefinition.getColumnName()) + "Enum.java";
-			CommonPageParser.writerPage(context, "Enum.ftl", fileDirPath, enumPath);
-		}
 		} catch (Exception e) {
-			throw new MojoExecutionException("文件生成失败",e);
+			throw new MojoExecutionException("文件生成失败", e);
 		}
-
 	}
-
-	/**
-	 * 后处理
-	 * 1.删除jooq多余文件，jooq目前无法通过配置方式解决
-	 * 2.DefaultSchema的引用改为yogurt的
-	 */
-
-	private void postHandle(Configuration configuration) throws Exception {
-		String path = StringUtils.join(basedir, File.separator, configuration.getGenerator().getTarget().getDirectory()
-				, File.separator, replaceSeparator(classDefinition.getPackageName()));
-		FileSystemUtils.deleteRecursively(new File(StringUtils.join(path, File.separator, "tables")));
-		String jooqPath = replaceSeparator(StringUtils.join(path, ".dao.jooq."));
-		//删除并替换为yogurt的DefaultSchema
-		FileSystemUtils.deleteRecursively(new File(StringUtils.join(jooqPath, "DefaultCatalog.java")));
-		FileSystemUtils.deleteRecursively(new File(StringUtils.join(jooqPath, "DefaultSchema.java")));
-
-		File file = new File(StringUtils.join(jooqPath, File.separator, classDefinition.getClassName(), ".java"));
-		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
-		CharArrayWriter caw = new CharArrayWriter();
-		String line;
-		//以行为单位进行遍历
-		while ((line = br.readLine()) != null) {
-			//替换每一行中符合被替换字符条件的字符串
-			line = line.replaceAll("DefaultSchema", "com.github.yogurt.core.dao.jooq.DefaultSchema");
-			//将该行写入内存
-			caw.write(line);
-			//添加换行符，并进入下次循环
-			caw.append(System.getProperty("line.separator"));
-		}
-		//关闭输入流
-		br.close();
-
-		//将内存中的流写入源文件
-		FileWriter fw = new FileWriter(file);
-		caw.writeTo(fw);
-		fw.close();
-
-
-	}
-
 	private String replaceSeparator(String s) {
 		return s.replaceAll("\\.", Matcher.quoteReplacement(File.separator));
 	}
