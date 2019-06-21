@@ -32,6 +32,7 @@ public class ${className}PO extends BasePO<${className}PO>{
     /**
      *  ${field.comment}
      */
+    <#if field.className ?index_of("Enum")!=-1>@Enumerated(EnumType.STRING)</#if>
     @Column(name = "${field.columnName}" <#if !field.nullable>,nullable = false </#if>  )
 	private ${field.className} ${field.codeName};
     </#if>
