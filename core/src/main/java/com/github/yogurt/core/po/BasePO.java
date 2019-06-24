@@ -1,5 +1,7 @@
 package com.github.yogurt.core.po;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -13,6 +15,7 @@ import java.time.LocalDateTime;
  * @author jtwu
  * @date 2015/4/21
  */
+@ApiModel(value = "项目")
 @DynamicInsert
 @DynamicUpdate
 
@@ -21,36 +24,30 @@ import java.time.LocalDateTime;
 public class BasePO<T extends BasePO<T>> implements Serializable {
 
 	private static final long serialVersionUID = 6468926052770326495L;
-	/**
-	 * 主键
-	 */
+
+	@ApiModelProperty("主键")
 	@Id
 	@GeneratedValue(strategy= GenerationType.IDENTITY)
 	@Column(name = "id")
 	private Long id;
-	/**
-	 * 创建人ID
-	 */
+
+	@ApiModelProperty("创建人id")
 	@Column(name = "creator_id")
 	private Long creatorId;
-	/**
-	 * 创建时间
-	 */
+
+	@ApiModelProperty("创建时间")
 	@Column(name = "gmt_create")
 	private LocalDateTime gmtCreate;
-	/**
-	 * 修改人ID
-	 */
+
+	@ApiModelProperty("修改人ID")
 	@Column(name = "modifier_id")
 	private Long modifierId;
-	/**
-	 * 修改时间
-	 */
+
+	@ApiModelProperty("修改时间")
 	@Column(name = "gmt_modified")
 	private LocalDateTime gmtModified;
-	/**
-	 * 逻辑删除标识
-	 */
+
+	@ApiModelProperty("逻辑删除标识")
 	@Column(name = "is_deleted")
 	private Boolean deleted;
 

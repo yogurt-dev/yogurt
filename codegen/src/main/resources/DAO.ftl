@@ -12,5 +12,5 @@ import org.springframework.data.domain.Pageable;
 public interface ${className}DAO extends BaseDAO<${className}PO> {
 
   @Query("select t from ${className}PO t")
-  Page<ConfigProjectPO> findAll(${className}AO ${lowerName}AO, Pageable pageable);
+  Page<${className}PO> findAll(${className}AO ${lowerName}AO, Pageable pageable);
 }
