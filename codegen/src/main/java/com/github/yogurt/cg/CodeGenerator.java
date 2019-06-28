@@ -12,12 +12,17 @@ import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
+import org.apache.tomcat.util.http.fileupload.FileUtils;
+import org.springframework.util.FileSystemUtils;
 
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.sql.*;
 import java.util.*;
 import java.util.regex.Matcher;
+
+import static org.twdata.maven.mojoexecutor.MojoExecutor.*;
 
 
 /**
@@ -63,6 +68,8 @@ public class CodeGenerator extends AbstractMojo {
 
 	private ClassDefinition classDefinition;
 
+	private FileTmplContext fileTmplContext;
+
 	private static final List<String> IGNORE_COLUMNS = Arrays.asList("creator_id", "modifier_id", "is_deleted", "gmt_create", "gmt_modified");
 
 	@Override
@@ -71,15 +78,94 @@ public class CodeGenerator extends AbstractMojo {
 			Configuration configuration = loadConfig();
 			//初始化类描述信息
 			createClassDefinition(configuration);
+			//先生成po，给QueryDSL提供生成素材
+			generatePOFile();
+			//生成QueryDSL代码
+			executeQueryDSLCodegen();
 			//创建文件
-			generateFile(configuration);
+			generateFile();
 
 		} catch (Exception e) {
-			log.error("生成失败",e);
+			log.error("生成失败", e);
 			throw new MojoExecutionException(e.getMessage(), e);
 		}
 	}
 
+	private void generatePOFile() throws MojoExecutionException {
+		log.info("\n                                      " +
+				"\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" +
+				"\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" +
+				"\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@  @@@@@@@@" +
+				"\n@@@@  @@@@@  @@@@    @@@@@@@   @@@@@@  @@@  @@@@@  @  @@@@      @@@@@@" +
+				"\n@@@@@  @@@  @@@  @@@  @@@@  @@@  @@@@  @@@  @@@@@   @@@@@@@@  @@@@@@@@" +
+				"\n@@@@@@  @  @@@@  @@@  @@@@  @@@  @@@@  @@@  @@@@@  @@@@@@@@@  @  @@@@@" +
+				"\n@@@@@@@@  @@@@@@@   @@@@@@@@     @@@@@    @  @@@@  @@@@@@@@@@   @@@@@@" +
+				"\n@@@@@@@  @@@@@@@@@@@@@@@@@@@@@@  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" +
+				"\n@@@@@@  @@@@@@@@@@@@@@@@@@@  @@  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" +
+				"\n@@@@@  @@@@@@@@@@@@@@@@@@@@@    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" +
+				"\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" +
+				"\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" +
+				"\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" +
+				"\n");
+
+		Map<String, Object> context = fileTmplContext.getContext();
+		String fileDirPath = fileTmplContext.getFileDirPath();
+		try {
+			CommonPageParser.writerPage(context, "PO.ftl", fileDirPath, fileTmplContext.getPoPath());
+		} catch (Exception e) {
+			throw new MojoExecutionException("文件生成失败", e);
+		}
+
+	}
+
+	/**
+	 * 调用jooq代码生成器
+	 */
+	private void executeQueryDSLCodegen() throws MojoExecutionException {
+		File qPoPath = new File(fileTmplContext.getFileDirPath() + fileTmplContext.getQPoPath());
+		if (!qPoPath.exists()) {
+			new File(qPoPath.getParent()).mkdirs();
+		} else {
+			log.info(qPoPath + "文件已存在!");
+			return;
+		}
+		executeMojo(
+				plugin(
+						groupId("com.mysema.maven"),
+						artifactId("apt-maven-plugin"),
+						version("1.1.3"),
+						dependencies(
+								dependency(
+										groupId("com.github.yogurt-dev"),
+										artifactId("codegen"),
+										version("3.0.1-SNAPSHOT")),
+								dependency(
+										groupId("com.querydsl"),
+										artifactId("querydsl-apt"),
+										version("4.2.1"))
+						)
+				),
+				goal("process"),
+				configuration(
+						element(name("outputDirectory"), "target/generated-sources/java"),
+						element(name("processor"), "com.querydsl.apt.jpa.JPAAnnotationProcessor")
+				),
+				executionEnvironment(
+						project,
+						session,
+						pluginManager
+				)
+		);
+
+		File queryDSLDir = new File(fileTmplContext.getFileDirPath().replace("src/main", "target/generated-sources") + fileTmplContext.getQPoPath());
+		try {
+
+			FileSystemUtils.copyRecursively(queryDSLDir, qPoPath);
+			FileUtils.deleteDirectory(new File(basedir + File.separator + "target/generated-sources"));
+		} catch (IOException e) {
+			throw new MojoExecutionException("复制QueryDSL文件失败", e);
+		}
+	}
 
 
 	/**
@@ -91,9 +177,53 @@ public class CodeGenerator extends AbstractMojo {
 		classDefinition = new ClassDefinition().setPackageName(conf.getPackageName())
 				.setClassName(getClassName(conf.getTableName()));
 		createTableDesc(conf);
-
+		createFileTmplContext(conf);
 	}
 
+	private void createFileTmplContext(Configuration conf) {
+//		此处使用jooq的配置文件及加载
+		String table = conf.getTableName();
+		String className = classDefinition.getClassName();
+
+		String lowerName = className.substring(0, 1).toLowerCase() + className.substring(1);
+
+		// java路径
+		String javaPath = File.separator + conf.getDirectory() + File.separator;
+		fileTmplContext = new FileTmplContext();
+		fileTmplContext.setPoPath(File.separator + "po" + File.separator + className + "PO.java");
+		fileTmplContext.setQPoPath(File.separator + "po" + File.separator + "Q" + className + "PO.java");
+
+		fileTmplContext.setVoPath(File.separator + "vo" + File.separator + className + "VO.java");
+
+		fileTmplContext.setAoPath(File.separator + "ao" + File.separator + className + "AO.java");
+
+		fileTmplContext.setDaoPath(File.separator + "dao" + File.separator + className + "DAO.java");
+
+		fileTmplContext.setDaoImplPath(File.separator + "dao" + File.separator + "impl" + File.separator + className + "DAOImpl.java");
+
+		fileTmplContext.setServicePath(File.separator + "service" + File.separator + className + "Service.java");
+
+		fileTmplContext.setServiceImplPath(File.separator + "service" + File.separator + "impl" + File.separator + className + "ServiceImpl.java");
+
+		fileTmplContext.setControllerPath(File.separator + "controller" + File.separator + className + "Controller.java");
+		Map<String, Object> context = new HashMap<>(7);
+		context.put("className", className);
+		context.put("lowerName", lowerName);
+		context.put("table", table);
+		context.put("modulePackage", classDefinition.getPackageName());
+		context.put("fields", classDefinition.getFieldDefinitions());
+		context.put("priKeys", classDefinition.getPriKeys());
+		context.put("userName", userName);
+		context.put("tableComment", StringUtils.endsWith(classDefinition.getComment(), "表")
+				? StringUtils.substringBeforeLast(classDefinition.getComment(), "表")
+				: classDefinition.getComment());
+		fileTmplContext.setContext(context);
+		fileTmplContext.setFileDirPath(basedir + javaPath + replaceSeparator(classDefinition.getPackageName()));
+	}
+
+	private String replaceSeparator(String s) {
+		return s.replaceAll("\\.", Matcher.quoteReplacement(File.separator));
+	}
 
 	/**
 	 * 读取jooq的配置文件
@@ -106,8 +236,8 @@ public class CodeGenerator extends AbstractMojo {
 //		}
 //		ClassLoader classLoader = getClass().getClassLoader();
 //		String path = classLoader.getResource("generator.yml").getPath();
-		try  {
-			YamlReader reader = new YamlReader(new FileReader(project.getBasedir()+File.separator+configurationFile));
+		try {
+			YamlReader reader = new YamlReader(new FileReader(project.getBasedir() + File.separator + configurationFile));
 			return reader.read(Configuration.class);
 		} catch (Exception e) {
 			throw new MojoExecutionException("配置文件", e);
@@ -147,7 +277,7 @@ public class CodeGenerator extends AbstractMojo {
 			}
 		}
 		if (StringUtils.isEmpty(classDefinition.getComment())) {
-			throw new MojoExecutionException("表" +conf.getTableSchema() + "." + conf.getTableName() + "不存在或没有表描述信息");
+			throw new MojoExecutionException("表" + conf.getTableSchema() + "." + conf.getTableName() + "不存在或没有表描述信息");
 		}
 		createFieldDefinition(conf);
 	}
@@ -339,69 +469,18 @@ public class CodeGenerator extends AbstractMojo {
 		}
 	}
 
-	private void generateFile(Configuration conf) throws MojoExecutionException {
-//        此处使用jooq的配置文件及加载
-		String table = conf.getTableName();
-		String className = classDefinition.getClassName();
-
-		String lowerName = className.substring(0, 1).toLowerCase() + className.substring(1);
-
-		// java路径
-		String javaPath = File.separator + conf.getDirectory() + File.separator;
-
-		String poPath = File.separator + "po" + File.separator + className + "PO.java";
-
-		String voPath = File.separator + "vo" + File.separator + className + "VO.java";
-
-		String aoPath = File.separator + "ao" + File.separator + className + "AO.java";
-
-		String daoPath = File.separator + "dao" + File.separator + className + "DAO.java";
-
-		String daoImplPath = File.separator + "dao" + File.separator + "impl" + File.separator + className + "DAOImpl.java";
-
-		String servicePath = File.separator + "service" + File.separator + className + "Service.java";
-
-		String serviceImplPath = File.separator + "service" + File.separator + "impl" + File.separator + className + "ServiceImpl.java";
-
-		String controllerPath = File.separator + "controller" + File.separator + className + "Controller.java";
-		Map<String, Object> context = new HashMap<>(7);
-		context.put("className", className);
-		context.put("lowerName", lowerName);
-		context.put("table", table);
-		context.put("modulePackage", classDefinition.getPackageName());
-		context.put("fields", classDefinition.getFieldDefinitions());
-		context.put("priKeys", classDefinition.getPriKeys());
-		context.put("userName", userName);
-		context.put("tableComment", StringUtils.endsWith(classDefinition.getComment(), "表")
-				? StringUtils.substringBeforeLast(classDefinition.getComment(), "表")
-				: classDefinition.getComment());
-
-		String fileDirPath = basedir + javaPath + replaceSeparator(classDefinition.getPackageName());
-		log.info("\n                                      " +
-				"\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" +
-				"\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" +
-				"\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@  @@@@@@@@" +
-				"\n@@@@  @@@@@  @@@@    @@@@@@@   @@@@@@  @@@  @@@@@  @  @@@@      @@@@@@" +
-				"\n@@@@@  @@@  @@@  @@@  @@@@  @@@  @@@@  @@@  @@@@@   @@@@@@@@  @@@@@@@@" +
-				"\n@@@@@@  @  @@@@  @@@  @@@@  @@@  @@@@  @@@  @@@@@  @@@@@@@@@  @  @@@@@" +
-				"\n@@@@@@@@  @@@@@@@   @@@@@@@@     @@@@@    @  @@@@  @@@@@@@@@@   @@@@@@" +
-				"\n@@@@@@@  @@@@@@@@@@@@@@@@@@@@@@  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" +
-				"\n@@@@@@  @@@@@@@@@@@@@@@@@@@  @@  @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" +
-				"\n@@@@@  @@@@@@@@@@@@@@@@@@@@@    @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" +
-				"\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" +
-				"\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" +
-				"\n@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@" +
-				"\n");
+	private void generateFile() throws MojoExecutionException {
+		Map<String, Object> context = fileTmplContext.getContext();
+		String fileDirPath = fileTmplContext.getFileDirPath();
 		try {
-			CommonPageParser.writerPage(context, "PO.ftl", fileDirPath, poPath);
 
-			CommonPageParser.writerPage(context, "VO.ftl", fileDirPath, voPath);
-			CommonPageParser.writerPage(context, "AO.ftl", fileDirPath, aoPath);
-			CommonPageParser.writerPage(context, "DAO.ftl", fileDirPath, daoPath);
-//			CommonPageParser.writerPage(context, "DAOImpl.ftl", fileDirPath, daoImplPath);
-			CommonPageParser.writerPage(context, "Service.ftl", fileDirPath, servicePath);
-			CommonPageParser.writerPage(context, "ServiceImpl.ftl", fileDirPath, serviceImplPath);
-			CommonPageParser.writerPage(context, "Controller.ftl", fileDirPath, controllerPath);
+			CommonPageParser.writerPage(context, "VO.ftl", fileDirPath, fileTmplContext.getVoPath());
+//			CommonPageParser.writerPage(context, "AO.ftl", fileDirPath, fileTmplContext.getAoPath());
+			CommonPageParser.writerPage(context, "DAO.ftl", fileDirPath, fileTmplContext.getDaoPath());
+//			CommonPageParser.writerPage(context, "DAOImpl.ftl", fileDirPath, fileTmplContext.getDaoImplPath());
+			CommonPageParser.writerPage(context, "Service.ftl", fileDirPath, fileTmplContext.getServicePath());
+			CommonPageParser.writerPage(context, "ServiceImpl.ftl", fileDirPath, fileTmplContext.getServiceImplPath());
+			CommonPageParser.writerPage(context, "Controller.ftl", fileDirPath, fileTmplContext.getControllerPath());
 //      生成枚举类型
 			for (FieldDefinition fieldDefinition : classDefinition.getFieldDefinitions()) {
 				if (!"enum".equals(fieldDefinition.getColumnType())) {
@@ -415,8 +494,4 @@ public class CodeGenerator extends AbstractMojo {
 			throw new MojoExecutionException("文件生成失败", e);
 		}
 	}
-	private String replaceSeparator(String s) {
-		return s.replaceAll("\\.", Matcher.quoteReplacement(File.separator));
-	}
-
 }

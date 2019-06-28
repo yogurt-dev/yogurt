@@ -6,12 +6,12 @@ import com.github.yogurt.core.exception.ServiceException;
 import com.github.yogurt.core.po.BasePO;
 import com.github.yogurt.core.service.BaseService;
 import com.github.yogurt.core.utils.JpaUtils;
+import com.querydsl.core.types.dsl.EntityPathBase;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -27,7 +27,7 @@ import java.util.Optional;
  * @author jtwu
  */
 @Slf4j
-public class BaseServiceImpl<T extends BasePO> implements BaseService<T> {
+public abstract class BaseServiceImpl<T extends BasePO> implements BaseService<T> {
 
 	@Autowired
 	private Configuration configuration;
@@ -36,23 +36,22 @@ public class BaseServiceImpl<T extends BasePO> implements BaseService<T> {
 	protected BaseDAO<T> baseDAO;
 
 	@Override
-	public <S extends T> S save(S po) {
-
-		if(null==po.getId()){
-			setCreator(po);
-		}else{
-			setModifier(po);
-		}
-
+	public void save(T po) {
+		setCreator(po);
 		baseDAO.save(po);
-		return po;
 	}
 
 	@Override
-	public <S extends T> Iterable<S> saveAll(Iterable<S> pos) {
+	public void update(T po) {
+		setModifier(po);
+		//todo baseDAO提供update方法
+		baseDAO.save(po);
+	}
+
+	@Override
+	public void saveAll(Iterable<T> pos) {
 		pos.forEach(this::setCreator);
 		baseDAO.saveAll(pos);
-		return pos;
 	}
 
 	@Override
@@ -61,13 +60,13 @@ public class BaseServiceImpl<T extends BasePO> implements BaseService<T> {
 	}
 
 	@Override
-	public boolean existsById(Long id) {
-		return baseDAO.existsById(id);
+	public List<T> findAll(T po) {
+		return baseDAO.findAll(po, getEntityPathBase());
 	}
 
 	@Override
-	public List<T> findAll() {
-		return baseDAO.findAll();
+	public Page<T> findAll(T po, Pageable pageable) {
+		return baseDAO.findAll(po,pageable,getEntityPathBase());
 	}
 
 	@Override
@@ -81,43 +80,13 @@ public class BaseServiceImpl<T extends BasePO> implements BaseService<T> {
 	}
 
 	@Override
-	public void deleteById(Long id) {
-		baseDAO.deleteById(id);
-	}
-
-	@Override
-	public void delete(T po) {
-		baseDAO.delete(po);
-	}
-
-	@Override
-	public void deleteAll(Iterable<? extends T> pos) {
-		baseDAO.deleteAll(pos);
-	}
-
-	@Override
-	public void deleteAll() {
-		baseDAO.deleteAll();
-	}
-
-	@Override
 	public void updateForSelective(T po) {
 		setModifier(po);
 		Optional<T> optional = findById(po.getId());
 		optional.ifPresent(t -> {
-			BeanUtils.copyProperties(po,t, JpaUtils.getNotNullProperties(po));
+			BeanUtils.copyProperties(po, t, JpaUtils.getNullProperties(po));
 			this.save(t);
 		});
-	}
-
-	@Override
-	public Iterable<T> findAll(Sort sort) {
-		return null;
-	}
-
-	@Override
-	public Page<T> findAll(Pageable pageable) {
-		return null;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -152,7 +121,6 @@ public class BaseServiceImpl<T extends BasePO> implements BaseService<T> {
 			throw new ServiceException(e);
 		}
 	}
-
 
 	/**
 	 * 获取request
@@ -196,4 +164,9 @@ public class BaseServiceImpl<T extends BasePO> implements BaseService<T> {
 			log.debug("update时session获取失败!");
 		}
 	}
+
+	/**
+	 * 获取QueryDSL对应类
+	 */
+	protected abstract EntityPathBase<T> getEntityPathBase();
 }

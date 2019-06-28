@@ -5,7 +5,7 @@ import javax.annotation.Resource;
 import org.springframework.web.bind.annotation.*;
 import com.github.yogurt.core.controller.BaseController;
 import ${modulePackage}.po.${className}PO;
-import ${modulePackage}.ao.${className}AO;
+<#--import ${modulePackage}.ao.${className}AO;-->
 import ${modulePackage}.service.${className}Service;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -29,8 +29,8 @@ public class ${className}Controller extends BaseController {
 
 //	@ApiOperation(value = "${tableComment}")
 //	@GetMapping
-//	public ResponseEntity list(${className}AO ${lowerName}AO , Pageable pageable) {
-//        return new ResponseEntity<>(${lowerName}Service.findAll(${lowerName}AO,pageable),HttpStatus.OK);
+//	public ResponseEntity list(${className}PO ${lowerName}PO , Pageable pageable) {
+//        return new ResponseEntity<>(${lowerName}Service.findAll(${lowerName}PO,pageable),HttpStatus.OK);
 //	}
 //
 //	@ApiImplicitParam("主键")

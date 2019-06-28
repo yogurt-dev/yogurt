@@ -70,13 +70,31 @@ public class JpaUtils {
 		}
 		Set<String> properties = new HashSet<>();
 		for(Field field : getAllFields(obj.getClass())){
-			if(null == getValue(obj,field)){
+			if(null != getValue(obj,field)){
 				properties.add(field.getName());
 			}
 		}
 		return properties.toArray(new String[properties.size()]);
 	}
 
+
+	/**
+	 * 获取空属性列表
+	 *
+	 *
+	 */
+	public static String[] getNullProperties(Object obj){
+		if(null==obj){
+			return new String[]{};
+		}
+		Set<String> properties = new HashSet<>();
+		for(Field field : getAllFields(obj.getClass())){
+			if(null == getValue(obj,field)){
+				properties.add(field.getName());
+			}
+		}
+		return properties.toArray(new String[properties.size()]);
+	}
 
 	/**
 	 * 获取主键属性
