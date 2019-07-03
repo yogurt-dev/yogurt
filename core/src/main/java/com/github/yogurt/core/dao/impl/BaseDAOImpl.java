@@ -13,9 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 
-import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
-import java.lang.reflect.ParameterizedType;
 import java.util.List;
 
 /**
@@ -57,6 +55,5 @@ public  class BaseDAOImpl<T extends BasePO> extends SimpleJpaRepository<T, Long>
 				.where(QueryDSLUtils.getPredicatesByNotNullFileds(po, entityPathBase))
 				.offset(pageable.getOffset())
 				.limit(pageable.getPageSize()),pageable);
-
 	}
 }

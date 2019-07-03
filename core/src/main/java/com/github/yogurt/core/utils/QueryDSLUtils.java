@@ -20,6 +20,6 @@ public class QueryDSLUtils {
 			SimpleExpression expression = (SimpleExpression) JpaUtils.getValue(entityPathBase,fieldName);
 			list.add(expression.eq(JpaUtils.getValue(basePO,fieldName)));
 		});
-		return (Predicate[]) list.toArray(new Predicate[list.size()]);
+		return  list.toArray(new Predicate[list.size()]);
 	}
 }

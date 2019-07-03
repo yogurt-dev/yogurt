@@ -15,4 +15,5 @@ public class Configuration {
 	private String tableSchema;
 	private String packageName;
 	private String directory;
+	private String discriminatorValue;
 }

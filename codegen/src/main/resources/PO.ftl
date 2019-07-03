@@ -26,6 +26,8 @@ import  ${field.classFullName};
 @Table(name = "${table}")
 @DynamicInsert
 @DynamicUpdate
+<#if discriminatorValue?exists>@DiscriminatorValue("${discriminatorValue}")</#if>
+
 
 @Data
 @Accessors(chain = true)

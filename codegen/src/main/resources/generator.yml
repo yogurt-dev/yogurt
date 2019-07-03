@@ -1,7 +1,9 @@
-jdbcUrl: jdbc:mysql://192.168.3.56:3306/middle?useUnicode=true&amp;characterEncoding=utf8&amp;autoReconnect=true&amp;rewriteBatchedStatements=TRUE&amp;useSSL=false&amp;serverTimezone=UTC
+jdbcUrl: jdbc:mysql://127.0.0.1:3306/middle?useUnicode=true&amp;characterEncoding=utf8&amp;autoReconnect=true&amp;rewriteBatchedStatements=TRUE&amp;useSSL=false&amp;serverTimezone=UTC
 jdbcUser: dev
 jdbcPassword: 123456
-tableName: config_project
+tableName: test
 tableSchema: middle
-packageName: com.hopestarting.middle.config.project
+packageName: com.test
 directory: src/main/java
+#如果使用到JPA的继承，建议配置discriminatorValue,具体参见@DiscriminatorValue
+discriminatorValue: M

@@ -111,11 +111,20 @@ public class CodeGenerator extends AbstractMojo {
 		Map<String, Object> context = fileTmplContext.getContext();
 		String fileDirPath = fileTmplContext.getFileDirPath();
 		try {
+			CommonPageParser.init(basedir,fileTmplContext.getContext());
 			CommonPageParser.writerPage(context, "PO.ftl", fileDirPath, fileTmplContext.getPoPath());
+			//      生成枚举类型
+			for (FieldDefinition fieldDefinition : classDefinition.getFieldDefinitions()) {
+				if (!"enum".equals(fieldDefinition.getColumnType())) {
+					continue;
+				}
+				context.put("fieldDefinition", fieldDefinition);
+				String enumPath = File.separator + "enums" + File.separator + getClassName(fieldDefinition.getColumnName()) + "Enum.java";
+				CommonPageParser.writerPage(context, "Enum.ftl", fileDirPath, enumPath);
+			}
 		} catch (Exception e) {
 			throw new MojoExecutionException("文件生成失败", e);
 		}
-
 	}
 
 	/**
@@ -165,6 +174,7 @@ public class CodeGenerator extends AbstractMojo {
 		} catch (IOException e) {
 			throw new MojoExecutionException("复制QueryDSL文件失败", e);
 		}
+		log.info("Generating QPO");
 	}
 
 
@@ -207,6 +217,7 @@ public class CodeGenerator extends AbstractMojo {
 
 		fileTmplContext.setControllerPath(File.separator + "controller" + File.separator + className + "Controller.java");
 		Map<String, Object> context = new HashMap<>(7);
+		context.put("discriminatorValue",conf.getDiscriminatorValue());
 		context.put("className", className);
 		context.put("lowerName", lowerName);
 		context.put("table", table);
@@ -481,15 +492,7 @@ public class CodeGenerator extends AbstractMojo {
 			CommonPageParser.writerPage(context, "Service.ftl", fileDirPath, fileTmplContext.getServicePath());
 			CommonPageParser.writerPage(context, "ServiceImpl.ftl", fileDirPath, fileTmplContext.getServiceImplPath());
 			CommonPageParser.writerPage(context, "Controller.ftl", fileDirPath, fileTmplContext.getControllerPath());
-//      生成枚举类型
-			for (FieldDefinition fieldDefinition : classDefinition.getFieldDefinitions()) {
-				if (!"enum".equals(fieldDefinition.getColumnType())) {
-					continue;
-				}
-				context.put("fieldDefinition", fieldDefinition);
-				String enumPath = File.separator + "enums" + File.separator + getClassName(fieldDefinition.getColumnName()) + "Enum.java";
-				CommonPageParser.writerPage(context, "Enum.ftl", fileDirPath, enumPath);
-			}
+
 		} catch (Exception e) {
 			throw new MojoExecutionException("文件生成失败", e);
 		}

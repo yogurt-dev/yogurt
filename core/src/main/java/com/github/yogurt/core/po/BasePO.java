@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
  * @author jtwu
  * @date 2015/4/21
  */
-@ApiModel(value = "项目")
 @DynamicInsert
 @DynamicUpdate
 
